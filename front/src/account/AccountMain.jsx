@@ -37,6 +37,7 @@ import Myhobby from "../setting/Myhobby";
 import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
 import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
+import RegionTreeSelect from "./RegionTreeSelect";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -66,6 +67,7 @@ const AccountMain = () => {
             )
           }
         />
+
         <Route path="/account01" element={<Account01 />} />
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<AccountLogin />} />
@@ -74,10 +76,12 @@ const AccountMain = () => {
           path="/mypage/myintro"
           element={<PrivateRoute element={<MyIntro />} />}
         />
+
         <Route
           path="/mypage/mymbti"
           element={<PrivateRoute element={<Mymbit />} />}
         />
+
         <Route
           path="/mypage/myintro"
           element={<PrivateRoute element={<Myprofile />} />}
@@ -86,22 +90,29 @@ const AccountMain = () => {
           path="/mypage/myhobby"
           element={<PrivateRoute element={<Myhobby />} />}
         />
+
         <Route
           path="/mypage/wantedinfor"
           element={<PrivateRoute element={<WantedInfor />} />}
         />
+
         {/* 회원가입 */}
+
         <Route path="/info" element={<AccountInfo />} />
+        <Route path="/region" element={<RegionTreeSelect />} />
         <Route path="/intro" element={<AccountIntro />} />
         <Route path="/hobby" element={<AccountHobby />} />
         <Route path="/selmbti" element={<AccountSelMbti />} />
         <Route path="/wantedmbti" element={<AccountMbti />} />
+
         <Route path="/wantedintro" element={<AccountwantedIntro />} />
         <Route path="/wantedhobby" element={<AccountWantedHobby />} />
         <Route path="/introduce" element={<IntroduceMySelf />} />
         <Route path="/summary" element={<Summary />} />
         <Route path="/precard" element={<PreCard />} />
+
         {/* 간단한 MBTI */}
+
         <Route
           path="/easymbti1"
           element={
@@ -206,7 +217,6 @@ const AccountMain = () => {
             </MbtiProvider>
           }
         />
-
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
       </Routes>
