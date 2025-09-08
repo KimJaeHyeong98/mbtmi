@@ -33,6 +33,10 @@ const Summary = () => {
     setReturnToSummary(true);
     navigate("/introduce");
   };
+  const handleEditRegion = () => {
+    setReturnToSummary(true);
+    navigate("/region");
+  };
 
   const handleSubmit = async () => {
     await fetch("http://localhost:8080/api/signup", {

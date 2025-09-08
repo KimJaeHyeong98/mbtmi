@@ -66,4 +66,64 @@ public class MyPageController {
 
 
 
+    //상대방 성격 태그 검색
+    @GetMapping("/wanted/tags")
+    public List<TagModel> getDesiredtags(@RequestParam String type, HttpSession session) {
+        AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+        System.out.println("인텔리제이 서버: /user/tags 호출됨");
+        System.out.println("세션 user: " + sessionUser);
+
+        if (sessionUser == null) {
+            return List.of(); // 세션 없으면 빈 리스트
+        }
+
+        return myPageService.getDesiredtags(sessionUser.getUser_id(), type);
+    }
+
+
+    //상대방  취미 검색
+    @GetMapping("/wanted/hobby")
+    public List<HobbyModel> getDesiredHobbys(@RequestParam String type, HttpSession session) {
+        AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+        System.out.println("인텔리제이 서버: /user/tags 호출됨");
+        System.out.println("세션 user: " + sessionUser);
+
+        if (sessionUser == null) {
+            return List.of(); // 세션 없으면 빈 리스트
+        }
+
+        return myPageService.getDesiredHobbys(sessionUser.getUser_id(), type);
+    }
+
+
+
+    @PutMapping("/update/desired")
+    public ResponseEntity<String> updateDesired(@RequestBody DesiredModel desiredModel,
+                                                HttpSession session) {
+        AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+        if (sessionUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+
+        System.out.println("업데이트 요청 유저ID: " + sessionUser.getUser_id());
+        System.out.println("전달받은 MBTI: " + desiredModel.getWantedMbti());
+        System.out.println("전달받은 Tags: " + desiredModel.getWantedTags());
+        System.out.println("전달받은 Hobbies: " + desiredModel.getWantedHobbies());
+
+        // DB 업데이트
+        myPageService.updateDesiredInfo(
+                sessionUser.getUser_id(),
+                desiredModel.getWantedMbti(),
+                desiredModel.getWantedTags(),
+                desiredModel.getWantedHobbies()
+        );
+
+        // 세션 반영
+        sessionUser.setDesired_mbti(desiredModel.getWantedMbti());
+        session.setAttribute("user", sessionUser);
+
+        return ResponseEntity.ok("업데이트 완료");
+    }
+
+
 }

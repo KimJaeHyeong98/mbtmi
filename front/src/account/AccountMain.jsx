@@ -36,7 +36,7 @@ import MyIntro from "../setting/MyIntro";
 import Myhobby from "../setting/Myhobby";
 import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
-import RegionTreeSelect from "./socialLogin/RegionTreeSelect";
+import RegionTreeSelect from "./RegionTreeSelect";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -70,10 +70,12 @@ const AccountMain = () => {
         <Route path="/account01" element={<Account01 />} />
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<AccountLogin />} />
+
+        {/* My page */}
         <Route path="/mypage" element={<PrivateRoute element={<MyInfo />} />} />
         <Route
-          path="/mypage/myintro"
-          element={<PrivateRoute element={<MyIntro />} />}
+          path="/mypage/profile"
+          element={<PrivateRoute element={<Myprofile />} />}
         />
 
         <Route
@@ -83,7 +85,7 @@ const AccountMain = () => {
 
         <Route
           path="/mypage/myintro"
-          element={<PrivateRoute element={<Myprofile />} />}
+          element={<PrivateRoute element={<MyIntro />} />}
         />
         <Route
           path="/mypage/myhobby"

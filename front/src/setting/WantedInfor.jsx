@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAuth } from "../main/AuthContext";
-import { useSignup } from "../SignupProvider";
+
 import axios from "axios";
 
 /* ======================== 공통 스타일 ======================== */
@@ -262,14 +262,6 @@ const StepMbti = ({ onNext, onPrev, selectedMbti, setSelectedMbti }) => {
         </MbtiIn>
       </Mbti>
 
-      {/* <SelectedText>
-        <Input
-          type="text"
-          value={`${mbti.EI}${mbti.SN}${mbti.TF}${mbti.JP}`} // 순서대로 합치기
-          readOnly // 사용자가 직접 수정하지 못하도록
-        />
-      </SelectedText> */}
-
       <PersonMBTI>
         <Input
           type="text"
@@ -286,6 +278,7 @@ const StepMbti = ({ onNext, onPrev, selectedMbti, setSelectedMbti }) => {
 };
 
 /* ======================== Step 2: 원하는 성격 ======================== */
+
 const tagsPersonality = [
   "#활발한",
   "#차분한",
@@ -321,81 +314,65 @@ const tagsUnique = [
 ];
 
 const StepWantedIntro = ({ onNext, onPrev, selectedTags, setSelectedTags }) => {
-  const { formData, setFormData } = useSignup();
-
-  const toggleTag = (tag) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else if (selectedTags.length < 6) {
-      setSelectedTags([...selectedTags, tag]);
-    } else {
-      alert("최대 6개까지만 선택할 수 있어요!");
-    }
-  };
-
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const res = await axios.get("api/wanted/tags?type=DESIRED", {
+        const res = await axios.get("/api/wanted/tags?type=DESIRED", {
           withCredentials: true,
         });
-        console.log("React -> 서버 응답 확인:", res.data);
-        if (res.data) {
-          // 서버에서 받은 태그 이름만 배열로 저장
-          const tagNames = res.data.map((tag) => tag.tag_name);
-          setFormData((prev) => ({
-            ...prev,
-            introTags: tagNames,
-          }));
+
+        if (Array.isArray(res.data)) {
+          const tagNames = res.data
+            .map((tag) => String(tag.tag_name || "").replace(/^#/, ""))
+            .filter(Boolean);
+
+          setSelectedTags(tagNames); // ✅ 상위 state만 업데이트
         }
       } catch (err) {
         console.error("DESIRED tags 불러오기 실패:", err);
       }
     };
     fetchTags();
-  }, [setFormData]);
+  }, [setSelectedTags]);
+
+  // 버튼 클릭 시 토글
+  const toggleTag = (tagName) => {
+    if (selectedTags.includes(tagName)) {
+      setSelectedTags(selectedTags.filter((t) => t !== tagName));
+    } else {
+      if (selectedTags.length < 6) {
+        setSelectedTags([...selectedTags, tagName]);
+      } else {
+        alert("최대 6개까지만 선택할 수 있어요!");
+      }
+    }
+  };
+
+  const renderTags = (tagArray) =>
+    tagArray.map((tag) => {
+      const tagNameWithoutHash = tag.replace(/^#/, "");
+      return (
+        <TagButton
+          key={tag}
+          onClick={() => toggleTag(tagNameWithoutHash)}
+          selected={selectedTags.includes(tagNameWithoutHash)} // ✅ selectedTags 기준
+        >
+          {tag}
+        </TagButton>
+      );
+    });
 
   return (
     <Container>
       <Title>당신이 원하는 상대는?</Title>
-      <TagTitle>성격 · 태도</TagTitle>
-      <TagsWrapper>
-        {tagsPersonality.map((tag) => (
-          <TagButton
-            key={tag}
-            onClick={() => toggleTag(tag)}
-            selected={selectedTags.includes(tag)}
-          >
-            {tag}
-          </TagButton>
-        ))}
-      </TagsWrapper>
+      <TagTitle>---------- 성격 · 태도 ----------</TagTitle>
+      <TagsWrapper>{renderTags(tagsPersonality)}</TagsWrapper>
 
       <TagTitle>감정 · 표현</TagTitle>
-      <TagsWrapper>
-        {tagsEmotion.map((tag) => (
-          <TagButton
-            key={tag}
-            onClick={() => toggleTag(tag)}
-            selected={selectedTags.includes(tag)}
-          >
-            {tag}
-          </TagButton>
-        ))}
-      </TagsWrapper>
+      <TagsWrapper>{renderTags(tagsEmotion)}</TagsWrapper>
 
       <TagTitle>독특한 매력</TagTitle>
-      <TagsWrapper>
-        {tagsUnique.map((tag) => (
-          <TagButton
-            key={tag}
-            onClick={() => toggleTag(tag)}
-            selected={selectedTags.includes(tag)}
-          >
-            {tag}
-          </TagButton>
-        ))}
-      </TagsWrapper>
+      <TagsWrapper>{renderTags(tagsUnique)}</TagsWrapper>
 
       <SelectedText>선택된 태그: {selectedTags.join(", ")}</SelectedText>
       <NextButton onClick={onNext}>다음</NextButton>
@@ -446,46 +423,74 @@ const StepWantedHobby = ({
   selectedHobbies,
   setSelectedHobbies,
 }) => {
-  const toggleTag = (tag) => {
-    if (selectedHobbies.includes(tag)) {
-      setSelectedHobbies(selectedHobbies.filter((t) => t !== tag));
+  useEffect(() => {
+    const fetchHobbies = async () => {
+      try {
+        const res = await axios.get("/api/wanted/hobby?type=DESIRED", {
+          withCredentials: true, // 세션 쿠키 포함 (로그인 세션 기반)
+        });
+        console.log("React -> 서버 응답 확인:", res.data);
+
+        if (Array.isArray(res.data)) {
+          const normalized = res.data
+            .map((item) => String(item.hobby_name || "").replace(/^#/, ""))
+            .filter(Boolean);
+
+          // ✅ 화면 눌림 상태를 props로 받은 상위 state에 세팅
+          setSelectedHobbies(normalized);
+        }
+      } catch (err) {
+        console.error("DESIRED hobby 불러오기 실패:", err);
+      }
+    };
+
+    fetchHobbies();
+    // ✅ 의존성: setter는 안정적이므로 포함해도 재렌더 루프 안 생김.
+    //   selectedHobbies를 넣으면 '설정 -> 변화 -> 다시 fetch' 루프 위험이 있으니 넣지 않음.
+  }, [setSelectedHobbies]);
+
+  const toggleTag = (tagNameNoHash) => {
+    // 이미 선택되어 있으면 제거, 아니면 추가 (최대 6개 제한)
+    if (selectedHobbies.includes(tagNameNoHash)) {
+      setSelectedHobbies(selectedHobbies.filter((t) => t !== tagNameNoHash));
     } else if (selectedHobbies.length < 6) {
-      setSelectedHobbies([...selectedHobbies, tag]);
+      setSelectedHobbies([...selectedHobbies, tagNameNoHash]);
     } else {
       alert("최대 6개까지만 선택할 수 있어요!");
     }
   };
 
+  const renderTags = (tagArray) =>
+    tagArray.map((tagWithHash) => {
+      const noHash = tagWithHash.replace(/^#/, "");
+      const isSelected = selectedHobbies.includes(noHash);
+
+      return (
+        <TagButton
+          key={tagWithHash}
+          onClick={() => toggleTag(noHash)}
+          selected={isSelected}
+        >
+          {tagWithHash}
+        </TagButton>
+      );
+    });
+
   return (
     <Container>
       <Title>상대의 이런 취미를 원해요!</Title>
+
       <TagTitle>밖에서 즐기는</TagTitle>
-      <TagsWrapper>
-        {activeHobbies.map((tag) => (
-          <TagButton
-            key={tag}
-            onClick={() => toggleTag(tag)}
-            selected={selectedHobbies.includes(tag)}
-          >
-            {tag}
-          </TagButton>
-        ))}
-      </TagsWrapper>
+      <TagsWrapper>{renderTags(activeHobbies)}</TagsWrapper>
 
       <TagTitle>집에서 즐기는</TagTitle>
-      <TagsWrapper>
-        {passiveHobbies.map((tag) => (
-          <TagButton
-            key={tag}
-            onClick={() => toggleTag(tag)}
-            selected={selectedHobbies.includes(tag)}
-          >
-            {tag}
-          </TagButton>
-        ))}
-      </TagsWrapper>
+      <TagsWrapper>{renderTags(passiveHobbies)}</TagsWrapper>
 
-      <SelectedText>선택된 취미: {selectedHobbies.join(", ")}</SelectedText>
+      {/* ✅ 선택 목록은 보기 좋게 '#' 붙여서 표기 */}
+      <SelectedText>
+        선택된 취미: {selectedHobbies.map((h) => `#${h}`).join(", ")}
+      </SelectedText>
+
       <NextButton onClick={onNext}>완료</NextButton>
       <NextButton onClick={onPrev}>이전</NextButton>
     </Container>
@@ -496,16 +501,37 @@ const StepWantedHobby = ({
 const WantedInfor = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const { updateDesired } = useAuth();
 
   // 최상위 state
   const [wantedMbti, setWantedMbti] = useState(null);
   const [wantedTags, setWantedTags] = useState([]);
   const [wantedHobbies, setWantedHobbies] = useState([]);
 
+  const handleNext = async () => {
+    try {
+      const payload = {
+        wantedMbti,
+        wantedTags,
+        wantedHobbies,
+      };
+
+      const success = await updateDesired(payload); // 서버 업데이트 + 전역 상태 갱신
+      if (success) {
+        alert("원하는 상대방 정보 업데이트 완료!");
+        navigate("/mypage");
+      } else {
+        alert("업데이트 실패");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("업데이트 중 오류가 발생했습니다.");
+    }
+  };
+
   const goNext = () => {
     if (step === 3) {
-      console.log("최종 데이터:", { wantedMbti, wantedTags, wantedHobbies });
-      navigate("/mypage");
+      handleNext();
     } else {
       setStep(step + 1);
     }

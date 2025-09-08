@@ -35,7 +35,7 @@ const Mymbit = () => {
       alert("MBTI가 업데이트되었습니다!");
       navigate("/mypage");
     } else {
-      alert("업데이트 실패 ㅠㅠ");
+      alert("업데이트 실패 ");
     }
   };
 
