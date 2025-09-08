@@ -69,10 +69,12 @@ const AccountMain = () => {
         <Route path="/account01" element={<Account01 />} />
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<AccountLogin />} />
+
+        {/* My page */}
         <Route path="/mypage" element={<PrivateRoute element={<MyInfo />} />} />
         <Route
-          path="/mypage/myintro"
-          element={<PrivateRoute element={<MyIntro />} />}
+          path="/mypage/profile"
+          element={<PrivateRoute element={<Myprofile />} />}
         />
 
         <Route
@@ -82,7 +84,7 @@ const AccountMain = () => {
 
         <Route
           path="/mypage/myintro"
-          element={<PrivateRoute element={<Myprofile />} />}
+          element={<PrivateRoute element={<MyIntro />} />}
         />
         <Route
           path="/mypage/myhobby"
