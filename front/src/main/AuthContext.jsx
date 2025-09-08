@@ -36,6 +36,24 @@ export const AuthProvider = ({ children }) => {
     checkSession();
   }, []);
 
+  const sendFormData = async (formData) => {
+    try {
+      const res = await axios.post("/api/signup", formData, {
+        withCredentials: true,
+      });
+      console.log("전송성공");
+      console.log("Signup response:", res.data);
+      if (res.data.success) {
+        setUser(res.data.user); // 전역 상태 갱신
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("sendFormData error:", err);
+      return false;
+    }
+  };
+
   const login = async (id, password) => {
     try {
       const res = await axios.post(
@@ -85,7 +103,16 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ loggedIn, user, login, logout, loading, setUser, updateMymbti }}
+      value={{
+        loggedIn,
+        user,
+        sendFormData,
+        login,
+        logout,
+        loading,
+        setUser,
+        updateMymbti,
+      }}
     >
       {children}
     </AuthContext.Provider>

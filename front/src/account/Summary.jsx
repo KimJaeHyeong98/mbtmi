@@ -26,7 +26,7 @@ const Summary = () => {
 
   const handleEditLocation = () => {
     setReturnToSummary(true);
-    navigate("/location");
+    navigate("/region");
   };
 
   const handleEditIntroduce = () => {

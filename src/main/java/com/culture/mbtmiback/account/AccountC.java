@@ -29,6 +29,11 @@ public class AccountC {
         return null;
     }
 
+//    @PostMapping("/signUp")
+//    public AccountModel signUp(@RequestBody AccountModel user, HttpSession session) {
+//        System.out.println();
+//    }
+
     @GetMapping("/check-session")
     public Map<String, Object> checkSession(HttpSession session) {
         Map<String, Object> result = new HashMap<>();
@@ -57,8 +62,6 @@ public class AccountC {
         }
         return result;
     }
-
-
 
     @PutMapping("/update-mymbti")
     public ResponseEntity<AccountModel> updateUser(@RequestBody AccountModel updatedUser, HttpSession session) {
