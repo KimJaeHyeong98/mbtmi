@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.SelectKey;
 @Mapper
 public interface CreateAcMapper {
 
-    @Insert("INSERT INTO USERS (user_id, username, password, name, created_at,birth_date, mbti,desired_mbti,self_intro,photo_url,location,gender) " +
-            "VALUES (USERS_SEQ.NEXTVAL, #{username}, #{password}, #{name}, SYSDATE, #{birth_date},#{mbti},#{desired_mbti},#{self_intro},#{photo_url},#{location},#{gender})")
+    @Insert("INSERT INTO USERS (user_id, username, password, name, created_at,birth_date, mbti,desired_mbti,self_intro,location,gender) " +
+            "VALUES (USERS_SEQ.NEXTVAL, #{username}, #{password}, #{name}, SYSDATE, #{birth_date},#{mbti},#{desired_mbti},#{self_intro},#{location},#{gender})")
     @SelectKey(statement = "SELECT USERS_SEQ.CURRVAL FROM DUAL", keyProperty = "user_id", before = false, resultType = Long.class)
     void signUp(CreateAcModel ac);
 

@@ -44,9 +44,25 @@ const RegionTreeSelect = ({
     if (value !== undefined) setSelected(value ?? "");
   }, [value]);
 
-  const { formData, setFormData } = useSignup();
+  const { formData, setFormData, returnToSummary, setReturnToSummary } =
+    useSignup();
 
   const navigate = useNavigate();
+
+  // 제출 핸들러(수정+다음 네비게이션)
+  const handleNext = () => {
+    if (!selected) return;
+    // 컨텍스트에 저장
+    setFormData((prev) => ({ ...prev, location: selected }));
+
+    // 수정에서 진입했는지에 따라 분기
+    if (returnToSummary) {
+      setReturnToSummary(false);
+      navigate("/summary");
+    } else {
+      navigate("/selmbti");
+    }
+  };
 
   return (
     <Container>
@@ -95,18 +111,7 @@ const RegionTreeSelect = ({
 
           <Footer>
             <Selected>{selected || "지역을 선택하세요"}</Selected>
-            <NextBtn
-              disabled={!selected}
-              onClick={() => {
-                if (!selected) return;
-                // ✅ 여기서 컨텍스트에 문자열로 저장
-                setFormData((prev) => ({
-                  ...prev,
-                  location: selected,
-                }));
-                navigate("/selmbti"); // ✅ 내부에서 바로 이동
-              }}
-            >
+            <NextBtn disabled={!selected} onClick={handleNext}>
               {nextLabel}
             </NextBtn>
           </Footer>

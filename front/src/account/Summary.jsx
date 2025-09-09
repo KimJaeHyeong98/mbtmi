@@ -26,10 +26,10 @@ const Summary = () => {
     navigate("/hobby");
   };
 
-  const handleEditLocation = () => {
-    setReturnToSummary(true);
-    navigate("/region");
-  };
+  // const handleEditLocation = () => {
+  //   setReturnToSummary(true);
+  //   navigate("/region");
+  // };
 
   const handleEditIntroduce = () => {
     setReturnToSummary(true);
@@ -103,7 +103,7 @@ const Summary = () => {
               {formData.location}
             </Center>
             <Right>
-              <EditButton onClick={handleEditLocation}>수정</EditButton>
+              <EditButton onClick={handleEditRegion}>수정</EditButton>
             </Right>
           </Item>
 
