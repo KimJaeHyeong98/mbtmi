@@ -114,6 +114,7 @@ const AccountMain = () => {
         <Route path="/introduce" element={<IntroduceMySelf />} />
         <Route path="/summary" element={<Summary />} />
         <Route path="/precard" element={<PreCard />} />
+        <Route path="/region" element={<RegionTreeSelect />} />
 
         {/* 간단한 MBTI */}
 

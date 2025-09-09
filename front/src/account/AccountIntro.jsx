@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSignup } from "../SignupProvider"; // ✅ Context 불러오기
@@ -6,6 +7,8 @@ const AccountIntro = () => {
   const navigate = useNavigate();
   const { formData, setFormData, returnToSummary, setReturnToSummary } =
     useSignup(); // 전역 상태 가져오기
+
+  const [type] = useState("SELF");
 
   const handleNext = () => {
     if (returnToSummary) {

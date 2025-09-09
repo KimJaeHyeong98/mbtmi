@@ -99,10 +99,6 @@ const AccountInfo = () => {
     reader.readAsDataURL(file);
   };
 
-  console.log(year);
-  console.log(month);
-  console.log(day);
-
   return (
     <Container>
       <Card>
@@ -225,9 +221,14 @@ const AccountInfo = () => {
                 name: name,
                 age: age, // ✅ 나이만 저장
                 gender: gender,
+                year: year,
+                month: month,
+                day: day,
+                id: id,
+                passWord: passWord,
               }));
 
-              navigate("/selmbti");
+              navigate("/region");
             }}
           >
             다음으로
