@@ -4,7 +4,7 @@ import logoimage from "../assets/img/mbtmi.jpg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
-
+import HomeModal from "../homeSearchModal/HomeModal";
 const Container = styled.div`
   min-height: 100dvh;
   width: 100vw;
@@ -26,6 +26,7 @@ const LogoImage = styled.img`
   left: 30px;
   object-fit: cover;
   width: 150px;
+  align-items: center;
 `;
 
 const Card = styled.div`
@@ -141,12 +142,26 @@ const CardItem = styled.div`
   flex-direction: column;
   align-items: center;
 `;
+// 모달용
+const SettingButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  appearance: none;
+  border: none;
+  background: #ecf0f3;
+  font-size: 24px; /* 점 크기 조금 키움 */
+  padding: 6px 10px;
+  border-radius: 16px;
+  cursor: pointer;
+`;
 const Home = () => {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(null);
   const [randomUsers, setRandomUsers] = useState([]); // 랜덤 유저 50명 배열
   const [currentIndex, setCurrentIndex] = useState(0); // 현재 카드 인덱스
+  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태 추가
 
   const profile = {
     btn: ["❤️", "❌"],
@@ -214,6 +229,10 @@ const Home = () => {
           {randomUsers.map((user) => (
             <CardItem key={user.user_id}>
               <Card>
+                {/*검색 세팅 버튼 */}
+                <SettingButton onClick={() => setIsModalOpen(true)}>
+                  ⋮
+                </SettingButton>
                 <div>
                   <ProfileImage src={user.photo_url} alt="profile" />
                   <Name>이름: {user.name}</Name>
@@ -248,6 +267,12 @@ const Home = () => {
         <NavBtn>➕</NavBtn>
         <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
       </BottomNav>
+      {/* ✅ 모달 */}
+      <HomeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectGender={(gender) => console.log("선택 성별:", gender)}
+      />
     </Container>
   );
 };

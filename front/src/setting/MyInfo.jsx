@@ -21,6 +21,14 @@ const MyInfo = () => {
       console.log("로그아웃 취소됨");
     }
   };
+  // 회원탈퇴용 핸들러
+  const handleDelAccount = async () => {
+    try {
+      navigate("/AccountDelConfirm", { replace: true }); // 회원탈퇴 페이지로 이동
+    } catch (e) {
+      console.error(e.message);
+    }
+  };
 
   const editpage = {
     mbti: "나의 MBTI 수정하기",
@@ -51,20 +59,28 @@ const MyInfo = () => {
         </ProfileSection>
 
         <ButtonSection>
-          <ActionButton onClick={() => navigate("/mypage/profile")}>{btn.edit}</ActionButton>
+          <ActionButton onClick={() => navigate("/mypage/profile")}>
+            {btn.edit}
+          </ActionButton>
           <EditList>
             <EditButton onClick={() => navigate("/mypage/mymbti")}>
               {editpage.mbti}
             </EditButton>
-            <EditButton onClick={() => navigate("/mypage/myintro")}>{editpage.introduce}</EditButton>
-            <EditButton onClick={() => navigate("/mypage/myhobby")}>{editpage.hobby}</EditButton>
-            <EditButton onClick={() => navigate("/mypage/wantedinfor")}>{editpage.partner}</EditButton>
+            <EditButton onClick={() => navigate("/mypage/myintro")}>
+              {editpage.introduce}
+            </EditButton>
+            <EditButton onClick={() => navigate("/mypage/myhobby")}>
+              {editpage.hobby}
+            </EditButton>
+            <EditButton onClick={() => navigate("/mypage/wantedinfor")}>
+              {editpage.partner}
+            </EditButton>
           </EditList>
         </ButtonSection>
 
         <BottomActions>
           <DangerButton onClick={handleLogout}>{btn.logout}</DangerButton>
-          <DangerButton>{btn.bye}</DangerButton>
+          <DangerButton onClick={handleDelAccount}>{btn.bye}</DangerButton>
         </BottomActions>
       </Card>
     </Container>
@@ -196,8 +212,6 @@ const EditButton = styled.button`
     background-color: #ffffff66;
     transform: translateY(-2px);
   }
-
-  
 `;
 
 const BottomActions = styled.div`
