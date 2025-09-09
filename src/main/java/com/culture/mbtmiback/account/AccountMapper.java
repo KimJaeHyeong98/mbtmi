@@ -12,11 +12,6 @@ public interface AccountMapper {
 //    void signUp(AccountModel account);
 
 
-    @Insert("INSERT INTO USERS (user_id, username, password, name, created_at,birth_date) " +
-                "VALUES (USERS_SEQ.NEXTVAL, #{username}, #{password}, #{name}, SYSDATE, #{birth_date})")
-    @SelectKey(statement = "SELECT USERS_SEQ.CURRVAL FROM DUAL", keyProperty = "user_id", before = false, resultType = Long.class)
-    void signUp(AccountModel account);
-
     //유저 login
     @Select("SELECT * FROM USERS WHERE USERNAME = #{username} AND PASSWORD = #{password}")
     AccountModel login(@Param("username") String username, @Param("password") String password);

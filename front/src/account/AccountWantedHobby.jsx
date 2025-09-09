@@ -46,6 +46,7 @@ const AccountWantedHobby = () => {
   ];
 
   const [selectedTags, setSelectedTags] = useState([]);
+  const [type] = useState("DESIRED");
 
   const toggleTag = (tag) => {
     if (selectedTags.includes(tag)) {

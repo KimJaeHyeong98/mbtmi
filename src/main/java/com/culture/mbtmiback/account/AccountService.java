@@ -30,20 +30,4 @@ public class AccountService {
         return accountMapper.updateMbti(userId, mbti) > 0;
     }
 
-//    @Transactional
-//    public AccountModel signUp(AccountModel accountModel, @RequestBody List<String> tags, @RequestBody List<String> hobbies) {
-//
-//        Long user_id = accountModel.getUser_id();
-//        accountMapper.signUp(accountModel);
-//
-//        // 이제 여기 사이에 태그랑 취미 넣는 mapper 문법 작성하기.
-//        myPageMapper.insertUserTag(user_id, "SELF");
-//        myPageMapper.insertUserTag(user_id, "DESIRED");
-//        myPageMapper.insertUserHobbies(user_id, "SELF");
-//        myPageMapper.insertUserHobbies(user_id, "DESIRED");
-//
-//        return accountModel;
-//    }
-
-
 }

@@ -6,7 +6,7 @@ export const useSignup = () => useContext(SignupContext);
 export const SignupProvider = ({ children }) => {
   const [formData, setFormData] = useState({
     id: "",
-    password: "",
+    passWord: "",
     location: "",
     name: "",
     mbti: {
@@ -15,6 +15,7 @@ export const SignupProvider = ({ children }) => {
       TF: "",
       JP: "",
     },
+    birth_date: Date,
     age: "",
     introTags: [],
     hobby: [],

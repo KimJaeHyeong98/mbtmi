@@ -519,6 +519,7 @@ const WantedInfor = () => {
       const success = await updateDesired(payload); // 서버 업데이트 + 전역 상태 갱신
       if (success) {
         alert("원하는 상대방 정보 업데이트 완료!");
+        console.log("최종데이터: ", payload);
         navigate("/mypage");
       } else {
         alert("업데이트 실패");

@@ -1,8 +1,8 @@
 // src/components/RegionTreeSelect.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import Container from "../../globaltool/Container";
-import { useSignup } from "../../SignupProvider";
+import Container from "../globaltool/Container";
+import { useSignup } from "../SignupProvider";
 import { useNavigate } from "react-router-dom";
 
 export const REGION_GROUPS = {

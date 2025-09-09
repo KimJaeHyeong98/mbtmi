@@ -95,10 +95,6 @@ const AccountInfo = () => {
     reader.readAsDataURL(file);
   };
 
-  console.log(year);
-  console.log(month);
-  console.log(day);
-
   return (
     <Container>
       <LogoWrapper>
@@ -212,7 +208,10 @@ const AccountInfo = () => {
               id: id,
               passWord: passWord,
               name: name,
-              age: age, // ✅ 나이만 저장
+              year: year,
+              month: month,
+              day: day,
+              age: age,
               gender: gender,
             }));
 

@@ -3,9 +3,11 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import PreCardModal from "../account/PreCardModal";
+import { useAuth } from "../main/AuthContext";
 
 const Summary = () => {
   const { formData, setReturnToSummary } = useSignup();
+  const { sendFormData } = useAuth();
   const navigate = useNavigate();
   const [openPreview, setOpenPreview] = useState(false);
 
@@ -38,14 +40,7 @@ const Summary = () => {
     navigate("/region");
   };
 
-  const handleSubmit = async () => {
-    await fetch("http://localhost:8080/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    alert("회원가입 완료!");
-  };
+  console.log(formData);
 
   // formData.mbti에서 문자열 조합
   const mbti = Object.values(formData.mbti ?? {}).join("");
@@ -137,7 +132,9 @@ const Summary = () => {
           <SubmitButton onClick={() => setOpenPreview(true)}>
             내 카드 <br /> 미리보기
           </SubmitButton>
-          <SubmitButton onClick={handleSubmit}>작성 완료</SubmitButton>
+          <SubmitButton onClick={() => sendFormData(formData)}>
+            작성 완료
+          </SubmitButton>
         </Btnzone>
         {openPreview && <PreCardModal onClose={() => setOpenPreview(false)} />}
       </InfoCard>

@@ -9,16 +9,24 @@ CREATE TABLE USERS (
                        desired_mbti  VARCHAR2(4),                        -- 원하는 상대방 MBTI
                        self_intro    VARCHAR2(1000),                     -- 자기소개
                        photo_url     VARCHAR2(255)                       -- 프로필 사진 경로
+
 );
 SELECT * FROM users WHERE username='123' AND password='1234';
 
 create sequence users_seq;
+
+
 
 select * from user_tags;
 
 insert into user_tags values (22,1,'DESIRED');
 
 select * from USERS;
+
+-- 만약 1000자도 부족할 수 있다면
+ALTER TABLE USERS MODIFY photo_url CLOB;
+
+select * from USER_HOBBIES;
 
 insert into users values (users_seq.nextval,'system',1234,'admin','1994-03-17',sysdate,'ESTP','INFP','안녕하세요 많은 이용 바랍니다','pig.png');
 insert into users values (users_seq.nextval,'yjm',123,'유지민','2000-04-11',sysdate,'ENTP','INFP','안녕하세요 유지민입니다','karina.png');

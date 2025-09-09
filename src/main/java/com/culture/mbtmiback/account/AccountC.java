@@ -29,11 +29,6 @@ public class AccountC {
         return null;
     }
 
-//    @PostMapping("/signUp")
-//    public AccountModel signUp(@RequestBody AccountModel user, HttpSession session) {
-//        System.out.println();
-//    }
-
     @GetMapping("/check-session")
     public Map<String, Object> checkSession(HttpSession session) {
         Map<String, Object> result = new HashMap<>();
@@ -69,7 +64,6 @@ public class AccountC {
         if (sessionUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
 
         // ✅ 수정된 부분
         boolean success = accountService.updateUser((long) sessionUser.getUser_id(), updatedUser.getMbti());
