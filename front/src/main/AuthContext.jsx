@@ -83,9 +83,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateDesired = async (payload) => {
+  try {
+    const res = await axios.put("/api/update/desired", payload, {
+      withCredentials: true,
+    });
+
+    if (res.status === 200) {
+      // 서버 세션 갱신 후, 전역 상태도 갱신
+      await checkSession(); // 최신 user 정보 가져오기
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("updateDesired error:", err);
+    return false;
+  }
+};
+
+  
+
   return (
     <AuthContext.Provider
-      value={{ loggedIn, user, login, logout, loading, setUser, updateMymbti }}
+      value={{ loggedIn, user, login, logout, loading, setUser, updateMymbti,updateDesired }}
     >
       {children}
     </AuthContext.Provider>
