@@ -18,4 +18,6 @@ public interface AccountMapper {
     @Update("UPDATE USERS SET MBTI = #{mbti} WHERE USER_ID = #{userId}")
     int updateMbti(@Param("userId") Long userId, @Param("mbti") String mbti);
 
+
+
 }

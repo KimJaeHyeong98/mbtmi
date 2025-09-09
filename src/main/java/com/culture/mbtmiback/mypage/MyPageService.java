@@ -12,6 +12,7 @@ public class MyPageService {
     @Autowired
     private MyPageMapper myPageMapper;
 
+
     //유저 태그 검색
     public List<TagModel> getUserTags(Long userId, String type) {
         return myPageMapper.getUserTags(userId, type);
@@ -46,5 +47,40 @@ public class MyPageService {
             myPageMapper.insertUserHobbies(userId, tagName, "SELF");
         }
     }
+
+    //유저 태그 검색
+    public List<TagModel> getDesiredtags(Long userId, String type) {
+        return myPageMapper.getUserTags(userId, type);
+    }
+
+    //유저 취미 검색
+    public List<HobbyModel> getDesiredHobbys(Long userId, String type) {
+        return myPageMapper.getDesiredHobbys(userId, type);
+    }
+
+
+    @Transactional
+    public void updateDesiredInfo(Long userId, String wantedMbti, List<String> wantedTags, List<String> wantedHobbies) {
+        // 1. MBTI 업데이트
+        myPageMapper.updateDesiredMbti(userId, wantedMbti);
+
+        // 2. 성격 태그 갱신
+        System.out.println("==== 원하는 성격 업데이트 시작 ====");
+        myPageMapper.deleteDesiredTags(userId);
+        for (String tag : wantedTags) {
+            System.out.println("넘어온 태그 = [" + tag + "]");
+            int result = myPageMapper.insertDesiredTag(userId, tag);
+            System.out.println("삽입 결과 = " + result);
+        }
+
+
+        // 3. 취미 갱신
+        myPageMapper.deleteDesiredHobbies(userId);
+        for (String hobby : wantedHobbies) {
+            myPageMapper.insertDesiredHobby(userId, hobby);
+        }
+    }
+
+
 
 }
