@@ -33,13 +33,13 @@ const AccountDelConfirm = () => {
           </p> */}
         </Card>
         <Card>
-          <h2>탈퇴 시 유의사항</h2>
-          <ul style={{ textAlign: "left", paddingLeft: "20px" }}>
+          <NoticeTitle>탈퇴 시 유의사항</NoticeTitle>
+          <NoticeList style={{ textAlign: "left", paddingLeft: "20px" }}>
             <li>탈퇴 후 30일 이내 재가입이 불가합니다.</li>
             <li>탈퇴 시 모든 개인 정보가 삭제됩니다.</li>
             <li>탈퇴 후 동일한 이메일로 재가입이 불가합니다.</li>
             <li>탈퇴 후 작성한 게시물은 삭제되지 않을 수 있습니다.</li>
-          </ul>
+          </NoticeList>
           <label>
             상기 내용을 확인하였습니다.
             <input
@@ -62,12 +62,76 @@ const AccountDelConfirm = () => {
     </Container>
   );
 };
+const NoticeTitle = styled.h2`
+  color: #ff4d4f; /* 경고색 */
+  font-weight: bold;
+`;
+
+const NoticeList = styled.ul`
+  text-align: left;
+  padding-left: 20px;
+  li {
+    margin-bottom: 8px;
+    color: #f8f9fa;
+  }
+  li::before {
+    content: "⚠ ";
+    color: #ffcc00;
+  }
+`;
+
+// export default AccountDelConfirm;
+// const Button = styled.button`
+//   margin-left: 10px;
+//   margin-right: 10px;
+//   width: 120px;
+// `;
+// const Card = styled.div`
+//   width: 100%;
+//   max-width: 350px;
+//   padding: 10px;
+//   border-radius: 20px;
+//   background: rgba(255, 255, 255, 0.15);
+//   backdrop-filter: blur(12px);
+//   border: 1px solid rgba(255, 255, 255, 0.4);
+//   background-image: linear-gradient(
+//     120deg,
+//     rgba(255, 255, 255, 0.4) 0%,
+//     rgba(255, 255, 255, 0.1) 40%,
+//     transparent 100%
+//   );
+//   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+//   color: #fff;
+//   text-align: center;
+//   position: relative;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   margin-bottom: 20px;
+// `;
+
+// const Container = styled.div`
+//   min-height: 100dvh;
+//   width: 100vw;
+//   overflow-x: hidden;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   text-align: center;
+//   box-sizing: border-box;
+//   flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
+//   background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+//   position: relative; /* 🔥 하단 네비 절대위치 기준 */
+// `;
+
 export default AccountDelConfirm;
+
 const Button = styled.button`
   margin-left: 10px;
   margin-right: 10px;
   width: 120px;
 `;
+
 const Card = styled.div`
   width: 100%;
   max-width: 350px;
@@ -76,12 +140,14 @@ const Card = styled.div`
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.4);
+  /* 필요하면 다시 주석 해제 가능
   background-image: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0.4) 0%,
     rgba(255, 255, 255, 0.1) 40%,
     transparent 100%
   );
+  */
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   color: #fff;
   text-align: center;
@@ -102,6 +168,6 @@ const Container = styled.div`
   text-align: center;
   box-sizing: border-box;
   flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
-  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+  background: rgba(255, 255, 255, 0.15);
   position: relative; /* 🔥 하단 네비 절대위치 기준 */
 `;

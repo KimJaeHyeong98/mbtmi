@@ -38,6 +38,8 @@ import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
 import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
 import RegionTreeSelect from "./RegionTreeSelect";
+import HomeModal from "../homeSearchModal/HomeModal";
+import GenderSelect from "../homeSearchModal/GenderSelect";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -219,6 +221,8 @@ const AccountMain = () => {
         />
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
+        {/* 홈 모달창 */}
+        <Route path="HomeModal" element={<HomeModal />} />
       </Routes>
     </SignupProvider>
   );

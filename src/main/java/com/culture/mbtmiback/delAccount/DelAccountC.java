@@ -15,7 +15,7 @@ public class DelAccountC {
     private UserService userService;
 
     @DeleteMapping
-    public ResponseEntity<String> DelAccountC(HttpSession session) {
+    public ResponseEntity<String> DelUser(HttpSession session) {
         AccountModel user = (AccountModel) session.getAttribute("user");
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
