@@ -111,12 +111,7 @@ public class MyPageController {
         System.out.println("전달받은 Hobbies: " + desiredModel.getWantedHobbies());
 
         // DB 업데이트
-        myPageService.updateDesiredInfo(
-                sessionUser.getUser_id(),
-                desiredModel.getWantedMbti(),
-                desiredModel.getWantedTags(),
-                desiredModel.getWantedHobbies()
-        );
+        myPageService.updateDesiredInfo(sessionUser.getUser_id(), desiredModel.getWantedMbti(), desiredModel.getWantedTags(), desiredModel.getWantedHobbies());
 
         // 세션 반영
         sessionUser.setDesired_mbti(desiredModel.getWantedMbti());

@@ -46,19 +46,27 @@ const MyInfo = () => {
           />
           <Name>이름: {user.name}</Name>
           <Id>아이디: {user.username}</Id>
-          <Mail>이메일: {user.email || "이메일 미등록"}</Mail>
+
           <Mbti> MBTI: {user.mbti}</Mbti>
         </ProfileSection>
 
         <ButtonSection>
-          <ActionButton onClick={() => navigate("/mypage/profile")}>{btn.edit}</ActionButton>
+          <ActionButton onClick={() => navigate("/mypage/profile")}>
+            {btn.edit}
+          </ActionButton>
           <EditList>
             <EditButton onClick={() => navigate("/mypage/mymbti")}>
               {editpage.mbti}
             </EditButton>
-            <EditButton onClick={() => navigate("/mypage/myintro")}>{editpage.introduce}</EditButton>
-            <EditButton onClick={() => navigate("/mypage/myhobby")}>{editpage.hobby}</EditButton>
-            <EditButton onClick={() => navigate("/mypage/wantedinfor")}>{editpage.partner}</EditButton>
+            <EditButton onClick={() => navigate("/mypage/myintro")}>
+              {editpage.introduce}
+            </EditButton>
+            <EditButton onClick={() => navigate("/mypage/myhobby")}>
+              {editpage.hobby}
+            </EditButton>
+            <EditButton onClick={() => navigate("/mypage/wantedinfor")}>
+              {editpage.partner}
+            </EditButton>
           </EditList>
         </ButtonSection>
 
@@ -139,12 +147,6 @@ const Id = styled.div`
   color: #000000;
 `;
 
-const Mail = styled.div`
-  font-size: 10pt;
-  color: #000000;
-  opacity: 0.9;
-`;
-
 const Mbti = styled.div`
   font-size: 15.5pt;
   color: #000000;
@@ -196,8 +198,6 @@ const EditButton = styled.button`
     background-color: #ffffff66;
     transform: translateY(-2px);
   }
-
-  
 `;
 
 const BottomActions = styled.div`
