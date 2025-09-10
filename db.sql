@@ -182,7 +182,31 @@ INSERT INTO user_tags VALUES (29,16,'SELF');
 INSERT INTO user_tags VALUES (29,20,'SELF');
 INSERT INTO user_tags VALUES (29,21,'SELF');
 
+----------------------------
+-- chat
+
+create table chat_room (
+    room_id number(3)  NOT NULL,
+    user1_id NUMBER(10) NOT NULL,
+    user2_id NUMBER(10) NOT NULL
+);
+create sequence chat_room_seq;
 
 
+insert into chat_room values (chat_room_seq.nextval, 10, 20);
+insert into chat_room values (chat_room_seq.nextval, 10, 21);
+insert into chat_room values (chat_room_seq.nextval, 10, 22);
+insert into chat_room values (chat_room_seq.nextval, 4, 1);
+insert into chat_room values (chat_room_seq.nextval, 2, 4);
 
+select * from chat_room where user1_id = 4 or user2_id = 4;
 
+SELECT
+    cr.room_id,
+    CASE WHEN cr.user1_id = 4 THEN cr.user1_id ELSE cr.user2_id END AS user1_id,
+    CASE WHEN cr.user1_id = 4 THEN cr.user2_id ELSE cr.user1_id END AS user2_id,
+    u.name AS opponent_name, u.photo_url as opponent_pic
+FROM chat_room cr
+         JOIN users u
+              ON u.user_id = (CASE WHEN cr.user1_id = 4 THEN cr.user2_id ELSE cr.user1_id END)
+WHERE (cr.user1_id = 4 OR cr.user2_id = 4);

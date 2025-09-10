@@ -37,6 +37,12 @@ import Myhobby from "../setting/Myhobby";
 import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
 import RegionTreeSelect from "./RegionTreeSelect";
+import Chatting from "../chatting/Chatting.jsx";
+import ChattingNav from "../chatting/ChattingNav.jsx";
+import ChattingSend from "../chatting/ChattingSend.jsx";
+import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
+import BottomNav from "../globaltool/BottomNav.jsx";
+import styled from "styled-components";
 
 const AccountMain = () => {
     const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -218,9 +224,27 @@ const AccountMain = () => {
                         </MbtiProvider>
                     }
                 />
+                <Route path="/chat" element={<Container><ChattingRoomNav /><BottomNav /></Container>}/>
+                <Route path="/chat/:id" element={<>
+                <ChattingNav />
+                <Chatting />
+
+                </>} />
             </Routes>
         </SignupProvider>
     );
 };
 
 export default AccountMain;
+const Container = styled.div`
+  min-height: 100dvh;
+  width: 100vw;
+  overflow-x: hidden;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
+
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+  position: relative; /* 🔥 하단 네비 절대위치 기준 */
+  padding-top: 60px;
+`;
