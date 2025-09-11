@@ -58,15 +58,12 @@ public class AccountC {
         return result;
     }
 
-
-
     @PutMapping("/update-mymbti")
     public ResponseEntity<AccountModel> updateUser(@RequestBody AccountModel updatedUser, HttpSession session) {
         AccountModel sessionUser = (AccountModel) session.getAttribute("user");
         if (sessionUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
 
         // ✅ 수정된 부분
         boolean success = accountService.updateUser((long) sessionUser.getUser_id(), updatedUser.getMbti());

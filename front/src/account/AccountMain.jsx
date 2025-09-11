@@ -36,7 +36,9 @@ import MyIntro from "../setting/MyIntro";
 import Myhobby from "../setting/Myhobby";
 import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
+import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
 import RegionTreeSelect from "./RegionTreeSelect";
+
 import Chatting from "../chatting/Chatting.jsx";
 import ChattingNav from "../chatting/ChattingNav.jsx";
 import ChattingSend from "../chatting/ChattingSend.jsx";
@@ -44,34 +46,38 @@ import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
 import BottomNav from "../globaltool/BottomNav.jsx";
 import styled from "styled-components";
 
+import HomeModal from "../homeSearchModal/HomeModal";
+import GenderSelect from "../homeSearchModal/GenderSelect";
+
+
 const AccountMain = () => {
-    const { loggedIn, loading } = useAuth(); // loading 상태 추가
+  const { loggedIn, loading } = useAuth(); // loading 상태 추가
 
-    // ✅ 세션 확인 완료 전에는 아무것도 렌더링하지 않음
-    if (loading) {
-        return null; // 원하면 로딩 스피너를 넣어도 됩니다
-    }
+  // ✅ 세션 확인 완료 전에는 아무것도 렌더링하지 않음
+  if (loading) {
+    return null; // 원하면 로딩 스피너를 넣어도 됩니다
+  }
 
-    const PrivateRoute = ({ element }) => {
-        const { loggedIn, loading } = useAuth();
-        if (loading) return null;
-        return loggedIn ? element : <Navigate to="/account01" replace />;
-    };
+  const PrivateRoute = ({ element }) => {
+    const { loggedIn, loading } = useAuth();
+    if (loading) return null;
+    return loggedIn ? element : <Navigate to="/account01" replace />;
+  };
 
-    return (
-        <SignupProvider>
-            <Routes>
-                {/* / 접속 시 로그인 여부에 따라 리다이렉트 */}
-                <Route
-                    path="/"
-                    element={
-                        loggedIn ? (
-                            <Navigate to="/home" replace />
-                        ) : (
-                            <Navigate to="/account01" replace />
-                        )
-                    }
-                />
+  return (
+    <SignupProvider>
+      <Routes>
+        {/* / 접속 시 로그인 여부에 따라 리다이렉트 */}
+        <Route
+          path="/"
+          element={
+            loggedIn ? (
+              <Navigate to="/home" replace />
+            ) : (
+              <Navigate to="/account01" replace />
+            )
+          }
+        />
 
         <Route path="/account01" element={<Account01 />} />
         <Route path="/home" element={<Home />} />
@@ -84,10 +90,10 @@ const AccountMain = () => {
           element={<PrivateRoute element={<Myprofile />} />}
         />
 
-                <Route
-                    path="/mypage/mymbti"
-                    element={<PrivateRoute element={<Mymbit />} />}
-                />
+        <Route
+          path="/mypage/mymbti"
+          element={<PrivateRoute element={<Mymbit />} />}
+        />
 
         <Route
           path="/mypage/myintro"
@@ -97,6 +103,7 @@ const AccountMain = () => {
           path="/mypage/myhobby"
           element={<PrivateRoute element={<Myhobby />} />}
         />
+
 
                 <Route
                     path="/mypage/wantedinfor"
@@ -230,9 +237,15 @@ const AccountMain = () => {
                 <Chatting />
 
                 </>} />
+                                             
+                                              {/* 회원탈퇴 */}
+        <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
+        {/* 홈 모달창 */}
+        <Route path="HomeModal" element={<HomeModal />} />
             </Routes>
         </SignupProvider>
     );
+
 };
 
 export default AccountMain;
