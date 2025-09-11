@@ -3,10 +3,9 @@ package com.culture.mbtmiback.createAc;
 import com.culture.mbtmiback.account.AccountModel;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -14,6 +13,14 @@ public class CreateAcController {
 
     @Autowired
     private CreateAcService createAcService;
+
+
+
+    @GetMapping("/users/exists")
+    public Map<String, Boolean> exists(@RequestParam String username) {
+        boolean exists = createAcService.usernameExists(username);
+        return Map.of("exists", exists);
+    }
 
 
     @PostMapping("/signup")

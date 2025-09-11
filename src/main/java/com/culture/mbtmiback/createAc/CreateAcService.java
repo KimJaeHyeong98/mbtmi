@@ -39,4 +39,9 @@ public class CreateAcService {
             createAcMapper.insertUserTag(user_id, tag, "DESIRED");
         }
     }
+
+    public boolean usernameExists(String username) {
+        String found = createAcMapper.findUsername(username);
+        return found != null; // 있으면 true, 없으면 false
+    }
 }

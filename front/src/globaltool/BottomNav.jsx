@@ -1,5 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 /* ✅ 하단 네비게이션 */
 const BottomWrapper = styled.nav`
@@ -42,7 +43,7 @@ const BottomNav = () => {
         <BottomWrapper>
             <div>
                 <NavBtn>🏠</NavBtn>
-                <NavBtn>🔍</NavBtn>
+                <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
                 <NavBtn>❤️</NavBtn>
                 <NavBtn>➕</NavBtn>
                 <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>

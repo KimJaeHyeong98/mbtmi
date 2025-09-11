@@ -48,85 +48,86 @@ import styled from "styled-components";
 
 import HomeModal from "../homeSearchModal/HomeModal";
 import GenderSelect from "../homeSearchModal/GenderSelect";
-
+import TodayPost from "../today's_post/TodayPost";
 
 const AccountMain = () => {
-  const { loggedIn, loading } = useAuth(); // loading 상태 추가
+    const { loggedIn, loading } = useAuth(); // loading 상태 추가
 
-  // ✅ 세션 확인 완료 전에는 아무것도 렌더링하지 않음
-  if (loading) {
-    return null; // 원하면 로딩 스피너를 넣어도 됩니다
-  }
+    // ✅ 세션 확인 완료 전에는 아무것도 렌더링하지 않음
+    if (loading) {
+        return null; // 원하면 로딩 스피너를 넣어도 됩니다
+    }
 
-  const PrivateRoute = ({ element }) => {
-    const { loggedIn, loading } = useAuth();
-    if (loading) return null;
-    return loggedIn ? element : <Navigate to="/account01" replace />;
-  };
+    const PrivateRoute = ({ element }) => {
+        const { loggedIn, loading } = useAuth();
+        if (loading) return null;
+        return loggedIn ? element : <Navigate to="/account01" replace />;
+    };
 
-  return (
-    <SignupProvider>
-      <Routes>
-        {/* / 접속 시 로그인 여부에 따라 리다이렉트 */}
-        <Route
-          path="/"
-          element={
-            loggedIn ? (
-              <Navigate to="/home" replace />
-            ) : (
-              <Navigate to="/account01" replace />
-            )
-          }
-        />
+    return (
+        <SignupProvider>
+            <Routes>
+                {/* / 접속 시 로그인 여부에 따라 리다이렉트 */}
+                <Route
+                    path="/"
+                    element={
+                        loggedIn ? (
+                            <Navigate to="/home" replace />
+                        ) : (
+                            <Navigate to="/account01" replace />
+                        )
+                    }
+                />
 
-        <Route path="/account01" element={<Account01 />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<AccountLogin />} />
+                <Route path="/account01" element={<Account01 />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/login" element={<AccountLogin />} />
 
-        {/* My page */}
-        <Route path="/mypage" element={<PrivateRoute element={<MyInfo />} />} />
-        <Route
-          path="/mypage/profile"
-          element={<PrivateRoute element={<Myprofile />} />}
-        />
+                {/* My page */}
+                <Route
+                    path="/mypage"
+                    element={<PrivateRoute element={<MyInfo />} />}
+                />
+                <Route
+                    path="/mypage/profile"
+                    element={<PrivateRoute element={<Myprofile />} />}
+                />
 
-        <Route
-          path="/mypage/mymbti"
-          element={<PrivateRoute element={<Mymbit />} />}
-        />
+                <Route
+                    path="/mypage/mymbti"
+                    element={<PrivateRoute element={<Mymbit />} />}
+                />
 
-        <Route
-          path="/mypage/myintro"
-          element={<PrivateRoute element={<MyIntro />} />}
-        />
-        <Route
-          path="/mypage/myhobby"
-          element={<PrivateRoute element={<Myhobby />} />}
-        />
+                <Route
+                    path="/mypage/myintro"
+                    element={<PrivateRoute element={<MyIntro />} />}
+                />
+                <Route
+                    path="/mypage/myhobby"
+                    element={<PrivateRoute element={<Myhobby />} />}
+                />
 
-        <Route
-          path="/mypage/wantedinfor"
-          element={<PrivateRoute element={<WantedInfor />} />}
-        />
-        
-      
+                <Route
+                    path="/mypage/wantedinfor"
+                    element={<PrivateRoute element={<WantedInfor />} />}
+                />
 
-        {/* 회원가입 */}
+                {/* 회원가입 */}
 
-        <Route path="/info" element={<AccountInfo />} />
-        <Route path="/region" element={<RegionTreeSelect />} />
-        <Route path="/intro" element={<AccountIntro />} />
-        <Route path="/hobby" element={<AccountHobby />} />
-        <Route path="/selmbti" element={<AccountSelMbti />} />
-        <Route path="/wantedmbti" element={<AccountMbti />} />
+                <Route path="/info" element={<AccountInfo />} />
+                <Route path="/region" element={<RegionTreeSelect />} />
+                <Route path="/intro" element={<AccountIntro />} />
+                <Route path="/hobby" element={<AccountHobby />} />
+                <Route path="/selmbti" element={<AccountSelMbti />} />
+                <Route path="/wantedmbti" element={<AccountMbti />} />
 
-        <Route path="/wantedintro" element={<AccountwantedIntro />} />
-        <Route path="/wantedhobby" element={<AccountWantedHobby />} />
-        <Route path="/introduce" element={<IntroduceMySelf />} />
-        <Route path="/summary" element={<Summary />} />
-        <Route path="/precard" element={<PreCard />} />
+                <Route path="/wantedintro" element={<AccountwantedIntro />} />
+                <Route path="/wantedhobby" element={<AccountWantedHobby />} />
+                <Route path="/introduce" element={<IntroduceMySelf />} />
+                <Route path="/summary" element={<Summary />} />
+                <Route path="/precard" element={<PreCard />} />
 
-        {/* 간단한 MBTI */}
+                {/* 간단한 MBTI */}
 
                 <Route
                     path="/easymbti1"
@@ -232,33 +233,47 @@ const AccountMain = () => {
                         </MbtiProvider>
                     }
                 />
-                <Route path="/chat" element={<Container><ChattingRoomNav /><BottomNav /></Container>}/>
-                <Route path="/chat/:id" element={<>
-                <ChattingNav />
-                <Chatting />
+                <Route
+                    path="/chat"
+                    element={
+                        <Container>
+                            <ChattingRoomNav />
+                            <BottomNav />
+                        </Container>
+                    }
+                />
+                <Route
+                    path="/chat/:id"
+                    element={
+                        <>
+                            <ChattingNav />
+                            <Chatting />
+                        </>
+                    }
+                />
 
-                </>} />
-                                             
-                                              {/* 회원탈퇴 */}
-        <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
-        {/* 홈 모달창 */}
-        <Route path="HomeModal" element={<HomeModal />} />
+                {/* 회원탈퇴 */}
+                <Route
+                    path="/AccountDelConfirm"
+                    element={<AccountDelConfirm />}
+                />
+                {/* 홈 모달창 */}
+                <Route path="HomeModal" element={<HomeModal />} />
             </Routes>
         </SignupProvider>
     );
-
 };
 
 export default AccountMain;
 const Container = styled.div`
-  min-height: 100dvh;
-  width: 100vw;
-  overflow-x: hidden;
-  display: flex;
-  box-sizing: border-box;
-  flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
+    min-height: 100dvh;
+    width: 100vw;
+    overflow-x: hidden;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
 
-  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-  position: relative; /* 🔥 하단 네비 절대위치 기준 */
-  padding-top: 60px;
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    position: relative; /* 🔥 하단 네비 절대위치 기준 */
+    padding-top: 60px;
 `;
