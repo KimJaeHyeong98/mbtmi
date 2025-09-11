@@ -4,12 +4,14 @@ import mbtmi from "../assets/img/mbtmi.jpg";
 import AccountYear from "./AccountYear";
 import { useNavigate } from "react-router-dom";
 import { useSignup } from "../SignupProvider";
+import axios from "axios";
 
 const AccountInfo = () => {
   const [id, setId] = useState("");
   const [passWord, setPassWord] = useState("");
   const [checkPassWord, setCheckPassWord] = useState("");
   const [name, setName] = useState("");
+  const [isIdAvailable, setIsIdAvailable] = useState(false);
   const navigate = useNavigate();
   const { formData, setFormData } = useSignup();
 
@@ -26,6 +28,7 @@ const AccountInfo = () => {
   const [day, setDay] = useState("1");
   const [gender, setGender] = useState("남");
 
+  //날짜 계산
   const calculateAge = (year, month, day) => {
     const today = new Date();
     const birthDate = new Date(year, month - 1, day);
@@ -41,37 +44,87 @@ const AccountInfo = () => {
     return age;
   };
 
-  const IdCheckHandle = () => {
-    if (id === "test") {
-      alert("이미 사용 중인 아이디입니다.");
-    } else {
-      alert("사용 가능한 아이디입니다!");
+  //ID중복확인 관련 핸들러 ,  isIdAvailable -> 아이디가 사용가능하지 않으면 다음 페이지 못넘어가게 하는 스테이트
+  const IdCheckHandle = async () => {
+    if (!id) {
+      alert("아이디를 입력해주세요!");
+      return;
+    }
+
+    try {
+      const res = await axios.get("http://localhost:8080/api/users/exists", {
+        params: { username: id },
+      });
+
+      if (res.data.exists) {
+        alert("이미 사용 중인 아이디입니다.");
+        setIsIdAvailable(false);
+      } else {
+        alert("사용 가능한 아이디입니다!");
+        setIsIdAvailable(true);
+      }
+    } catch (err) {
+      console.error("중복 체크 오류:", err);
+      alert("서버와 통신 중 문제가 발생했습니다.");
     }
   };
 
+  //비번 vs 재입력 비번이 틀렸을때
   const checkPassWordBoth = () => {
     if (passWord !== checkPassWord) {
       alert("비밀번호가 다릅니다.");
-      return false; // ❌ 불일치 → 실패
+      return false;
     }
-    return true; // ✅ 일치 → 성공
+    return true;
   };
 
+  //빈칸이 있는지 없는지 확인
   const allCheck = () => {
     if (!id || !passWord || !name) {
       alert("빈칸이 있어요!");
-      return false; // ❌ 실패
+      return false;
     }
-    return true; // ✅ 성공
+    return true;
   };
 
-  const Loging = () => {
-    const pwOk = checkPassWordBoth(); // true/false
-    const allOk = allCheck(); // true/false
+  // 아이디: 영문만 허용 (대/소문자)
+  const handleIdChange = (e) => {
+    const onlyValid = e.target.value.replace(
+      /[^A-Za-z0-9!@#$%^&*()\-_=+\[\]{};:'",.<>/?\\|`~]/g,
+      ""
+    );
+    setId(onlyValid);
+  };
 
-    if (pwOk && allOk) {
-      navigate("/AccountSelMbti"); // 조건 통과 시 이동
+  // 비번: 영문만 허용 (대/소문자)
+  const handlePwChange = (e) => {
+    const onlyValid = e.target.value.replace(
+      /[^A-Za-z0-9!@#$%^&*()\-_=+\[\]{};:'",.<>/?\\|`~]/g,
+      ""
+    );
+    setPassWord(onlyValid);
+  };
+
+  // 비번 재입력: 한글 차단 — 기존 비번과 동일 규칙
+  const handlePwConfirmChange = (e) => {
+    const onlyValid = e.target.value.replace(
+      /[^A-Za-z0-9!@#$%^&*()\-=+\[\]{};:'",.<>/?\\|`~]/g,
+      ""
+    );
+    setCheckPassWord(onlyValid);
+  };
+
+  //전체 로그인 관련 흐름
+  const Loging = () => {
+    if (!allCheck()) return;
+    if (!checkPassWordBoth()) return;
+
+    if (!isIdAvailable) {
+      alert("아이디 중복 체크를 먼저 해주세요");
+      return;
     }
+
+    navigate("/region");
   };
 
   return (
@@ -89,8 +142,8 @@ const AccountInfo = () => {
           <Input
             type="text"
             value={id}
-            onChange={(e) => setId(e.target.value)}
-            placeholder="아이디를 입력해주세요"
+            onChange={handleIdChange}
+            placeholder="영문, 특수문자, 숫자만 입력 가능합니다"
           />
           <BtnSmall onClick={IdCheckHandle}>중복체크</BtnSmall>
         </SideLeft>
@@ -101,17 +154,17 @@ const AccountInfo = () => {
           <Input
             type="text"
             value={passWord}
-            onChange={(e) => setPassWord(e.target.value)}
-            placeholder="비밀번호를 입력해주세요"
+            onChange={handlePwChange}
+            placeholder="영문, 특수문자, 숫자만 입력 가능합니다"
           />
         </SideLeft>
 
         <SideLeft>
           <h2>비밀번호 재입력</h2>
           <Input
-            type="text"
+            type="password"
             value={checkPassWord}
-            onChange={(e) => setCheckPassWord(e.target.value)}
+            onChange={handlePwConfirmChange}
             placeholder="비밀번호를 다시한번 입력해주세요"
           />
         </SideLeft>
@@ -181,8 +234,7 @@ const AccountInfo = () => {
                 id: id,
                 passWord: passWord,
               }));
-
-              navigate("/region");
+              Loging();
             }}
           >
             다음으로

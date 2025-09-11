@@ -112,4 +112,27 @@ public interface MyPageMapper {
         VALUES (#{userId}, (SELECT hobby_id FROM HOBBIES WHERE hobby_name = #{hobbyName}), 'DESIRED')
     """)
     int insertDesiredHobby(@Param("userId") Long userId, @Param("hobbyName") String hobbyName);
+
+
+    // 아이디 중복체크
+    @Select("SELECT COUNT(*) FROM USERS WHERE USERNAME = #{username}")
+    int countByUsername(@Param("username") String username);
+
+
+
+    @Update("""
+    UPDATE USERS
+    SET name = #{name},
+        location = #{location},
+        self_intro = #{selfIntro},
+        photo_url = NVL(#{profileFileName, jdbcType=VARCHAR}, photo_url)
+    WHERE user_id = #{userId}
+""")
+    int updateUserProfile(@Param("userId") Long userId,
+                          @Param("name") String name,
+                          @Param("location") String location,
+                          @Param("selfIntro") String selfIntro,
+                          @Param("profileFileName") String profileFileName);
+
+
 }

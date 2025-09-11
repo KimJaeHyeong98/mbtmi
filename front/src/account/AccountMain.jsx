@@ -38,9 +38,18 @@ import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
 import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
 import RegionTreeSelect from "./RegionTreeSelect";
+
+import Chatting from "../chatting/Chatting.jsx";
+import ChattingNav from "../chatting/ChattingNav.jsx";
+import ChattingSend from "../chatting/ChattingSend.jsx";
+import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
+import BottomNav from "../globaltool/BottomNav.jsx";
+import styled from "styled-components";
+
 import HomeModal from "../homeSearchModal/HomeModal";
 import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
+import TodayPost from "../today's_post/TodayPost";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -224,6 +233,25 @@ const AccountMain = () => {
             </MbtiProvider>
           }
         />
+        <Route
+          path="/chat"
+          element={
+            <Container>
+              <ChattingRoomNav />
+              <BottomNav />
+            </Container>
+          }
+        />
+        <Route
+          path="/chat/:id"
+          element={
+            <>
+              <ChattingNav />
+              <Chatting />
+            </>
+          }
+        />
+
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
         {/* 홈 모달창 */}
@@ -234,3 +262,15 @@ const AccountMain = () => {
 };
 
 export default AccountMain;
+const Container = styled.div`
+  min-height: 100dvh;
+  width: 100vw;
+  overflow-x: hidden;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
+
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+  position: relative; /* 🔥 하단 네비 절대위치 기준 */
+  padding-top: 60px;
+`;

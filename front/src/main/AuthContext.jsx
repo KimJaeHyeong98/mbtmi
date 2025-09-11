@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, setUser } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 axios.defaults.baseURL = "http://localhost:8080"; // <-- 반드시 localhost로 통일
@@ -76,22 +76,6 @@ export const AuthProvider = ({ children }) => {
         type: "DESIRED",
       };
 
-      // const res = await axios.post(
-      //   "/api/signup",
-      //   {
-      //     createAcModel: payload,
-      //     createUserTagsModel,
-      //     createUserDesiredTagsModel,
-      //   },
-      //   { withCredentials: true }
-      // );
-      // console.log("전송성공", formData);
-      // console.log("Signup response:", res.data);
-      // if (res.data.success) {
-      //   setUser(res.data.user); // 전역 상태 갱신
-      //   return true;
-      // }
-      // return false;
       const res = await axios.post(
         "/api/signup",
         {
@@ -101,12 +85,10 @@ export const AuthProvider = ({ children }) => {
         },
         { withCredentials: true }
       );
-
+      console.log("전송성공", formData);
       console.log("Signup response:", res.data);
-
-      // success 키 없을 때도 true로 처리
-      if (res.data && (res.data.success || res.status === 200)) {
-        setUser(res.data.user || res.data);
+      if (res.data.success) {
+        setUser(res.data.user); // 전역 상태 갱신
         return true;
       }
       return false;
@@ -181,6 +163,43 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateMyInfo = async (payload) => {
+    try {
+      // FormData 생성
+      const formData = new FormData();
+      // formData.append(payload);
+      formData.append("name", payload.name);
+      formData.append("location", payload.location);
+      formData.append("self_intro", payload.self_intro);
+
+      // 파일이 있다면 FormData에 추가
+      if (payload.profileFile) {
+        formData.append("profileFile", payload.profileFile);
+      }
+
+      // ✅ 콘솔로 FormData 값 확인
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // 실제 API 호출
+      const res = await axios.post("/api/update/profile", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.status === 200) {
+        // 서버 세션 갱신 후, 전역 상태도 갱신
+        await checkSession(); // 최신 user 정보 가져오기
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("updateMyInfo error:", err);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -193,6 +212,7 @@ export const AuthProvider = ({ children }) => {
         setUser,
         updateMymbti,
         updateDesired,
+        updateMyInfo,
       }}
     >
       {children}

@@ -81,6 +81,15 @@ public class MyPageService {
         }
     }
 
+    // 아이디 중복체크
+    public boolean isUsernameTaken(String username) {
+        return myPageMapper.countByUsername(username) > 0;
+    }
 
+    //
+    @Transactional
+    public void updateUserProfile(Long userId, String name, String location, String selfIntro, String profileFileName) {
+        myPageMapper.updateUserProfile(userId, name, location, selfIntro, profileFileName);
+    }
 
 }

@@ -21,6 +21,9 @@ const MyInfo = () => {
       console.log("로그아웃 취소됨");
     }
   };
+  const profileImageUrl = user?.photo_url
+    ? `http://localhost:8080/uploads/${user.photo_url}`
+    : defaultProfile;
   // 회원탈퇴용 핸들러
   const handleDelAccount = async () => {
     try {
@@ -38,7 +41,7 @@ const MyInfo = () => {
   };
 
   const btn = {
-    edit: "프로필 수정",
+    edit: "프로필 정보 수정",
     logout: "로그아웃",
     bye: "회원탈퇴",
   };
@@ -48,13 +51,13 @@ const MyInfo = () => {
       <Card>
         <ProfileSection>
           <ProfileImage
-            src={profileimage}
+            src={profileImageUrl}
             alt="프로필 이미지"
             draggable="false"
           />
           <Name>이름: {user.name}</Name>
           <Id>아이디: {user.username}</Id>
-          <Mail>이메일: {user.email || "이메일 미등록"}</Mail>
+
           <Mbti> MBTI: {user.mbti}</Mbti>
         </ProfileSection>
 
@@ -153,12 +156,6 @@ const Name = styled.div`
 const Id = styled.div`
   font-size: 11pt;
   color: #000000;
-`;
-
-const Mail = styled.div`
-  font-size: 10pt;
-  color: #000000;
-  opacity: 0.9;
 `;
 
 const Mbti = styled.div`

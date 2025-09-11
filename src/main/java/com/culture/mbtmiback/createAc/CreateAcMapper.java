@@ -1,10 +1,7 @@
 package com.culture.mbtmiback.createAc;
 
 import com.culture.mbtmiback.account.AccountModel;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface CreateAcMapper {
@@ -20,4 +17,9 @@ public interface CreateAcMapper {
 
     @Insert("INSERT INTO USER_HOBBIES(user_id, hobby_id, type) VALUES(#{userId},(SELECT hobby_id FROM HOBBIES WHERE hobby_name=#{hobbyName}), #{type})")
     void insertUserHobby(@Param("userId") Long userId, @Param("hobbyName") String hobbyName, @Param("type") String type);
+
+//    유저 아이디 중복 검사 username이 존재하면 username값 리턴, 없으면 null
+    @Select("SELECT username FROM USERS WHERE username = #{username}")
+    String findUsername(@Param("username") String username);
+
 }
