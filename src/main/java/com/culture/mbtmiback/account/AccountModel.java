@@ -20,5 +20,9 @@ public class AccountModel {
     private String location;
     private String gender;
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bf9ef988baa9185e2d202fc77d09df95819ace56
 
 }

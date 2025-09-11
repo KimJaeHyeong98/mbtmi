@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Myprofile = () => {
-  const { user, updateUser, updateMyInfo  } = useAuth();
-    const navigate = useNavigate();
+  const { user, updateUser, updateMyInfo } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -43,7 +43,7 @@ const Myprofile = () => {
     }
   };
 
-   const handleUpdate = async () => {
+  const handleUpdate = async () => {
     // payload 생성
     const payload = {
       name: form.name,
@@ -57,7 +57,7 @@ const Myprofile = () => {
     const success = await updateMyInfo(payload);
     if (success) {
       alert("프로필이 업데이트되었습니다!");
-      navigate("/mypage"); 
+      navigate("/mypage");
     } else {
       alert("업데이트에 실패했습니다.");
     }
