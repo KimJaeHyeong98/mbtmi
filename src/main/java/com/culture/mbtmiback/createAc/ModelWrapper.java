@@ -7,5 +7,4 @@ public class ModelWrapper {
     private CreateAcModel createAcModel;
     private CreateUserTagsModel createUserTagsModel;
     private CreateUserDesiredTagsModel createUserDesiredTagsModel;
-
 }

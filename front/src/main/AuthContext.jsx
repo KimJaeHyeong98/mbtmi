@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 axios.defaults.baseURL = "http://localhost:8080"; // <-- 반드시 localhost로 통일
