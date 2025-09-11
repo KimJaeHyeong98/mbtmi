@@ -1,15 +1,33 @@
 import { useSignup } from "../SignupProvider";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import PreCardModal from "../account/PreCardModal";
+import { useState, useEffect } from "react";
 import { useAuth } from "../main/AuthContext";
 
 const Summary = () => {
   const { formData, setReturnToSummary } = useSignup();
   const { sendFormData } = useAuth();
   const navigate = useNavigate();
-  const [openPreview, setOpenPreview] = useState(false);
+
+  // 1️⃣ 뒤로가기 막는 로직
+  useEffect(() => {
+    // 뒤로가기를 눌렀을 때 실행될 함수
+    const handleBack = (event) => {
+      event.preventDefault(); // 기본 뒤로가기 동작 막기
+      window.history.pushState(null, "", window.location.href); // 현재 페이지 상태를 다시 히스토리에 쌓기
+    };
+
+    // 페이지 진입 시 히스토리에 현재 페이지 넣기
+    window.history.pushState(null, "", window.location.href);
+
+    // popstate 이벤트 등록
+    window.addEventListener("popstate", handleBack);
+
+    // 컴포넌트 언마운트 시 이벤트 제거 (메모리 누수 방지)
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, []);
 
   const handleEditMbti = () => {
     setReturnToSummary(true);
@@ -38,6 +56,19 @@ const Summary = () => {
   const handleEditRegion = () => {
     setReturnToSummary(true);
     navigate("/region");
+  };
+
+  const handleNext = async () => {
+    // 1. 백엔드로 전송
+    const success = await sendFormData(formData);
+
+    if (!success) {
+      alert("회원가입 실패!");
+      return;
+    }
+
+    // 2. 전송 성공 시 다음 페이지로 이동
+    navigate("/profilephoto", { replace: true }); // 이동할 경로
   };
 
   console.log(formData);
@@ -129,14 +160,8 @@ const Summary = () => {
           </Item>
         </Info>
         <Btnzone>
-          <SubmitButton onClick={() => setOpenPreview(true)}>
-            내 카드 <br /> 미리보기
-          </SubmitButton>
-          <SubmitButton onClick={() => sendFormData(formData)}>
-            작성 완료
-          </SubmitButton>
+          <NextButton onClick={handleNext}>다음으로</NextButton>
         </Btnzone>
-        {openPreview && <PreCardModal onClose={() => setOpenPreview(false)} />}
       </InfoCard>
     </Container>
   );
@@ -248,7 +273,7 @@ const Btnzone = styled.div`
   gap: 20px;
 `;
 
-const SubmitButton = styled.button`
+const NextButton = styled.button`
   width: 110px;
   height: 50px;
   padding: 12px;

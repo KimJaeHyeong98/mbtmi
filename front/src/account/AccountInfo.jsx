@@ -73,31 +73,6 @@ const AccountInfo = () => {
       navigate("/AccountSelMbti"); // 조건 통과 시 이동
     }
   };
-  //사진추가용
-  // 📌 프로필 이미지 상태
-  const [profileImage, setProfileImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const preview = reader.result;
-
-      // 로컬 state (현재 화면 미리보기용)
-      setProfileImage(file);
-      setPreviewUrl(preview);
-
-      // 전역 상태 (다음 페이지에서도 사용)
-      setFormData((prev) => ({
-        ...prev,
-        profile: { file, preview },
-      }));
-    };
-    reader.readAsDataURL(file);
-  };
 
   return (
     <Container>
@@ -139,27 +114,6 @@ const AccountInfo = () => {
             onChange={(e) => setCheckPassWord(e.target.value)}
             placeholder="비밀번호를 다시한번 입력해주세요"
           />
-        </SideLeft>
-      </Card>
-      <Card>
-        <SideLeft>
-          <h2>프로필사진 선택</h2>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              style={{ marginBottom: "10px" }}
-            />
-            {previewUrl && <PreviewImage src={previewUrl} alt="미리보기" />}
-          </div>
         </SideLeft>
       </Card>
       <Card>
@@ -281,16 +235,6 @@ const LogoWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-bottom: 5px;
-`;
-
-//사진 관련
-const PreviewImage = styled.img`
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #a6c1ee;
-  margin-top: 8px;
 `;
 
 const TitleWrapper = styled.div`

@@ -76,6 +76,22 @@ export const AuthProvider = ({ children }) => {
         type: "DESIRED",
       };
 
+      // const res = await axios.post(
+      //   "/api/signup",
+      //   {
+      //     createAcModel: payload,
+      //     createUserTagsModel,
+      //     createUserDesiredTagsModel,
+      //   },
+      //   { withCredentials: true }
+      // );
+      // console.log("전송성공", formData);
+      // console.log("Signup response:", res.data);
+      // if (res.data.success) {
+      //   setUser(res.data.user); // 전역 상태 갱신
+      //   return true;
+      // }
+      // return false;
       const res = await axios.post(
         "/api/signup",
         {
@@ -85,10 +101,12 @@ export const AuthProvider = ({ children }) => {
         },
         { withCredentials: true }
       );
-      console.log("전송성공", formData);
+
       console.log("Signup response:", res.data);
-      if (res.data.success) {
-        setUser(res.data.user); // 전역 상태 갱신
+
+      // success 키 없을 때도 true로 처리
+      if (res.data && (res.data.success || res.status === 200)) {
+        setUser(res.data.user || res.data);
         return true;
       }
       return false;

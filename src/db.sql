@@ -75,6 +75,11 @@ WHEN MATCHED THEN
                                 WHEN 17 THEN '제주특별자치도'
         END;
 
+SELECT constraint_name, column_name
+FROM user_cons_columns
+WHERE table_name = 'USERS';
+
+select * from users order by user_id;
 
 
 

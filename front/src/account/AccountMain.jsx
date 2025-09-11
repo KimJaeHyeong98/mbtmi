@@ -40,6 +40,7 @@ import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
 import RegionTreeSelect from "./RegionTreeSelect";
 import HomeModal from "../homeSearchModal/HomeModal";
 import GenderSelect from "../homeSearchModal/GenderSelect";
+import ProfilePhoto from "./ProfilePhoto";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -115,6 +116,7 @@ const AccountMain = () => {
         <Route path="/summary" element={<Summary />} />
         <Route path="/precard" element={<PreCard />} />
         <Route path="/region" element={<RegionTreeSelect />} />
+        <Route path="/profilephoto" element={<ProfilePhoto />} />
 
         {/* 간단한 MBTI */}
 
