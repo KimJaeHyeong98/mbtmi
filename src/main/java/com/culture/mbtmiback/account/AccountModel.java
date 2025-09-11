@@ -18,10 +18,7 @@ public class AccountModel {
     private String self_intro;
     private String photo_url;
     private String location;
-<<<<<<< HEAD
     private String gender;
-=======
-    private String email;
->>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
+
 
 }
