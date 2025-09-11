@@ -520,6 +520,7 @@ const WantedInfor = () => {
       if (success) {
         console.log("최종 서버 전송 데이터:", payload);
         alert("원하는 상대방 정보 업데이트 완료!");
+        console.log("최종데이터: ", payload);
         navigate("/mypage");
       } else {
         alert("업데이트 실패");

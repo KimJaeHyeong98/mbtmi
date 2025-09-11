@@ -36,7 +36,18 @@ import MyIntro from "../setting/MyIntro";
 import Myhobby from "../setting/Myhobby";
 import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
+import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
 import RegionTreeSelect from "./RegionTreeSelect";
+
+import Chatting from "../chatting/Chatting.jsx";
+import ChattingNav from "../chatting/ChattingNav.jsx";
+import ChattingSend from "../chatting/ChattingSend.jsx";
+import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
+import BottomNav from "../globaltool/BottomNav.jsx";
+import styled from "styled-components";
+
+import HomeModal from "../homeSearchModal/HomeModal";
+import GenderSelect from "../homeSearchModal/GenderSelect";
 
 
 const AccountMain = () => {
@@ -117,113 +128,137 @@ const AccountMain = () => {
 
         {/* 간단한 MBTI */}
 
-        <Route
-          path="/easymbti1"
-          element={
-            <MbtiProvider>
-              <EasyMbti1 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti2"
-          element={
-            <MbtiProvider>
-              <EasyMbti2 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti3"
-          element={
-            <MbtiProvider>
-              <EasyMbti3 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti4"
-          element={
-            <MbtiProvider>
-              <EasyMbti4 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti5"
-          element={
-            <MbtiProvider>
-              <EasyMbti5 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti6"
-          element={
-            <MbtiProvider>
-              <EasyMbti6 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti7"
-          element={
-            <MbtiProvider>
-              <EasyMbti7 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti8"
-          element={
-            <MbtiProvider>
-              <EasyMbti8 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti9"
-          element={
-            <MbtiProvider>
-              <EasyMbti9 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti10"
-          element={
-            <MbtiProvider>
-              <EasyMbti10 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti11"
-          element={
-            <MbtiProvider>
-              <EasyMbti11 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/easymbti12"
-          element={
-            <MbtiProvider>
-              <EasyMbti12 />
-            </MbtiProvider>
-          }
-        />
-        <Route
-          path="/resultmbti"
-          element={
-            <MbtiProvider>
-              <ResultMbti />
-            </MbtiProvider>
-          }
-        />
-      </Routes>
-    </SignupProvider>
-  );
+                <Route
+                    path="/easymbti1"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti1 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti2"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti2 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti3"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti3 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti4"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti4 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti5"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti5 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti6"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti6 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti7"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti7 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti8"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti8 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti9"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti9 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti10"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti10 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti11"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti11 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/easymbti12"
+                    element={
+                        <MbtiProvider>
+                            <EasyMbti12 />
+                        </MbtiProvider>
+                    }
+                />
+                <Route
+                    path="/resultmbti"
+                    element={
+                        <MbtiProvider>
+                            <ResultMbti />
+                        </MbtiProvider>
+                    }
+                />
+                <Route path="/chat" element={<Container><ChattingRoomNav /><BottomNav /></Container>}/>
+                <Route path="/chat/:id" element={<>
+                <ChattingNav />
+                <Chatting />
+
+                </>} />
+                                             
+                                              {/* 회원탈퇴 */}
+        <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
+        {/* 홈 모달창 */}
+        <Route path="HomeModal" element={<HomeModal />} />
+            </Routes>
+        </SignupProvider>
+    );
+
 };
 
 export default AccountMain;
+const Container = styled.div`
+  min-height: 100dvh;
+  width: 100vw;
+  overflow-x: hidden;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
+
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+  position: relative; /* 🔥 하단 네비 절대위치 기준 */
+  padding-top: 60px;
+`;

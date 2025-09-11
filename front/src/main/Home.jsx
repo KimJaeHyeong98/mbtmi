@@ -1,17 +1,20 @@
 import styled from "styled-components";
-import profileimage from "../assets/img/kar.jpg";
 import logoimage from "../assets/img/mbtmi.jpg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
+
+import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
+import BottomNav from "../globaltool/BottomNav.jsx";
+
+
+import HomeModal from "../homeSearchModal/HomeModal";
 
 const Container = styled.div`
   min-height: 100dvh;
   width: 100vw;
   overflow-x: hidden;
   display: flex;
-  justify-content: center;
-  align-items: center;
   box-sizing: border-box;
   flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
 
@@ -26,6 +29,7 @@ const LogoImage = styled.img`
   left: 30px;
   object-fit: cover;
   width: 150px;
+  align-items: center;
 `;
 
 const Card = styled.div`
@@ -90,40 +94,7 @@ const Btn = styled.span`
   font-size: 30px;
 `;
 
-/* ✅ 하단 네비게이션 */
-const BottomNav = styled.nav`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #ecf0f3; /* 밝은 회색톤 */
-  padding: 12px 0 calc(env(safe-area-inset-bottom, 0) + 12px);
 
-  display: flex;
-  justify-content: space-evenly;
-
-  border-radius: 20px 20px 0 0; /* 위쪽만 둥글게 */
-  box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; /* 뉴모피즘 음각 효과 */
-`;
-
-const NavBtn = styled.button`
-  appearance: none;
-  border: none;
-  background: #ecf0f3;
-  font-size: 24px;
-  padding: 10px;
-  border-radius: 16px;
-  cursor: pointer;
-
-  /* 뉴모피즘 버튼 */
-  box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
-  transition: all 0.2s ease;
-
-  &:active {
-    box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; /* 눌림 효과 */
-    transform: scale(0.95);
-  }
-`;
 const CardWrapper = styled.div`
   overflow: hidden; // 화면 밖 카드 숨김
 `;
@@ -141,12 +112,26 @@ const CardItem = styled.div`
   flex-direction: column;
   align-items: center;
 `;
+// 모달용
+const SettingButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  appearance: none;
+  border: none;
+  background: #ecf0f3;
+  font-size: 24px; /* 점 크기 조금 키움 */
+  padding: 6px 10px;
+  border-radius: 16px;
+  cursor: pointer;
+`;
 const Home = () => {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(null);
   const [randomUsers, setRandomUsers] = useState([]); // 랜덤 유저 50명 배열
   const [currentIndex, setCurrentIndex] = useState(0); // 현재 카드 인덱스
+  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태 추가
 
   const profile = {
     btn: ["❤️", "❌"],
@@ -203,52 +188,53 @@ const Home = () => {
   };
 
   return (
-    <Container>
-      <LogoImage
-        src={logoimage}
-        alt=""
-        style={{ userSelect: "none", WebkitUserDrag: "none" }}
-      />
-      <CardWrapper>
-        <CardSlide index={currentIndex}>
-          {randomUsers.map((user) => (
-            <CardItem key={user.user_id}>
-              <Card>
-                <div>
-                  <ProfileImage src={user.photo_url} alt="profile" />
-                  <Name>이름: {user.name}</Name>
-                  <p>MBTI: {user.mbti}</p>
-                  <p>자기소개: {user.self_intro}</p>
-                </div>
-                {/* // 백엔드에서 받아온 태그 중 SELF 타입만 필터링 */}
-                <TagList>
-                  {user.tags
-                    .filter((tag) => tag.type === "SELF") // SELF 타입만
-                    .map((tag) => (
-                      <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
-                    ))}
-                </TagList>
-                {/* <Btn onClick={handleNext}>Next</Btn> */}
-                <Btns onClick={handleNext}>
-                  {profile.btn.map((btn, index) => (
-                    <Btn key={index}>{btn}</Btn>
-                  ))}
-                </Btns>
-              </Card>
-            </CardItem>
-          ))}
-        </CardSlide>
-      </CardWrapper>
+      <Container>
+        <LogoImage
+            src={logoimage}
+            alt=""
+            style={{ userSelect: "none", WebkitUserDrag: "none" }}
+        />
+                 <CardWrapper>
+              <CardSlide index={currentIndex}>
+                {randomUsers.map((user) => (
+                    <CardItem key={user.user_id}>
+                      <Card>
+                        <div>
+                          <ProfileImage src={user.photo_url} alt="profile" />
+                          <Name>이름: {user.name}</Name>
+                          <p>MBTI: {user.mbti}</p>
+                          <p>자기소개: {user.self_intro}</p>
+                        </div>
+                        {/* // 백엔드에서 받아온 태그 중 SELF 타입만 필터링 */}
+                        <TagList>
+                          {user.tags
+                              .filter((tag) => tag.type === "SELF") // SELF 타입만
+                              .map((tag) => (
+                                  <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
+                              ))}
+                        </TagList>
+                        {/* <Btn onClick={handleNext}>Next</Btn> */}
+                        <Btns onClick={handleNext}>
+                          {profile.btn.map((btn, index) => (
+                              <Btn key={index}>{btn}</Btn>
+                          ))}
+                        </Btns>
+                      </Card>
+                    </CardItem>
+                ))}
+              </CardSlide>
+            </CardWrapper>
 
-      {/* ✅ 하단 네비 */}
-      <BottomNav>
-        <NavBtn>🏠</NavBtn>
-        <NavBtn>🔍</NavBtn>
-        <NavBtn>❤️</NavBtn>
-        <NavBtn>➕</NavBtn>
-        <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
-      </BottomNav>
-    </Container>
+        )
+
+        {/* ✅ 하단 네비 */}
+        <BottomNav />
+ <HomeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectGender={(gender) => console.log("선택 성별:", gender)}
+      />
+      </Container>
   );
 };
 

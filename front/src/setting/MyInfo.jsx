@@ -24,6 +24,14 @@ const MyInfo = () => {
   const profileImageUrl = user?.photo_url
     ? `http://localhost:8080/uploads/${user.photo_url}`
     : defaultProfile;
+  // 회원탈퇴용 핸들러
+  const handleDelAccount = async () => {
+    try {
+      navigate("/AccountDelConfirm", { replace: true }); // 회원탈퇴 페이지로 이동
+    } catch (e) {
+      console.error(e.message);
+    }
+  };
 
   const editpage = {
     mbti: "나의 MBTI 수정하기",
@@ -57,7 +65,6 @@ const MyInfo = () => {
           <ActionButton onClick={() => navigate("/mypage/profile")}>
             {btn.edit}
           </ActionButton>
-
           <EditList>
             <EditButton onClick={() => navigate("/mypage/mymbti")}>
               {editpage.mbti}
@@ -76,7 +83,7 @@ const MyInfo = () => {
 
         <BottomActions>
           <DangerButton onClick={handleLogout}>{btn.logout}</DangerButton>
-          <DangerButton>{btn.bye}</DangerButton>
+          <DangerButton onClick={handleDelAccount}>{btn.bye}</DangerButton>
         </BottomActions>
       </Card>
     </Container>

@@ -1,15 +1,17 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
-const ChattingMain = () => {
+const ChattingMain = ({room, onClick}) => {
   const chatting = {
-    name: "유지민",
-    content: "안녕하세요!",
-    date: "1일전",
+    roomId : room.room_id,
+    user2Id : room.user2_id,
+    name: room.opponent_name,
+    pic : room.opponent_pic
+
   };
 
   return (
-    <Container>
+    <Container onClick={onClick}>
       <ProfileBlock>
         <ProfileImage
           src={profileimage}
@@ -18,8 +20,6 @@ const ChattingMain = () => {
         />
         <Chat>
           <Name>{chatting.name}</Name>
-          <Content>{chatting.content}</Content>
-          <Date>{chatting.date}</Date>
         </Chat>
       </ProfileBlock>
     </Container>
@@ -28,7 +28,6 @@ const ChattingMain = () => {
 
 const Container = styled.div`
   position: relative;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;

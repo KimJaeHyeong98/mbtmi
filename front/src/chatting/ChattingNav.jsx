@@ -1,11 +1,13 @@
 import styled from "styled-components";
-import profileImg from "../assets/img/kar.jpg"; // 상대 프로필 이미지
+import profileImg from "../assets/img/kar.jpg";
+import {useNavigate} from "react-router-dom"; // 상대 프로필 이미지
 
 const ChattingNav = () => {
+    const navigate = useNavigate();
   return (
     <HeaderContainer>
       <LeftSection>
-        <BackButton>{"<"}</BackButton>
+        <BackButton onClick={() => navigate(-1)}>{"<"}</BackButton>
         <Profile src={profileImg} alt="프로필" />
         <NameSection>
           <Name>유지민</Name>
@@ -23,13 +25,14 @@ const ChattingNav = () => {
 /* ===== styled components ===== */
 
 const HeaderContainer = styled.div`
-  width: 100%;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 60px;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 `;
 
 const LeftSection = styled.div`
