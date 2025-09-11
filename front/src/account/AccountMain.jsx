@@ -47,13 +47,9 @@ import BottomNav from "../globaltool/BottomNav.jsx";
 import styled from "styled-components";
 
 import HomeModal from "../homeSearchModal/HomeModal";
-<<<<<<< HEAD
 import NothingResultHome from "../main/NothingResultHome";
-=======
-import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
 import TodayPost from "../today's_post/TodayPost";
->>>>>>> 99ac6d24461c010f199ec06f229ecafaf93653d2
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
