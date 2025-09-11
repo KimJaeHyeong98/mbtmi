@@ -1,24 +1,43 @@
 import styled from "styled-components";
+import {useEffect, useState} from "react";
+import ChattingMain from "./ChattingMain.jsx";
+import {useNavigate} from "react-router-dom";
+import axios from "axios";
+import {useAuth} from "../main/AuthContext.jsx";
 
 const ChattingRoomNav = () => {
-  const chat = {
-    name: "Chatting",
-  };
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [roomList , setRoomList] = useState([
+
+  ]);
+    useEffect(() => {
+        const chatList = async () => {
+         const res = await axios.get("/api/chat", {params: { userId: user.user_id }})
+            console.log(res.data)
+            setRoomList(res.data)
+        }
+        chatList();
+
+    }, []);
+
+
 
   return (
     <Nav>
-      <Name>{chat.name}</Name>
+      <h2>chatting list</h2>
+      <Name>{roomList.map((room) => <ChattingMain key={room.room_id} onClick={()=> navigate(`/chat/${room.room_id}`, {state: {room}})} room={room} />)}</Name>
     </Nav>
   );
 };
 
 const Nav = styled.div`
-  margin: 20px 10px;
+  margin: -50px 10px;
   align-items: center;
   gap: 10px; /* 이미지-텍스트-버튼 간 간격 */
 `;
 
-const Name = styled.h2`
+const Name = styled.div`
   margin-bottom: 10px;
   font-size: 25pt;
 `;

@@ -1,48 +1,54 @@
 import styled from "styled-components";
+import {useNavigate} from "react-router-dom";
 
-const Bar = styled.nav`
-    position: sticky; /* 화면 하단 고정 */
+/* ✅ 하단 네비게이션 */
+const BottomWrapper = styled.nav`
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #d7f1fa;
-    border-top: 1px solid #cfe8ee;
-    padding: 10px 12px calc(env(safe-area-inset-bottom, 0) + 10px);
-    z-index: 10;
-    width: inherit;
-`;
+    background: #ecf0f3; /* 밝은 회색톤 */
+    padding: 12px 0 calc(env(safe-area-inset-bottom, 0) + 12px);
 
-const Row = styled.div`
-    max-width: 560px;
-    margin: 0 auto;
-    display: grid;
     display: flex;
     justify-content: space-evenly;
-    grid-template-columns: repeat(4, 1fr);
-    align-items: center;
-    gap: 8px;
+
+    border-radius: 20px 20px 0 0; /* 위쪽만 둥글게 */
+    box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; /* 뉴모피즘 음각 효과 */
 `;
 
-const Btn = styled.button`
+const NavBtn = styled.button`
     appearance: none;
-    border: 0;
-    background: none;
+    border: none;
+    background: #ecf0f3;
     font-size: 24px;
-    padding: 8px 0;
+    padding: 10px;
+    border-radius: 16px;
     cursor: pointer;
+
+    /* 뉴모피즘 버튼 */
+    box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+    transition: all 0.2s ease;
+
+    &:active {
+        box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; /* 눌림 효과 */
+        transform: scale(0.95);
+    }
 `;
 
 const BottomNav = () => {
+    const navigate = useNavigate();
     return (
-        <Bar>
-            <Row>
-                <Btn>🏠</Btn>
-                <Btn>🔍</Btn>
-                <Btn>❤️</Btn>
-                <Btn>➕</Btn>
-                <Btn>🔔</Btn>
-            </Row>
-        </Bar>
+        <BottomWrapper>
+            <div>
+                <NavBtn>🏠</NavBtn>
+                <NavBtn>🔍</NavBtn>
+                <NavBtn>❤️</NavBtn>
+                <NavBtn>➕</NavBtn>
+                <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
+                <NavBtn onClick={() => navigate("/chat")}>💌</NavBtn>
+            </div>
+        </BottomWrapper>
     );
 };
 export default BottomNav;
