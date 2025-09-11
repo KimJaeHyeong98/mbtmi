@@ -162,13 +162,12 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   };
-<<<<<<< HEAD
 
   const updateMyInfo = async (payload) => {
     try {
       // FormData 생성
       const formData = new FormData();
-     // formData.append(payload);
+      // formData.append(payload);
       formData.append("name", payload.name);
       formData.append("location", payload.location);
       formData.append("self_intro", payload.self_intro);
@@ -200,28 +199,20 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   };
-=======
->>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
 
   return (
     <AuthContext.Provider
       value={{
         loggedIn,
         user,
-<<<<<<< HEAD
-=======
         sendFormData,
->>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
         login,
         logout,
         loading,
         setUser,
         updateMymbti,
         updateDesired,
-<<<<<<< HEAD
         updateMyInfo,
-=======
->>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
       }}
     >
       {children}
