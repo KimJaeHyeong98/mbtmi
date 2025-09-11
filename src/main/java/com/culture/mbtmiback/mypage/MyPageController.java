@@ -6,8 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -111,12 +118,7 @@ public class MyPageController {
         System.out.println("전달받은 Hobbies: " + desiredModel.getWantedHobbies());
 
         // DB 업데이트
-        myPageService.updateDesiredInfo(
-                sessionUser.getUser_id(),
-                desiredModel.getWantedMbti(),
-                desiredModel.getWantedTags(),
-                desiredModel.getWantedHobbies()
-        );
+        myPageService.updateDesiredInfo(sessionUser.getUser_id(), desiredModel.getWantedMbti(), desiredModel.getWantedTags(), desiredModel.getWantedHobbies());
 
         // 세션 반영
         sessionUser.setDesired_mbti(desiredModel.getWantedMbti());
@@ -124,6 +126,52 @@ public class MyPageController {
 
         return ResponseEntity.ok("업데이트 완료");
     }
+
+    //아이디 중복체크
+    @GetMapping("/users/check-username")
+    public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String username) {
+        boolean exists = myPageService.isUsernameTaken(username);
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    //개인정보 수정
+    @PostMapping("/update/profile")
+    public ResponseEntity<String> updateProfile(
+            @RequestPart("name") String name,
+            @RequestPart("location") String location,
+            @RequestPart("self_intro") String selfIntro,
+            @RequestPart(value = "profileFile", required = false) MultipartFile profileFile,
+            HttpSession session
+    ) {
+        try {
+            AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+            if (sessionUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+
+            String fileName = null;
+            if (profileFile != null && !profileFile.isEmpty()) {
+                fileName = UUID.randomUUID() + "_" + profileFile.getOriginalFilename();
+                Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
+                Files.createDirectories(uploadDir);
+                Path savePath = uploadDir.resolve(fileName);
+                profileFile.transferTo(savePath.toFile());
+                System.out.println("파일 저장 완료: " + savePath.toAbsolutePath());
+            }
+
+            myPageService.updateUserProfile(sessionUser.getUser_id(), name, location, selfIntro, fileName);
+
+            sessionUser.setName(name);
+            sessionUser.setLocation(location);
+            sessionUser.setSelf_intro(selfIntro);
+            if (fileName != null) sessionUser.setPhoto_url(fileName);
+            session.setAttribute("user", sessionUser);
+
+            return ResponseEntity.ok("프로필 업데이트 완료");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("서버 에러: " + e.getMessage());
+        }
+    }
+
 
 
 }

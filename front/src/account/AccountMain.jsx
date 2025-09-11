@@ -104,28 +104,29 @@ const AccountMain = () => {
           element={<PrivateRoute element={<Myhobby />} />}
         />
 
+        <Route
+          path="/mypage/wantedinfor"
+          element={<PrivateRoute element={<WantedInfor />} />}
+        />
+        
+      
 
-                <Route
-                    path="/mypage/wantedinfor"
-                    element={<PrivateRoute element={<WantedInfor />} />}
-                />
+        {/* 회원가입 */}
 
-                {/* 회원가입 */}
+        <Route path="/info" element={<AccountInfo />} />
+        <Route path="/region" element={<RegionTreeSelect />} />
+        <Route path="/intro" element={<AccountIntro />} />
+        <Route path="/hobby" element={<AccountHobby />} />
+        <Route path="/selmbti" element={<AccountSelMbti />} />
+        <Route path="/wantedmbti" element={<AccountMbti />} />
 
-                <Route path="/info" element={<AccountInfo />} />
-                <Route path="/region" element={<RegionTreeSelect />} />
-                <Route path="/intro" element={<AccountIntro />} />
-                <Route path="/hobby" element={<AccountHobby />} />
-                <Route path="/selmbti" element={<AccountSelMbti />} />
-                <Route path="/wantedmbti" element={<AccountMbti />} />
+        <Route path="/wantedintro" element={<AccountwantedIntro />} />
+        <Route path="/wantedhobby" element={<AccountWantedHobby />} />
+        <Route path="/introduce" element={<IntroduceMySelf />} />
+        <Route path="/summary" element={<Summary />} />
+        <Route path="/precard" element={<PreCard />} />
 
-                <Route path="/wantedintro" element={<AccountwantedIntro />} />
-                <Route path="/wantedhobby" element={<AccountWantedHobby />} />
-                <Route path="/introduce" element={<IntroduceMySelf />} />
-                <Route path="/summary" element={<Summary />} />
-                <Route path="/precard" element={<PreCard />} />
-
-                {/* 간단한 MBTI */}
+        {/* 간단한 MBTI */}
 
                 <Route
                     path="/easymbti1"

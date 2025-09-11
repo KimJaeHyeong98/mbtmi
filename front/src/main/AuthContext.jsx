@@ -162,19 +162,66 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   };
+<<<<<<< HEAD
+
+  const updateMyInfo = async (payload) => {
+    try {
+      // FormData 생성
+      const formData = new FormData();
+     // formData.append(payload);
+      formData.append("name", payload.name);
+      formData.append("location", payload.location);
+      formData.append("self_intro", payload.self_intro);
+
+      // 파일이 있다면 FormData에 추가
+      if (payload.profileFile) {
+        formData.append("profileFile", payload.profileFile);
+      }
+
+      // ✅ 콘솔로 FormData 값 확인
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // 실제 API 호출
+      const res = await axios.post("/api/update/profile", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.status === 200) {
+        // 서버 세션 갱신 후, 전역 상태도 갱신
+        await checkSession(); // 최신 user 정보 가져오기
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("updateMyInfo error:", err);
+      return false;
+    }
+  };
+=======
+>>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
 
   return (
     <AuthContext.Provider
       value={{
         loggedIn,
         user,
+<<<<<<< HEAD
+=======
         sendFormData,
+>>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
         login,
         logout,
         loading,
         setUser,
         updateMymbti,
         updateDesired,
+<<<<<<< HEAD
+        updateMyInfo,
+=======
+>>>>>>> 76c84ee1cd9ffd89c262faad08f8c5f5e9d37b49
       }}
     >
       {children}
