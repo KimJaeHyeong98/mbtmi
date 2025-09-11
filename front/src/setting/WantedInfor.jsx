@@ -510,7 +510,7 @@ const WantedInfor = () => {
 
   const handleNext = async () => {
     try {
-      const payload = {
+      const payload = { 
         wantedMbti,
         wantedTags,
         wantedHobbies,
@@ -518,6 +518,7 @@ const WantedInfor = () => {
 
       const success = await updateDesired(payload); // 서버 업데이트 + 전역 상태 갱신
       if (success) {
+        console.log("최종 서버 전송 데이터:", payload);
         alert("원하는 상대방 정보 업데이트 완료!");
         console.log("최종데이터: ", payload);
         navigate("/mypage");

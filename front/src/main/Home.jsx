@@ -1,17 +1,19 @@
 import styled from "styled-components";
-import profileimage from "../assets/img/kar.jpg";
 import logoimage from "../assets/img/mbtmi.jpg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
+
+import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
+import BottomNav from "../globaltool/BottomNav.jsx";
+
 import HomeModal from "../homeSearchModal/HomeModal";
+
 const Container = styled.div`
     min-height: 100dvh;
     width: 100vw;
     overflow-x: hidden;
     display: flex;
-    justify-content: center;
-    align-items: center;
     box-sizing: border-box;
     flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
 
@@ -91,40 +93,6 @@ const Btn = styled.span`
     font-size: 30px;
 `;
 
-/* ✅ 하단 네비게이션 */
-const BottomNav = styled.nav`
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #ecf0f3; /* 밝은 회색톤 */
-    padding: 12px 0 calc(env(safe-area-inset-bottom, 0) + 12px);
-
-    display: flex;
-    justify-content: space-evenly;
-
-    border-radius: 20px 20px 0 0; /* 위쪽만 둥글게 */
-    box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; /* 뉴모피즘 음각 효과 */
-`;
-
-const NavBtn = styled.button`
-    appearance: none;
-    border: none;
-    background: #ecf0f3;
-    font-size: 24px;
-    padding: 10px;
-    border-radius: 16px;
-    cursor: pointer;
-
-    /* 뉴모피즘 버튼 */
-    box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
-    transition: all 0.2s ease;
-
-    &:active {
-        box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; /* 눌림 효과 */
-        transform: scale(0.95);
-    }
-`;
 const CardWrapper = styled.div`
     overflow: hidden; // 화면 밖 카드 숨김
 `;
@@ -204,23 +172,6 @@ const Home = () => {
     //단일카드용 이었음
     // const currentRandomUser = randomUsers[currentIndex];
 
-    const handleNext = async () => {
-        const nextIndex = currentIndex + 1;
-        if (nextIndex >= randomUsers.length) {
-            try {
-                const res = await axios.get(
-                    `/api/users/random/${currentUser.user_id}`
-                );
-                setRandomUsers(res.data);
-                setCurrentIndex(0); // 새 데이터 첫 카드부터 시작
-            } catch (err) {
-                console.error(err);
-            }
-        } else {
-            setCurrentIndex(nextIndex);
-        }
-    };
-
     return (
         <Container>
             <LogoImage
@@ -233,11 +184,6 @@ const Home = () => {
                     {randomUsers.map((user) => (
                         <CardItem key={user.user_id}>
                             <Card>
-                                {/*검색 세팅 버튼 */}
-                                <SettingButton
-                                    onClick={() => setIsModalOpen(true)}>
-                                    ⋮
-                                </SettingButton>
                                 <div>
                                     <ProfileImage
                                         src={user.photo_url}
@@ -268,16 +214,8 @@ const Home = () => {
                     ))}
                 </CardSlide>
             </CardWrapper>
-
-            {/* ✅ 하단 네비 */}
-            <BottomNav>
-                <NavBtn>🏠</NavBtn>
-                <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
-                <NavBtn>❤️</NavBtn>
-                <NavBtn>➕</NavBtn>
-                <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
-            </BottomNav>
-            {/* ✅ 모달 */}
+            ){/* ✅ 하단 네비 */}
+            <BottomNav />
             <HomeModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
