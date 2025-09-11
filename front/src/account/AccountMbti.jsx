@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useSignup } from "../SignupProvider";
 
 const ITEM_HEIGHT = 60;
 const VISIBLE_COUNT = 5;
@@ -26,9 +27,23 @@ const mbtiTypes = [
 ];
 
 const AccountMbti = () => {
-    const nevigate = useNavigate();
+    const navigate = useNavigate();
+
+    const { formData, setFormData } = useSignup();
 
     const [activeIndex, setActiveIndex] = useState(null);
+
+    const handleDeMbti = () => {
+        if (activeIndex === null) {
+            alert("MBTI를 선택해주세요");
+            return;
+        }
+        setFormData((prev) => ({
+            ...prev,
+            de_mbti: mbtiTypes[activeIndex],
+        }));
+        navigate("/wantedintro");
+    };
 
     return (
         <Page>
@@ -51,9 +66,7 @@ const AccountMbti = () => {
                 선택:{" "}
                 {activeIndex !== null ? mbtiTypes[activeIndex] : "선택 없음"}
             </Selected>
-            <NextButton onClick={() => nevigate("/wantedintro")}>
-                다음으로
-            </NextButton>
+            <NextButton onClick={handleDeMbti}>다음으로</NextButton>
         </Page>
     );
 };

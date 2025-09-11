@@ -4,12 +4,14 @@ import mbtmi from "../assets/img/mbtmi.jpg";
 import AccountYear from "./AccountYear";
 import { useNavigate } from "react-router-dom";
 import { useSignup } from "../SignupProvider";
+import axios from "axios";
 
 const AccountInfo = () => {
   const [id, setId] = useState("");
   const [passWord, setPassWord] = useState("");
   const [checkPassWord, setCheckPassWord] = useState("");
   const [name, setName] = useState("");
+  const [isIdAvailable, setIsIdAvailable] = useState(false);
   const navigate = useNavigate();
   const { formData, setFormData } = useSignup();
 
@@ -26,6 +28,7 @@ const AccountInfo = () => {
   const [day, setDay] = useState("1");
   const [gender, setGender] = useState("남");
 
+  //날짜 계산
   const calculateAge = (year, month, day) => {
     const today = new Date();
     const birthDate = new Date(year, month - 1, day);
@@ -41,67 +44,88 @@ const AccountInfo = () => {
     return age;
   };
 
-  const IdCheckHandle = () => {
-    if (id === "test") {
-      alert("이미 사용 중인 아이디입니다.");
-    } else {
-      alert("사용 가능한 아이디입니다!");
+  //ID중복확인 관련 핸들러 ,  isIdAvailable -> 아이디가 사용가능하지 않으면 다음 페이지 못넘어가게 하는 스테이트
+  const IdCheckHandle = async () => {
+    if (!id) {
+      alert("아이디를 입력해주세요!");
+      return;
+    }
+
+    try {
+      const res = await axios.get("http://localhost:8080/api/users/exists", {
+        params: { username: id },
+      });
+
+      if (res.data.exists) {
+        alert("이미 사용 중인 아이디입니다.");
+        setIsIdAvailable(false);
+      } else {
+        alert("사용 가능한 아이디입니다!");
+        setIsIdAvailable(true);
+      }
+    } catch (err) {
+      console.error("중복 체크 오류:", err);
+      alert("서버와 통신 중 문제가 발생했습니다.");
     }
   };
 
+  //비번 vs 재입력 비번이 틀렸을때
   const checkPassWordBoth = () => {
     if (passWord !== checkPassWord) {
       alert("비밀번호가 다릅니다.");
-      return false; // ❌ 불일치 → 실패
+      return false;
     }
-    return true; // ✅ 일치 → 성공
+    return true;
   };
 
+  //빈칸이 있는지 없는지 확인
   const allCheck = () => {
     if (!id || !passWord || !name) {
       alert("빈칸이 있어요!");
-      return false; // ❌ 실패
+      return false;
     }
-    return true; // ✅ 성공
+    return true;
   };
 
+  // 아이디: 영문만 허용 (대/소문자)
+  const handleIdChange = (e) => {
+    const onlyValid = e.target.value.replace(
+      /[^A-Za-z0-9!@#$%^&*()\-_=+\[\]{};:'",.<>/?\\|`~]/g,
+      ""
+    );
+    setId(onlyValid);
+  };
+
+  // 비번: 영문만 허용 (대/소문자)
+  const handlePwChange = (e) => {
+    const onlyValid = e.target.value.replace(
+      /[^A-Za-z0-9!@#$%^&*()\-_=+\[\]{};:'",.<>/?\\|`~]/g,
+      ""
+    );
+    setPassWord(onlyValid);
+  };
+
+  // 비번 재입력: 한글 차단 — 기존 비번과 동일 규칙
+  const handlePwConfirmChange = (e) => {
+    const onlyValid = e.target.value.replace(
+      /[^A-Za-z0-9!@#$%^&*()\-=+\[\]{};:'",.<>/?\\|`~]/g,
+      ""
+    );
+    setCheckPassWord(onlyValid);
+  };
+
+  //전체 로그인 관련 흐름
   const Loging = () => {
-    const pwOk = checkPassWordBoth(); // true/false
-    const allOk = allCheck(); // true/false
+    if (!allCheck()) return;
+    if (!checkPassWordBoth()) return;
 
-    if (pwOk && allOk) {
-      navigate("/AccountSelMbti"); // 조건 통과 시 이동
+    if (!isIdAvailable) {
+      alert("아이디 중복 체크를 먼저 해주세요");
+      return;
     }
+
+    navigate("/region");
   };
-  //사진추가용
-  // 📌 프로필 이미지 상태
-  const [profileImage, setProfileImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const preview = reader.result;
-
-      // 로컬 state (현재 화면 미리보기용)
-      setProfileImage(file);
-      setPreviewUrl(preview);
-
-      // 전역 상태 (다음 페이지에서도 사용)
-      setFormData((prev) => ({
-        ...prev,
-        profile: { file, preview },
-      }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  console.log(year);
-  console.log(month);
-  console.log(day);
 
   return (
     <Container>
@@ -118,8 +142,8 @@ const AccountInfo = () => {
           <Input
             type="text"
             value={id}
-            onChange={(e) => setId(e.target.value)}
-            placeholder="아이디를 입력해주세요"
+            onChange={handleIdChange}
+            placeholder="영문, 특수문자, 숫자만 입력 가능합니다"
           />
           <BtnSmall onClick={IdCheckHandle}>중복체크</BtnSmall>
         </SideLeft>
@@ -130,40 +154,19 @@ const AccountInfo = () => {
           <Input
             type="text"
             value={passWord}
-            onChange={(e) => setPassWord(e.target.value)}
-            placeholder="비밀번호를 입력해주세요"
+            onChange={handlePwChange}
+            placeholder="영문, 특수문자, 숫자만 입력 가능합니다"
           />
         </SideLeft>
 
         <SideLeft>
           <h2>비밀번호 재입력</h2>
           <Input
-            type="text"
+            type="password"
             value={checkPassWord}
-            onChange={(e) => setCheckPassWord(e.target.value)}
+            onChange={handlePwConfirmChange}
             placeholder="비밀번호를 다시한번 입력해주세요"
           />
-        </SideLeft>
-      </Card>
-      <Card>
-        <SideLeft>
-          <h2>프로필사진 선택</h2>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              style={{ marginBottom: "10px" }}
-            />
-            {previewUrl && <PreviewImage src={previewUrl} alt="미리보기" />}
-          </div>
         </SideLeft>
       </Card>
       <Card>
@@ -225,9 +228,13 @@ const AccountInfo = () => {
                 name: name,
                 age: age, // ✅ 나이만 저장
                 gender: gender,
+                year: year,
+                month: month,
+                day: day,
+                id: id,
+                passWord: passWord,
               }));
-
-              navigate("/selmbti");
+              Loging();
             }}
           >
             다음으로
@@ -280,16 +287,6 @@ const LogoWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-bottom: 5px;
-`;
-
-//사진 관련
-const PreviewImage = styled.img`
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #a6c1ee;
-  margin-top: 8px;
 `;
 
 const TitleWrapper = styled.div`

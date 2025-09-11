@@ -17,5 +17,8 @@ public class AccountModel {
     private String desired_mbti;
     private String self_intro;
     private String photo_url;
+    private String location;
+    private String gender;
+
 
 }

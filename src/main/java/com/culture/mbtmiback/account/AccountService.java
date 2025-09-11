@@ -1,9 +1,11 @@
 package com.culture.mbtmiback.account;
 
+import com.culture.mbtmiback.mypage.MyPageMapper;
 import com.culture.mbtmiback.mypage.TagModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -11,8 +13,13 @@ import java.util.List;
 public class AccountService {
 
     @Autowired
-    private AccountMapper accountMapper;
+    private final AccountMapper accountMapper;
+    @Autowired
+    private MyPageMapper myPageMapper;
 
+    public  AccountService(AccountMapper accountMapper) {
+        this.accountMapper = accountMapper;
+    }
 
     public AccountModel login(String username, String password) {
         return accountMapper.login(username, password);
@@ -22,6 +29,5 @@ public class AccountService {
     public boolean updateUser(Long userId, String mbti) {
         return accountMapper.updateMbti(userId, mbti) > 0;
     }
-
 
 }

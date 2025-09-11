@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useSignup } from "../SignupProvider";
 
 const AccountwantedIntro = () => {
-    const nevigate = useNavigate();
+    const navigate = useNavigate();
+    const { formData, setFormData, returnToSummary, setReturnToSummary } =
+        useSignup();
+
     const tags = [
         "#활발한",
         "#차분한",
@@ -41,16 +45,45 @@ const AccountwantedIntro = () => {
     ];
 
     const [selectedTags, setSelectedTags] = useState([]);
+    const [type] = useState("DESIRED");
 
     const toggleTag = (tag) => {
         if (selectedTags.includes(tag)) {
-            setSelectedTags(selectedTags.filter((t) => t !== tag));
+            // 이미 선택된 태그 → 제거
+            const updated = selectedTags.filter((t) => t !== tag);
+            setSelectedTags(updated);
+            setFormData({
+                ...formData,
+                de_introTags: updated,
+            });
         } else {
+            // 새로 선택
             if (selectedTags.length < 6) {
-                setSelectedTags([...selectedTags, tag]);
+                const updated = [...selectedTags, tag];
+                setSelectedTags(updated);
+                setFormData({
+                    ...formData,
+                    de_introTags: updated,
+                });
             } else {
                 alert("최대 6개까지만 선택할 수 있어요!");
             }
+        }
+    };
+
+    console.log(formData.de_introTags);
+
+    const handleNext = () => {
+        if (selectedTags.length === 0) {
+            alert("하나 이상의 태그를 선택하셔야 합니다.");
+            return;
+        }
+
+        if (returnToSummary) {
+            setReturnToSummary(false);
+            navigate("/summary");
+        } else {
+            navigate("/wantedhobby");
         }
     };
 
@@ -96,9 +129,7 @@ const AccountwantedIntro = () => {
             </TagsWrapper>
 
             <SelectedText>선택된 태그: {selectedTags.join(", ")}</SelectedText>
-            <NextButton onClick={() => nevigate("/wantedhobby")}>
-                다음
-            </NextButton>
+            <NextButton onClick={handleNext}>다음</NextButton>
         </Container>
     );
 };

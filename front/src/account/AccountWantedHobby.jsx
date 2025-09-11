@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useSignup } from "../SignupProvider";
 
 const AccountWantedHobby = () => {
-    const nevigate = useNavigate();
+    const navigate = useNavigate();
+    const { formData, setFormData, returnToSummary, setReturnToSummary } =
+        useSignup();
 
     // 활동적인 취미
     const activeHobbies = [
@@ -44,16 +47,46 @@ const AccountWantedHobby = () => {
     ];
 
     const [selectedTags, setSelectedTags] = useState([]);
+    const [type] = useState("DESIRED");
 
     const toggleTag = (tag) => {
         if (selectedTags.includes(tag)) {
-            setSelectedTags(selectedTags.filter((t) => t !== tag));
+            // 이미 선택된 태그 → 제거
+            const updated = selectedTags.filter((t) => t !== tag);
+            setSelectedTags(updated);
+            setFormData({
+                ...formData,
+                de_hobby: updated,
+            });
         } else {
+            // 새로 선택
             if (selectedTags.length < 6) {
-                setSelectedTags([...selectedTags, tag]);
+                const updated = [...selectedTags, tag];
+                setSelectedTags(updated);
+                setFormData({
+                    ...formData,
+                    de_hobby: updated,
+                });
             } else {
                 alert("최대 6개까지만 선택할 수 있어요!");
             }
+        }
+    };
+
+    console.log(formData);
+
+    const handleNext = () => {
+        const currentDe_Hobbies = selectedTags.length || [];
+        if (currentDe_Hobbies.length === 0) {
+            alert("하나 이상의 태그를 선택하셔야 합니다.");
+            return;
+        }
+
+        if (returnToSummary) {
+            setReturnToSummary(false);
+            navigate("/summary");
+        } else {
+            navigate("/introduce");
         }
     };
 
@@ -91,7 +124,7 @@ const AccountWantedHobby = () => {
             </Section>
 
             <SelectedText>선택된 취미: {selectedTags.join(", ")}</SelectedText>
-            <NextButton onClick={() => nevigate("/introduce")}>다음</NextButton>
+            <NextButton onClick={handleNext}>다음</NextButton>
         </Container>
     );
 };

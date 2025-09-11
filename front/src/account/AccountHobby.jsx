@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSignup } from "../SignupProvider"; // ✅ Context 불러오기
@@ -8,7 +8,15 @@ const AccountHobby = () => {
     const { formData, setFormData, returnToSummary, setReturnToSummary } =
         useSignup(); // 전역 상태 가져오기
 
+    const [type] = useState("SELF");
+
     const handleNext = () => {
+        const currentHobbies = formData.hobby || [];
+        if (currentHobbies.length === 0) {
+            alert("하나 이상의 태그를 선택하셔야 합니다.");
+            return;
+        }
+
         if (returnToSummary) {
             setReturnToSummary(false);
             navigate("/summary");
@@ -126,9 +134,7 @@ const AccountHobby = () => {
                 선택된 취미: {formData.hobby?.join(", ")}
             </SelectedText>
 
-            <NextButton disabled={formData.length === 0} onClick={handleNext}>
-                다음
-            </NextButton>
+            <NextButton onClick={handleNext}>다음</NextButton>
             {/* <NextButton
         disabled={selectedTags.length === 0}
         onClick={() => navigate("/summary")}
