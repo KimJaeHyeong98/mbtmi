@@ -1,18 +1,36 @@
-import React, { use } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useSignup } from "../SignupProvider"; // ✅ Context 불러오기
 
 const IntroduceMySelf = () => {
     const navigate = useNavigate();
-    const { formData, setFormData } = useSignup(); // 전역 상태 가져오기
+    const { formData, setFormData, returnToSummary, setReturnToSummary } =
+        useSignup(); // 전역 상태 가져오기
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             introduce: e.target.value, // 자기소개 글 저장
         });
+    };
+
+    const handleNext = () => {
+        const text = (formData.introduce ?? "").trim();
+
+        if (text.length === 0) {
+            setFormData((prev) => ({
+                ...prev,
+                introduce: `안녕하세요 제 이름은 ${prev.name}입니다. 잘 부탁드려요`,
+            }));
+        }
+
+        if (returnToSummary) {
+            setReturnToSummary(false);
+            navigate("/summary");
+        } else {
+            navigate("/summary");
+        }
     };
 
     return (
@@ -33,12 +51,10 @@ const IntroduceMySelf = () => {
                 <Selfinput
                     placeholder="자기소개를 적어주세요 (최대 300자)"
                     maxLength={300}
-                    value={formData.introduce} // context 값 연결
+                    value={formData.introduce || ""} // context 값 연결
                     onChange={handleChange} // 입력 이벤트 처리
                 />
-                <NextButton onClick={() => navigate("/summary")}>
-                    작성완료
-                </NextButton>
+                <NextButton onClick={handleNext}>작성완료</NextButton>
             </Card>
         </Container>
     );
