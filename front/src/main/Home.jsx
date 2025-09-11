@@ -172,6 +172,15 @@ const Home = () => {
     //단일카드용 이었음
     // const currentRandomUser = randomUsers[currentIndex];
 
+
+const handleNext = () => {
+    if (currentIndex < randomUsers.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+    } else {
+        setCurrentIndex(0); // 마지막이면 처음으로
+    }
+};
+
     return (
         <Container>
             <LogoImage
