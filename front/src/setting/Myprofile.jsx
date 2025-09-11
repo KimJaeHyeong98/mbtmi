@@ -1,32 +1,31 @@
-// src/pages/Myprofile.jsx
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import { useAuth } from "../main/AuthContext";
-import profileimage from "../assets/img/kar.jpg";
-import RegionTreeSelectMini, { REGION_GROUPS } from "../setting/RegionTreeSelectMini";
+import RegionTreeSelectMini from "../setting/RegionTreeSelectMini";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Myprofile = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, updateMyInfo  } = useAuth();
+    const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
-    username: "",
-    password: "",
-    email: "",
     location: "",
     self_intro: "",
+    profileFile: null, // 업로드할 파일
+    preview: null, // 미리보기 URL
   });
   const [showRegionModal, setShowRegionModal] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setForm({
+      setForm((prev) => ({
+        ...prev,
         name: user.name || "",
-        username: user.username || "",
-        password: user.password || "",
-        email: user.email || "",
         location: user.location || "",
         self_intro: user.self_intro || "",
-      });
+        preview: user.profileUrl || null, // DB에 저장된 이미지 경로가 있다면 사용
+      }));
     }
   }, [user]);
 
@@ -35,31 +34,59 @@ const Myprofile = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = async () => {
-    const success = await updateUser(form);
-    if (success) alert("프로필이 업데이트되었습니다!");
-    else alert("업데이트에 실패했습니다.");
+  // 이미지 업로드 핸들러
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const preview = URL.createObjectURL(file);
+      setForm((prev) => ({ ...prev, profileFile: file, preview }));
+    }
+  };
+
+   const handleUpdate = async () => {
+    // payload 생성
+    const payload = {
+      name: form.name,
+      location: form.location,
+      self_intro: form.self_intro,
+      profileFile: form.profileFile,
+    };
+
+    console.log("전송 payload:", payload); // 🔹 콘솔로 확인
+
+    const success = await updateMyInfo(payload);
+    if (success) {
+      alert("프로필이 업데이트되었습니다!");
+      navigate("/mypage"); 
+    } else {
+      alert("업데이트에 실패했습니다.");
+    }
   };
 
   return (
     <Container>
       <Card>
         <ProfileSection>
-          <ProfileImage src={profileimage} alt="프로필 이미지" draggable="false" />
+          {/* 프로필 이미지 & 업로드 */}
+          <ProfileImage
+            src={form.preview || "/default_profile.png"} // 기본 이미지
+            alt="프로필 이미지"
+            draggable="false"
+          />
+          <FileInputLabel>
+            이미지 변경
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+          </FileInputLabel>
 
+          {/* 이름 */}
           <Label>
             <span>이름:</span>
-            <input type="text" name="name" value={form.name} onChange={handleChange} />
-          </Label>
-
-          <Label>
-            <span>ID:</span>
-            <input type="text" name="username" value={form.username} onChange={handleChange} />
-          </Label>
-
-          <Label>
-            <span>PW:</span>
-            <input type="text" name="password" value={form.password} onChange={handleChange} />
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+            />
           </Label>
 
           {/* 지역 선택 */}
@@ -75,6 +102,7 @@ const Myprofile = () => {
             />
           </Label>
 
+          {/* 자기소개 */}
           <Label>
             <span>자기소개:</span>
             <textarea
@@ -84,6 +112,7 @@ const Myprofile = () => {
             />
           </Label>
 
+          {/* 수정 버튼 */}
           <ButtonGroup>
             <ActionButton onClick={handleUpdate}>수정하기</ActionButton>
           </ButtonGroup>
@@ -94,13 +123,12 @@ const Myprofile = () => {
       {showRegionModal && (
         <ModalOverlay>
           <ModalContent>
-            
-
             <RegionTreeSelectMini
               value={form.location}
-              onChange={(loc) => setForm(prev => ({ ...prev, location: loc }))}
+              onChange={(loc) =>
+                setForm((prev) => ({ ...prev, location: loc }))
+              }
             />
-
             <CloseBtn onClick={() => setShowRegionModal(false)}>확인</CloseBtn>
           </ModalContent>
         </ModalOverlay>
@@ -147,7 +175,23 @@ const ProfileImage = styled.img`
   height: 90px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+`;
+
+const FileInputLabel = styled.label`
+  font-size: 12px;
+  color: #333;
+  font-weight: bold;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  margin-bottom: 10px;
+
+  input {
+    display: none;
+  }
 `;
 
 const Label = styled.div`
@@ -203,11 +247,10 @@ const ActionButton = styled.button`
   }
 `;
 
-/* ===== 모달 스타일 ===== */
 const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -217,16 +260,11 @@ const ModalContent = styled.div`
   background: white;
   border-radius: 16px;
   padding: 20px;
-  width: 350px;        
-  max-width: 90vw;     // 화면 작아질 때 대비
-  max-height: 75vh;    // 화면 높이 대비
-  overflow-y: auto;    // 내용이 길면 스크롤
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-`;
-
-const ModalTitle = styled.h3`
-  margin-bottom: 15px;
-  text-align: center;
+  width: 350px;
+  max-width: 90vw;
+  max-height: 75vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 `;
 
 const CloseBtn = styled.button`

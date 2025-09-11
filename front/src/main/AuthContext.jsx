@@ -84,28 +84,73 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateDesired = async (payload) => {
-  try {
-    const res = await axios.put("/api/update/desired", payload, {
-      withCredentials: true,
-    });
+    try {
+      const res = await axios.put("/api/update/desired", payload, {
+        withCredentials: true,
+      });
 
-    if (res.status === 200) {
-      // 서버 세션 갱신 후, 전역 상태도 갱신
-      await checkSession(); // 최신 user 정보 가져오기
-      return true;
+      if (res.status === 200) {
+        // 서버 세션 갱신 후, 전역 상태도 갱신
+        await checkSession(); // 최신 user 정보 가져오기
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("updateDesired error:", err);
+      return false;
     }
-    return false;
-  } catch (err) {
-    console.error("updateDesired error:", err);
-    return false;
-  }
-};
+  };
 
-  
+  const updateMyInfo = async (payload) => {
+    try {
+      // FormData 생성
+      const formData = new FormData();
+     // formData.append(payload);
+      formData.append("name", payload.name);
+      formData.append("location", payload.location);
+      formData.append("self_intro", payload.self_intro);
+
+      // 파일이 있다면 FormData에 추가
+      if (payload.profileFile) {
+        formData.append("profileFile", payload.profileFile);
+      }
+
+      // ✅ 콘솔로 FormData 값 확인
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // 실제 API 호출
+      const res = await axios.post("/api/update/profile", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.status === 200) {
+        // 서버 세션 갱신 후, 전역 상태도 갱신
+        await checkSession(); // 최신 user 정보 가져오기
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("updateMyInfo error:", err);
+      return false;
+    }
+  };
 
   return (
     <AuthContext.Provider
-      value={{ loggedIn, user, login, logout, loading, setUser, updateMymbti,updateDesired }}
+      value={{
+        loggedIn,
+        user,
+        login,
+        logout,
+        loading,
+        setUser,
+        updateMymbti,
+        updateDesired,
+        updateMyInfo,
+      }}
     >
       {children}
     </AuthContext.Provider>

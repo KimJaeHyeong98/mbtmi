@@ -38,6 +38,7 @@ import WantedInfor from "../setting/WantedInfor";
 import PreCard from "./PreCard";
 import RegionTreeSelect from "./RegionTreeSelect";
 
+
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
 
@@ -96,6 +97,8 @@ const AccountMain = () => {
           path="/mypage/wantedinfor"
           element={<PrivateRoute element={<WantedInfor />} />}
         />
+        
+      
 
         {/* 회원가입 */}
 

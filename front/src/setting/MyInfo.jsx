@@ -21,6 +21,9 @@ const MyInfo = () => {
       console.log("로그아웃 취소됨");
     }
   };
+  const profileImageUrl = user?.photo_url
+    ? `http://localhost:8080/uploads/${user.photo_url}`
+    : defaultProfile;
 
   const editpage = {
     mbti: "나의 MBTI 수정하기",
@@ -30,7 +33,7 @@ const MyInfo = () => {
   };
 
   const btn = {
-    edit: "프로필 수정",
+    edit: "프로필 정보 수정",
     logout: "로그아웃",
     bye: "회원탈퇴",
   };
@@ -40,7 +43,7 @@ const MyInfo = () => {
       <Card>
         <ProfileSection>
           <ProfileImage
-            src={profileimage}
+            src={profileImageUrl}
             alt="프로필 이미지"
             draggable="false"
           />
@@ -54,6 +57,7 @@ const MyInfo = () => {
           <ActionButton onClick={() => navigate("/mypage/profile")}>
             {btn.edit}
           </ActionButton>
+
           <EditList>
             <EditButton onClick={() => navigate("/mypage/mymbti")}>
               {editpage.mbti}
