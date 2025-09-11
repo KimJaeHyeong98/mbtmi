@@ -39,7 +39,7 @@ import PreCard from "./PreCard";
 import AccountDelConfirm from "../deleteAccount/AccountDelConfirm";
 import RegionTreeSelect from "./RegionTreeSelect";
 import HomeModal from "../homeSearchModal/HomeModal";
-import GenderSelect from "../homeSearchModal/GenderSelect";
+import NothingResultHome from "../main/NothingResultHome";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -225,6 +225,8 @@ const AccountMain = () => {
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
         {/* 홈 모달창 */}
         <Route path="HomeModal" element={<HomeModal />} />
+        {/* 결과화면 없을때 보여주는 창 */}
+        <Route path="/NothingResultHome" element={<NothingResultHome />} />
       </Routes>
     </SignupProvider>
   );
