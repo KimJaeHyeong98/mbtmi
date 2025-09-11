@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const Bar = styled.nav`
@@ -33,14 +34,16 @@ const Btn = styled.button`
 `;
 
 const BottomNav = () => {
+    const navigate = useNavigate();
+
     return (
         <Bar>
             <Row>
                 <Btn>🏠</Btn>
-                <Btn>🔍</Btn>
+                <Btn onClick={() => navigate("/todaypost")}>🔍</Btn>
                 <Btn>❤️</Btn>
                 <Btn>➕</Btn>
-                <Btn>🔔</Btn>
+                <Btn onClick={() => navigate("/mypage")}>🔔</Btn>
             </Row>
         </Bar>
     );
