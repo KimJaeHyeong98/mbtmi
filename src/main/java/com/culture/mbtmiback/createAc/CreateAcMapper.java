@@ -22,4 +22,7 @@ public interface CreateAcMapper {
     @Select("SELECT username FROM USERS WHERE username = #{username}")
     String findUsername(@Param("username") String username);
 
+
+    @Update("UPDATE USERS SET photo_url = #{profileFileName} WHERE user_id = #{userId}")
+    int updateUserProfile(@Param("userId") Long userId, @Param("profileFileName") String profileFileName);
 }

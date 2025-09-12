@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Signup response:", res.data);
       if (res.data.success) {
         setUser(res.data.user); // 전역 상태 갱신
-        return true;
+        return { success: true, userId: res.data.userId };
       }
       return false;
     } catch (err) {

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useSignup } from "../SignupProvider";
 import Container from "../globaltool/Container";
 import { useAuth } from "../main/AuthContext";
 import PreCardModal from "../account/PreCardModal";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 const ProfilePhoto = () => {
@@ -15,6 +16,10 @@ const ProfilePhoto = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [openPreview, setOpenPreview] = useState(false);
+  const location = useLocation();
+  const userId = location.state?.userId;
+
+  
 
   // 📌 프로필 업로드 함수 추가
   const uploadProfile = async (userId, file) => {
@@ -58,24 +63,34 @@ const ProfilePhoto = () => {
   };
 
   const handleSubmit = async () => {
-    // 1. 회원가입 먼저 실행
-    const user = await sendFormData(formData);
-    if (!user) {
-      alert("회원가입 실패");
+    if (!profileImage) {
+      alert("프로필 사진을 선택해주세요!");
       return;
     }
 
-    // 2. 프로필 이미지 업로드 (선택한 경우만)
-    if (profileImage) {
-      const photoUrl = await uploadProfile(user.userId, profileImage);
-      if (photoUrl) {
-        console.log("최종 등록된 프로필:", photoUrl);
-        alert("회원가입 + 프로필 사진 등록 완료!");
+    try {
+      // 1️⃣ FormData 생성
+      const formDataToSend = new FormData();
+      formDataToSend.append("userId", userId); // 회원번호
+      formDataToSend.append("profileFile", profileImage); // 업로드 파일
+
+      // 2️⃣ POST 요청
+      const res = await axios.post("/api/profilephoto", formDataToSend, {
+        withCredentials: true, // 쿠키 포함
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // 3️⃣ 성공 여부 확인
+      if (res.status === 200) {
+        alert("프로필 사진 업로드 완료!");
+        // 필요하면 전역 상태 갱신
+        // 예: setFormData(prev => ({ ...prev, profileUrl: res.data.photoUrl }));
       } else {
-        alert("회원가입은 성공했지만 프로필 업로드는 실패했어.");
+        alert("업로드 실패!");
       }
-    } else {
-      alert("회원가입 완료!");
+    } catch (err) {
+      console.error("프로필 업로드 에러:", err);
+      alert("업로드 중 오류가 발생했습니다.");
     }
   };
 
@@ -102,6 +117,7 @@ const ProfilePhoto = () => {
           </div>
         </SideLeft>
       </Card>
+      <p>회원번호: {userId}</p>
       <Button>
         <ButtonCard onClick={() => setOpenPreview(true)}>
           내 카드 <br /> 미리보기
