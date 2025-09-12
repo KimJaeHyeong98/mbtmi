@@ -15,7 +15,7 @@ public class CreateAcService {
 
 
     @Transactional
-    public void signUp(CreateAcModel ac,
+    public Long signUp(CreateAcModel ac,
                        CreateUserTagsModel myTags,
                        CreateUserDesiredTagsModel deTags) {
 
@@ -38,10 +38,17 @@ public class CreateAcService {
         for (String tag : deTags.getTag_name()) {
             createAcMapper.insertUserTag(user_id, tag, "DESIRED");
         }
+        return user_id;
     }
 
     public boolean usernameExists(String username) {
         String found = createAcMapper.findUsername(username);
         return found != null; // 있으면 true, 없으면 false
     }
+
+
+    public void updateUserProfilePhoto(Long userId, String profileFileName) {
+        createAcMapper.updateUserProfile(userId, profileFileName);
+    }
+
 }
