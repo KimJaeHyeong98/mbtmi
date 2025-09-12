@@ -1,6 +1,5 @@
 package com.culture.mbtmiback.createAc;
 
-import com.culture.mbtmiback.account.AccountModel;
 import org.apache.ibatis.annotations.*;
 
 @Mapper

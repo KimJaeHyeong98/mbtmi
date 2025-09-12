@@ -1,9 +1,6 @@
 package com.culture.mbtmiback.createAc;
 
-import com.culture.mbtmiback.account.AccountModel;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -55,11 +51,8 @@ public class CreateAcController {
         return response;
     }
 
-
     @PostMapping("/profilephoto")
     public ResponseEntity<String> profilePhoto(@RequestPart("userId") String userIdStr, @RequestPart(value = "profileFile", required = false) MultipartFile profileFile) {
-
-
 
         try {
             Long userId = Long.parseLong(userIdStr);

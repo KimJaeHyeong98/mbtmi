@@ -6,11 +6,10 @@ import { useAuth } from "../main/AuthContext";
 import PreCardModal from "../account/PreCardModal";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePhoto = () => {
-  //사진추가용
-  // 📌 프로필 이미지 상태
-
+  const navigate = useNavigate();
   const { formData, setFormData } = useSignup();
   const { sendFormData } = useAuth();
   const [profileImage, setProfileImage] = useState(null);
@@ -19,32 +18,26 @@ const ProfilePhoto = () => {
   const location = useLocation();
   const userId = location.state?.userId;
 
-  
+  // 🔒 뒤로가기 완전 차단
+  useEffect(() => {
+    // 현재 페이지 히스토리에 push
+    window.history.pushState(null, "", window.location.href);
 
-  // 📌 프로필 업로드 함수 추가
-  const uploadProfile = async (userId, file) => {
-    try {
-      const formData = new FormData();
-      formData.append("userId", userId); // 유저 ID
-      formData.append("profileImage", file); // 업로드 파일
+    const handlePop = (e) => {
+      e.preventDefault();
+      // 뒤로가기를 눌러도 현재 페이지 유지
+      window.history.replaceState(null, "", window.location.href);
+    };
 
-      const res = await axios.post("/api/upload-profile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      return res.data.photoUrl; // 백엔드에서 저장된 경로 반환
-    } catch (error) {
-      console.error("프로필 업로드 실패:", error);
-      return null;
-    }
-  };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-
     reader.onloadend = () => {
       const preview = reader.result;
 
@@ -83,6 +76,7 @@ const ProfilePhoto = () => {
       // 3️⃣ 성공 여부 확인
       if (res.status === 200) {
         alert("프로필 사진 업로드 완료!");
+        navigate("/account01");
         // 필요하면 전역 상태 갱신
         // 예: setFormData(prev => ({ ...prev, profileUrl: res.data.photoUrl }));
       } else {
@@ -117,7 +111,6 @@ const ProfilePhoto = () => {
           </div>
         </SideLeft>
       </Card>
-      <p>회원번호: {userId}</p>
       <Button>
         <ButtonCard onClick={() => setOpenPreview(true)}>
           내 카드 <br /> 미리보기
