@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 
 /* ✅ 하단 네비게이션 */
 const BottomWrapper = styled.nav`
