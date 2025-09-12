@@ -47,7 +47,8 @@ public class CreateAcController {
     }
 
     @PostMapping("/profilephoto")
-    public Map<String, Object> profilePhoto(@RequestBody ProfileModel profileModel) {
+    public Map<String, Object> profilePhoto(
+            @RequestBody ProfileModel profileModel) {
         System.out.println("사진 업로드" + profileModel.getPhoto_url());
         return Map.of("success", true);
     }

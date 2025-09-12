@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useSignup } from "../SignupProvider";
 import Container from "../globaltool/Container";
@@ -16,14 +16,43 @@ const ProfilePhoto = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [openPreview, setOpenPreview] = useState(false);
 
+  // 🔒 뒤로가기 완전 차단
+  useEffect(() => {
+    // 현재 페이지 히스토리에 push
+    window.history.pushState(null, "", window.location.href);
+
+    const handlePop = (e) => {
+      e.preventDefault();
+      // 뒤로가기를 눌러도 현재 페이지 유지
+      window.history.replaceState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
+
+  // useEffect(() => {
+  //   const handleBack = () => {
+  //     window.history.replaceState(null, "", "");
+  //     alert("이 페이지에서는 뒤로가기를 사용할 수 없습니다."); // 사용자 안내도 가능
+  //   };
+
+  //   window.history.replaceState(null, "", "");
+  //   window.addEventListener("popstate", handleBack);
+
+  //   return () => {
+  //     window.removeEventListener("popstate", handleBack);
+  //   };
+  // }, []);
+
   // 📌 프로필 업로드 함수 추가
   const uploadProfile = async (userId, file) => {
     try {
-      const formData = new FormData();
-      formData.append("userId", userId); // 유저 ID
-      formData.append("profileImage", file); // 업로드 파일
+      const data = new FormData();
+      data.append("userId", userId); // 유저 ID
+      data.append("profileImage", file); // 업로드 파일
 
-      const res = await axios.post("/api/upload-profile", formData, {
+      const res = await axios.post("/api/upload-profile", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -39,7 +68,6 @@ const ProfilePhoto = () => {
     if (!file) return;
 
     const reader = new FileReader();
-
     reader.onloadend = () => {
       const preview = reader.result;
 
