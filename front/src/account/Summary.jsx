@@ -1,15 +1,12 @@
 import { useSignup } from "../SignupProvider";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import PreCardModal from "../account/PreCardModal";
 import { useAuth } from "../main/AuthContext";
 
 const Summary = () => {
   const { formData, setReturnToSummary } = useSignup();
   const { sendFormData } = useAuth();
   const navigate = useNavigate();
-  const [openPreview, setOpenPreview] = useState(false);
 
   const handleEditMbti = () => {
     setReturnToSummary(true);
@@ -40,6 +37,22 @@ const Summary = () => {
     navigate("/region");
   };
 
+  const handleNext = async () => {
+    // 1. 백엔드로 전송
+    const result = await sendFormData(formData);
+
+    if (!result || !result.success) {
+      alert("회원가입 실패!");
+      return;
+    }
+
+    const userId = result.userId; // ✅ 구조 분해 or 직접 꺼내기
+
+    console.log("회원가입된 userId:", userId);
+    alert("회원가입이 완료 되었습니다!");
+    navigate("/profilephoto", { state: { userId }, replace: true });
+  };
+
   console.log(formData);
 
   // formData.mbti에서 문자열 조합
@@ -50,15 +63,12 @@ const Summary = () => {
       <InfoCard>
         <Title>입력 확인</Title>
         <Info>
-          <Item>
+          <EditButton onClick={handleEditMbti}>
             <Left>MBTI</Left>
             <Center>{mbti}</Center>
-            <Right>
-              <EditButton onClick={handleEditMbti}>수정</EditButton>
-            </Right>
-          </Item>
+          </EditButton>
 
-          <Item>
+          <EditButton onClick={handleEditIntro}>
             <Left>성격</Left>
             <Center
               style={{
@@ -72,12 +82,9 @@ const Summary = () => {
                 </span>
               ))}
             </Center>
-            <Right>
-              <EditButton onClick={handleEditIntro}>수정</EditButton>
-            </Right>
-          </Item>
+          </EditButton>
 
-          <Item>
+          <EditButton onClick={handleEditHobby}>
             <Left>취미</Left>
             <Center
               style={{
@@ -87,12 +94,9 @@ const Summary = () => {
             >
               {formData.hobby.join("  ")}
             </Center>
-            <Right>
-              <EditButton onClick={handleEditHobby}>수정</EditButton>
-            </Right>
-          </Item>
+          </EditButton>
 
-          <Item>
+          <EditButton onClick={handleEditRegion}>
             <Left>거주 지역</Left>
             <Center
               style={{
@@ -102,12 +106,9 @@ const Summary = () => {
             >
               {formData.location}
             </Center>
-            <Right>
-              <EditButton onClick={handleEditRegion}>수정</EditButton>
-            </Right>
-          </Item>
+          </EditButton>
 
-          <Item>
+          <EditButton onClick={handleEditIntroduce}>
             <Left>자기소개</Left>
             <Center
               style={{
@@ -123,20 +124,11 @@ const Summary = () => {
                   </p>
                 ))}
             </Center>
-            <Right>
-              <EditButton onClick={handleEditIntroduce}>수정</EditButton>
-            </Right>
-          </Item>
+          </EditButton>
         </Info>
         <Btnzone>
-          <SubmitButton onClick={() => setOpenPreview(true)}>
-            내 카드 <br /> 미리보기
-          </SubmitButton>
-          <SubmitButton onClick={() => sendFormData(formData)}>
-            작성 완료
-          </SubmitButton>
+          <NextButton onClick={handleNext}>다음으로</NextButton>
         </Btnzone>
-        {openPreview && <PreCardModal onClose={() => setOpenPreview(false)} />}
       </InfoCard>
     </Container>
   );
@@ -187,26 +179,28 @@ const Info = styled.div`
   text-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.4);
 `;
 
-// 각 항목
-const Item = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  &:hover {
-    background-color: #aa80dd88;
-  }
-`;
+// // 각 항목
+// const Item = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin: 10px 0;
+//   padding: 8px 12px;
+//   background: rgba(255, 255, 255, 0.1);
+//   border-radius: 12px;
+//   cursor: pointer;
+//   transition: background-color 0.3s;
+//   &:hover {
+//     background-color: #aa80dd88;
+//   }
+// `;
 
 const Left = styled.div`
   flex: 1;
   text-align: left;
   font-weight: bold;
+  font-size: 17px;
+  text-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.4);
 `;
 
 const Center = styled.div`
@@ -215,16 +209,12 @@ const Center = styled.div`
   font-size: 12px;
 `;
 
-const Right = styled.div`
-  text-align: right;
-`;
-
 const EditButton = styled.button`
+  width: 100%;
   font-size: 15px;
   font-weight: bold;
-  border-radius: 15px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.293);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 
   backdrop-filter: blur(6px);
@@ -237,7 +227,9 @@ const EditButton = styled.button`
   &:hover {
     box-shadow: inset 4px 4px 12px rgba(0, 0, 0, 0.3),
       inset -4px -4px 12px rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.575);
+    background: #aa80dd88;
+
+    transition: background-color 0.3s;
     transform: translateY(1px);
   }
 `;
@@ -248,7 +240,7 @@ const Btnzone = styled.div`
   gap: 20px;
 `;
 
-const SubmitButton = styled.button`
+const NextButton = styled.button`
   width: 110px;
   height: 50px;
   padding: 12px;

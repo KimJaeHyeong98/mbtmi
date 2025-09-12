@@ -96,6 +96,12 @@ CONSTRAINT pk_post_likes PRIMARY KEY (post_id, user_id),
 CONSTRAINT fk_pl_post   FOREIGN KEY (post_id) REFERENCES POSTS(post_id) ON DELETE CASCADE,
 CONSTRAINT fk_pl_user   FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
 );
+SELECT constraint_name, column_name
+FROM user_cons_columns
+WHERE table_name = 'USERS';
+
+select * from users order by user_id;
+
 
 
 

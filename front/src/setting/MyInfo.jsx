@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import { useAuth } from "../main/AuthContext";
-import profileimage from "../assets/img/kar.jpg";
 import { useNavigate } from "react-router-dom";
+import BottomNav from "../globaltool/BottomNav.jsx";
 
 const MyInfo = () => {
   const [name, setName] = useState("");
@@ -60,7 +60,6 @@ const MyInfo = () => {
 
           <Mbti> MBTI: {user.mbti}</Mbti>
         </ProfileSection>
-
         <ButtonSection>
           <ActionButton onClick={() => navigate("/mypage/profile")}>
             {btn.edit}
@@ -86,6 +85,7 @@ const MyInfo = () => {
           <DangerButton onClick={handleDelAccount}>{btn.bye}</DangerButton>
         </BottomActions>
       </Card>
+      <BottomNav />
     </Container>
   );
 };
@@ -103,6 +103,7 @@ const Container = styled.div`
 `;
 
 const Card = styled.div`
+  
   width: 100%;
   max-width: 300px;
   padding: 24px;
@@ -131,7 +132,7 @@ const ProfileSection = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 `;
 
 const ProfileImage = styled.img`
