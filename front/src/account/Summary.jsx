@@ -39,15 +39,18 @@ const Summary = () => {
 
   const handleNext = async () => {
     // 1. 백엔드로 전송
-    const success = await sendFormData(formData);
+    const result = await sendFormData(formData);
 
-    if (!success) {
+    if (!result || !result.success) {
       alert("회원가입 실패!");
       return;
     }
 
-    // 2. 전송 성공 시 다음 페이지로 이동
-    navigate("/profilephoto"); // 이동할 경로
+    const userId = result.userId; // ✅ 구조 분해 or 직접 꺼내기
+
+    console.log("회원가입된 userId:", userId);
+    alert("회원가입이 완료 되었습니다!");
+    navigate("/profilephoto", { state: { userId }, replace: true });
   };
 
   console.log(formData);

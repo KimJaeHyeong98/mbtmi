@@ -4,17 +4,19 @@ import { useSignup } from "../SignupProvider";
 import Container from "../globaltool/Container";
 import { useAuth } from "../main/AuthContext";
 import PreCardModal from "../account/PreCardModal";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePhoto = () => {
-  //사진추가용
-  // 📌 프로필 이미지 상태
-
+  const navigate = useNavigate();
   const { formData, setFormData } = useSignup();
   const { sendFormData } = useAuth();
   const [profileImage, setProfileImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [openPreview, setOpenPreview] = useState(false);
+  const location = useLocation();
+  const userId = location.state?.userId;
 
   // 🔒 뒤로가기 완전 차단
   useEffect(() => {
@@ -30,38 +32,6 @@ const ProfilePhoto = () => {
     window.addEventListener("popstate", handlePop);
     return () => window.removeEventListener("popstate", handlePop);
   }, []);
-
-  // useEffect(() => {
-  //   const handleBack = () => {
-  //     window.history.replaceState(null, "", "");
-  //     alert("이 페이지에서는 뒤로가기를 사용할 수 없습니다."); // 사용자 안내도 가능
-  //   };
-
-  //   window.history.replaceState(null, "", "");
-  //   window.addEventListener("popstate", handleBack);
-
-  //   return () => {
-  //     window.removeEventListener("popstate", handleBack);
-  //   };
-  // }, []);
-
-  // 📌 프로필 업로드 함수 추가
-  const uploadProfile = async (userId, file) => {
-    try {
-      const data = new FormData();
-      data.append("userId", userId); // 유저 ID
-      data.append("profileImage", file); // 업로드 파일
-
-      const res = await axios.post("/api/upload-profile", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      return res.data.photoUrl; // 백엔드에서 저장된 경로 반환
-    } catch (error) {
-      console.error("프로필 업로드 실패:", error);
-      return null;
-    }
-  };
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -86,24 +56,35 @@ const ProfilePhoto = () => {
   };
 
   const handleSubmit = async () => {
-    // 1. 회원가입 먼저 실행
-    const user = await sendFormData(formData);
-    if (!user) {
-      alert("회원가입 실패");
+    if (!profileImage) {
+      alert("프로필 사진을 선택해주세요!");
       return;
     }
 
-    // 2. 프로필 이미지 업로드 (선택한 경우만)
-    if (profileImage) {
-      const photoUrl = await uploadProfile(user.userId, profileImage);
-      if (photoUrl) {
-        console.log("최종 등록된 프로필:", photoUrl);
-        alert("회원가입 + 프로필 사진 등록 완료!");
+    try {
+      // 1️⃣ FormData 생성
+      const formDataToSend = new FormData();
+      formDataToSend.append("userId", userId); // 회원번호
+      formDataToSend.append("profileFile", profileImage); // 업로드 파일
+
+      // 2️⃣ POST 요청
+      const res = await axios.post("/api/profilephoto", formDataToSend, {
+        withCredentials: true, // 쿠키 포함
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // 3️⃣ 성공 여부 확인
+      if (res.status === 200) {
+        alert("프로필 사진 업로드 완료!");
+        navigate("/account01");
+        // 필요하면 전역 상태 갱신
+        // 예: setFormData(prev => ({ ...prev, profileUrl: res.data.photoUrl }));
       } else {
-        alert("회원가입은 성공했지만 프로필 업로드는 실패했어.");
+        alert("업로드 실패!");
       }
-    } else {
-      alert("회원가입 완료!");
+    } catch (err) {
+      console.error("프로필 업로드 에러:", err);
+      alert("업로드 중 오류가 발생했습니다.");
     }
   };
 

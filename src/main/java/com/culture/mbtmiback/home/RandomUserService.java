@@ -19,9 +19,14 @@ public class RandomUserService {
         this.randomUserMapper = randomUserMapper;
     }
 
-    public List<RandomUserModel> getRandomUsersExceptMe(Long currentUserId) {
+    public List<RandomUserModel> getRandomUsersExceptMe(Long currentUserId,
+                                                        String gender,
+                                                        Integer ageDown,
+                                                        Integer ageUp,
+                                                        String location) {
         // Mapper에서 50명의 유저 + 태그 row 가져오기
-        List<RandomUserModel> rows = randomUserMapper.findRandomUserExcept(currentUserId);
+        List<RandomUserModel> rows = randomUserMapper.findRandomUserExcept(currentUserId, gender, ageDown, ageUp, location);
+
         for (RandomUserModel row : rows) {
             row.setTags(randomUserMapper.findTagsByUser(row.getUser_id()));
         }
@@ -30,4 +35,5 @@ public class RandomUserService {
 
         return rows;
     }
+
 }

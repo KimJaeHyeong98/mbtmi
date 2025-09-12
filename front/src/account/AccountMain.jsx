@@ -47,6 +47,7 @@ import BottomNav from "../globaltool/BottomNav.jsx";
 import styled from "styled-components";
 
 import HomeModal from "../homeSearchModal/HomeModal";
+import NothingResultHome from "../main/NothingResultHome";
 import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
 import TodayPost from "../today's_post/TodayPost";
@@ -256,6 +257,8 @@ const AccountMain = () => {
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
         {/* 홈 모달창 */}
         <Route path="HomeModal" element={<HomeModal />} />
+        {/* 결과화면 없을때 보여주는 창 */}
+        <Route path="/NothingResultHome" element={<NothingResultHome />} />
       </Routes>
     </SignupProvider>
   );

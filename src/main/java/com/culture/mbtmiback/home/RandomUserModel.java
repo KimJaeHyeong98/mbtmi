@@ -15,6 +15,9 @@ public class RandomUserModel {
     private String desired_mbti;
     private String self_intro;
     private String photo_url;
+    private String gender;
+    private Date birth_date;
+    private String location;
 
 
     private List<TagModel> tags;

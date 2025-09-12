@@ -1,6 +1,5 @@
 package com.culture.mbtmiback.createAc;
 
-import com.culture.mbtmiback.account.AccountModel;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -22,5 +21,7 @@ public interface CreateAcMapper {
     @Select("SELECT username FROM USERS WHERE username = #{username}")
     String findUsername(@Param("username") String username);
 
-//    @Update("")
+
+    @Update("UPDATE USERS SET photo_url = #{profileFileName} WHERE user_id = #{userId}")
+    int updateUserProfile(@Param("userId") Long userId, @Param("profileFileName") String profileFileName);
 }
