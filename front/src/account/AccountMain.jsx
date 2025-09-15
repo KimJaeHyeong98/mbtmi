@@ -48,6 +48,7 @@ import styled from "styled-components";
 
 import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "../main/NothingResultHome";
+import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
 import TodayPost from "../today's_post/TodayPost";
 import ActivityNav from "../activities/ActivityNav.jsx";
@@ -127,6 +128,7 @@ const AccountMain = () => {
         <Route path="/precard" element={<PreCard />} />
         <Route path="/region" element={<RegionTreeSelect />} />
         <Route path="/profilephoto" element={<ProfilePhoto />} />
+        <Route path="/todaypost" element={<TodayPost />} />
 
         {/* 간단한 MBTI */}
 
@@ -252,8 +254,6 @@ const AccountMain = () => {
             </>
           }
         />
-        {/* 준하트, 받은하트 */}
-        <Route path="/ActivityNav" element={<ActivityNav />} />
 
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />

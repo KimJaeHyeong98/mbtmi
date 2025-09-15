@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 /* ✅ 하단 네비게이션 */
 const BottomWrapper = styled.nav`
@@ -36,19 +36,14 @@ const NavBtn = styled.button`
   }
 `;
 
-const BottomNav = ({ currentUser }) => {
-  console.log("BottomNav 현재 유저(버튼에서):", currentUser);
+const BottomNav = () => {
   const navigate = useNavigate();
   return (
     <BottomWrapper>
       <div>
-        <NavBtn onClick={() => navigate("/home")}>🏠</NavBtn>
+        <NavBtn>🏠</NavBtn>
         <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
-        <NavBtn
-          onClick={() => navigate("/ActivityNav", { state: { currentUser } })}
-        >
-          ❤️
-        </NavBtn>
+        <NavBtn>❤️</NavBtn>
         <NavBtn>➕</NavBtn>
         <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
         <NavBtn onClick={() => navigate("/chat")}>💌</NavBtn>

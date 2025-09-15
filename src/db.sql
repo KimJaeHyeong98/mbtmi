@@ -75,6 +75,27 @@ WHEN MATCHED THEN
                                 WHEN 17 THEN '제주특별자치도'
         END;
 
+-- 오늘의 글 테이블
+CREATE TABLE POSTS
+( post_id NUMBER PRIMARY KEY,
+  user_id NUMBER NOT NULL,
+  text VARCHAR2(1000) NOT NULL,
+  image_url VARCHAR2(255),
+  like_count NUMBER DEFAULT 0 NOT NULL,
+  created_at DATE DEFAULT SYSDATE NOT NULL,
+  CONSTRAINT fk_posts_user FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE );
+
+CREATE SEQUENCE posts_seq START WITH 1 INCREMENT BY 1;
+
+--오늘의 글 좋아요 테이블
+CREATE TABLE POST_LIKES (
+post_id    NUMBER NOT NULL,
+user_id    NUMBER NOT NULL,
+created_at DATE DEFAULT SYSDATE NOT NULL,
+CONSTRAINT pk_post_likes PRIMARY KEY (post_id, user_id),
+CONSTRAINT fk_pl_post   FOREIGN KEY (post_id) REFERENCES POSTS(post_id) ON DELETE CASCADE,
+CONSTRAINT fk_pl_user   FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
+);
 SELECT constraint_name, column_name
 FROM user_cons_columns
 WHERE table_name = 'USERS';
@@ -89,3 +110,19 @@ CREATE SEQUENCE hearts_seq
     NOCACHE
     NOCYCLE;
 
+SELECT user_id, username, name, photo_url FROM users WHERE username = 'user30';
+
+--더미 데이터, post테스트
+INSERT INTO posts (post_id, user_id, text, image_url, like_count)
+VALUES (posts_seq.NEXTVAL, 117, '첫 글 테스트입니다!', 'abc123.jpg', 0);
+
+SELECT p.*, u.name, u.photo_url
+FROM posts p JOIN users u ON u.user_id = p.user_id
+ORDER BY p.created_at DESC;
+
+--좋아요 테스트
+-- user_id=117이 방금 글(post_id=?에) 좋아요
+INSERT INTO post_likes (post_id, user_id) VALUES (:postId, 117);
+UPDATE posts SET like_count = like_count + 1 WHERE post_id = :postId;
+
+select * from posts;

@@ -206,7 +206,6 @@ const Home = () => {
         console.error("세션 체크 실패:", err);
       }
     };
-
     fetchCurrentUser();
   }, []);
 
@@ -221,7 +220,6 @@ const Home = () => {
   // 이미 하트한 유저면 취소, 아니면 추가
   const handleHeart = async () => {
     const targetUserId = randomUsers[currentIndex].user_id;
-
     try {
       const res = await axios.post("/api/hearts/toggle", null, {
         params: {
@@ -325,7 +323,7 @@ const Home = () => {
           </CardSlide>
         )}
       </CardWrapper>
-      ){/* ✅ 하단 네비 */}
+      {/* ✅ 하단 네비 */}
       <BottomNav currentUser={currentUser} />
       <HomeModal
         isOpen={isModalOpen}
