@@ -26,4 +26,22 @@ public interface HeartsCheckMapper {
     // 내가 하트한 유저 목록 가져오기
     @Select("SELECT to_user FROM HEARTS WHERE from_user = #{fromUser}")
     List<Integer> findHeartedUserIds(@Param("fromUser") int fromUser);
+
+    //하트를 누른사람을 따로 보기위해서 만드는 쿼리
+    @Select("""
+    SELECT 
+        u.user_id AS userId,
+        u.name,
+        u.photo_url AS photoUrl,
+        CASE WHEN h2.from_user IS NOT NULL THEN 1 ELSE 0 END AS mutualHeart
+    FROM HEARTS h
+    JOIN USERS u 
+        ON h.to_user = u.user_id
+    LEFT JOIN HEARTS h2 
+        ON h2.from_user = u.user_id
+       AND h2.to_user = h.from_user
+    WHERE h.from_user = #{fromUser}
+""")
+    List<HeartedUserDTO> findHeartedUsers(@Param("fromUser") int fromUser);
+
 }

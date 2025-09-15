@@ -104,7 +104,11 @@ select * from users order by user_id;
 
 
 
-
+CREATE SEQUENCE hearts_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
 
 SELECT user_id, username, name, photo_url FROM users WHERE username = 'user30';
 

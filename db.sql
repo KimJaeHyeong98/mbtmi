@@ -210,3 +210,14 @@ FROM chat_room cr
          JOIN users u
               ON u.user_id = (CASE WHEN cr.user1_id = 4 THEN cr.user2_id ELSE cr.user1_id END)
 WHERE (cr.user1_id = 4 OR cr.user2_id = 4);
+
+SELECT * FROM hearts WHERE from_user = 4;
+
+SELECT
+    u.user_id AS userId,
+    u.name,
+    u.photo_url AS photoUrl
+FROM HEARTS h
+         JOIN USERS u
+              ON h.to_user = u.user_id
+WHERE h.from_user = 4;
