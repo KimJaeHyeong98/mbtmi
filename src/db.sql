@@ -120,3 +120,5 @@ ORDER BY p.created_at DESC;
 -- user_id=117이 방금 글(post_id=?에) 좋아요
 INSERT INTO post_likes (post_id, user_id) VALUES (:postId, 117);
 UPDATE posts SET like_count = like_count + 1 WHERE post_id = :postId;
+
+select * from posts;
