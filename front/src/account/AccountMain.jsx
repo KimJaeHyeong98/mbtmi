@@ -50,6 +50,7 @@ import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "../main/NothingResultHome";
 import ProfilePhoto from "./ProfilePhoto";
 import TodayPost from "../today's_post/TodayPost";
+import ActivityNav from "../activities/ActivityNav.jsx";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -251,6 +252,8 @@ const AccountMain = () => {
             </>
           }
         />
+        {/* 준하트, 받은하트 */}
+        <Route path="/ActivityNav" element={<ActivityNav />} />
 
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />

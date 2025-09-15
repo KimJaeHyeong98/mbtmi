@@ -36,14 +36,19 @@ const NavBtn = styled.button`
   }
 `;
 
-const BottomNav = () => {
+const BottomNav = ({ currentUser }) => {
+  console.log("BottomNav 현재 유저(버튼에서):", currentUser);
   const navigate = useNavigate();
   return (
     <BottomWrapper>
       <div>
-        <NavBtn>🏠</NavBtn>
+        <NavBtn onClick={() => navigate("/home")}>🏠</NavBtn>
         <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
-        <NavBtn>❤️</NavBtn>
+        <NavBtn
+          onClick={() => navigate("/ActivityNav", { state: { currentUser } })}
+        >
+          ❤️
+        </NavBtn>
         <NavBtn>➕</NavBtn>
         <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
         <NavBtn onClick={() => navigate("/chat")}>💌</NavBtn>

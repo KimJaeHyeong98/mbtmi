@@ -130,6 +130,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(null);
+  console.log("현재 유저:", currentUser);
   const [randomUsers, setRandomUsers] = useState([]); // 랜덤 유저 50명 배열
   const [currentIndex, setCurrentIndex] = useState(0); // 현재 카드 인덱스
   const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태 추가
@@ -222,12 +223,14 @@ const Home = () => {
     const targetUserId = randomUsers[currentIndex].user_id;
 
     try {
-      const res = await axios.post("/api/hearts", {
-        fromUser: currentUser.user_id,
-        toUser: targetUserId,
+      const res = await axios.post("/api/hearts/toggle", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: targetUserId,
+        },
       });
 
-      if (res.data.success) {
+      if (res.data) {
         alert("하트를 눌렀습니다!");
         setHeartedUsers((prev) => new Set(prev).add(targetUserId)); // 하트한 유저 추가
       } else {
@@ -287,7 +290,12 @@ const Home = () => {
                       ⬅️
                     </Btn>
                     {/* 하트 */}
-                    <Btn onClick={handleHeart}>
+                    <Btn
+                      onClick={() => {
+                        handleHeart(); // 하트 누르기
+                        setTimeout(handleNext, 2000); // 초 뒤 다음 카드로
+                      }}
+                    >
                       {heartedUsers.has(randomUsers[currentIndex].user_id)
                         ? "❤️"
                         : "🤍"}
@@ -318,7 +326,7 @@ const Home = () => {
         )}
       </CardWrapper>
       ){/* ✅ 하단 네비 */}
-      <BottomNav />
+      <BottomNav currentUser={currentUser} />
       <HomeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
