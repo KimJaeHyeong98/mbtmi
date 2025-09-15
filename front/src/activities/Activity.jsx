@@ -1,41 +1,39 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
-const Activity = () => {
-  const profile = {
-    name: "유지민",
-    activity: "유지민님께 하트를 보냈습니다.",
-    btn: "하트 보내기",
-  };
+const Activity = ({ name, activity, btn, profileImage }) => {
+  // const profile = {
+  //   name: "유지민",
+  //   activity: "유지민님께 하트를 보냈습니다.",
+  //   btn: "하트 보내기",
+  // };
 
   return (
     <Container>
       <ProfileBlock>
+        {/* 프로필 이미지 */}
         <ProfileImage
-          src={profileimage}
-          alt=""
+          src={profileImage} // ✅ props로 받은 이미지
+          alt={`${name} 프로필`}
           style={{ userSelect: "none", WebkitUserDrag: "none" }}
         />
-        <Give>
-          {profile.name} <br /> {profile.activity}
-        </Give>
-        <Btn>{profile.btn}</Btn>
+
+        {/* 활동 텍스트 */}
+        <Give>{activity}</Give>
+
+        {/* 버튼 */}
+        <Btn>{btn}</Btn>
       </ProfileBlock>
     </Container>
   );
 };
 
 const Container = styled.div`
-  min-height: 100dvh;
+  margin: 10px 0;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  overflow-y: hidden;
-  position: relative;
-  /* 파스텔톤 배경 그라데이션 */
-  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
 `;
 
 const ProfileBlock = styled.div`
@@ -50,7 +48,6 @@ const Give = styled.h2`
 `;
 
 const ProfileImage = styled.img`
-  padding: 0px 15px;
   width: 40px;
   height: 40px;
   border-radius: 100%;
@@ -58,7 +55,7 @@ const ProfileImage = styled.img`
 `;
 
 const Btn = styled.button`
-  margin-left: 20px;
+  margin-left: 10px;
   padding: 6px 12px;
   border-radius: 10px;
   font-size: 10px;
