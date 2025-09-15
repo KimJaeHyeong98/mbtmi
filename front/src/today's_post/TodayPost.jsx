@@ -4,12 +4,13 @@ import PostMain from "./PostMain";
 import TopNav from "../globaltool/TopNav";
 
 const TodayPost = () => {
-    return (
-        <Container>
-            <TopNav />
-            <PostMain />
-            <BottomNav />
-        </Container>
-    );
+  return (
+    <Container>
+      <TopNav />
+      <PostMain />
+      <BottomNav />
+    </Container>
+  );
 };
+
 export default TodayPost;

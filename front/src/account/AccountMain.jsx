@@ -50,7 +50,7 @@ import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "../main/NothingResultHome";
 import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
-import TodayPost from "../today's_post/TodayPost";
+import TodayPost from "../today's_post/TodayPost.jsx";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
