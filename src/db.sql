@@ -15,8 +15,6 @@ SELECT * FROM users WHERE username='123' AND password='1234';
 
 create sequence users_seq;
 
-
-
 select * from user_tags;
 
 insert into user_tags values (22,1,'DESIRED');
@@ -30,8 +28,6 @@ select * from USER_HOBBIES;
 
 insert into users values (users_seq.nextval,'system',1234,'admin','1994-03-17',sysdate,'ESTP','INFP','안녕하세요 많은 이용 바랍니다','pig.png');
 insert into users values (users_seq.nextval,'yjm',123,'유지민','2000-04-11',sysdate,'ENTP','INFP','안녕하세요 유지민입니다','karina.png');
-
-
 
 insert into users values (users_seq.nextval,'123',123,'유지민','2000-04-11',sysdate,'ENTP','INFP','안녕하세요 유지민입니다','karina.png');
 
@@ -102,10 +98,6 @@ WHERE table_name = 'USERS';
 
 select * from users order by user_id;
 
-
-
-
-
 SELECT user_id, username, name, photo_url FROM users WHERE username = 'user30';
 
 --더미 데이터, post테스트
@@ -122,3 +114,41 @@ INSERT INTO post_likes (post_id, user_id) VALUES (:postId, 117);
 UPDATE posts SET like_count = like_count + 1 WHERE post_id = :postId;
 
 select * from posts;
+
+INSERT INTO POSTS (
+    post_id, user_id, text, image_url
+) VALUES (
+             posts_seq.NEXTVAL,   -- 글 번호 시퀀스
+             185,                   -- 작성자 (곽여름 user_id)
+             '그래도 해야지',
+             'rrr.jpeg'
+         );
+
+
+INSERT INTO POST_LIKES (post_id, user_id)
+VALUES (3, 22);  -- post_id=1번 글에 user_id=2번 유저가 좋아요
+
+select * from POSTS;
+
+select * from POST_LIKES;
+
+select Count(post_id) as count from post_likes where post_id = 3;
+
+select * from POSTS;
+
+
+SELECT
+    p.post_id,
+    p.user_id,
+    p.text,
+    p.image_url,
+    p.created_at,
+    u.name,
+    u.mbti,
+    COUNT(pl.user_id) AS like_count
+FROM posts p
+         JOIN users u ON p.user_id = u.user_id
+         LEFT JOIN post_likes pl ON p.post_id = pl.post_id
+GROUP BY
+    p.post_id, p.user_id, p.text, p.image_url, p.created_at, u.name, u.mbti
+ORDER BY p.created_at DESC;
