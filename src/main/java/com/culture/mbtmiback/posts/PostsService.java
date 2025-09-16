@@ -18,4 +18,7 @@ public class PostsService {
         return postsMapper.getAllPosts();
     }
 
+    public void insertPost(Long userId, String text, String fileName) {
+        postsMapper.insertPost(userId, text, fileName);
+    }
 }
