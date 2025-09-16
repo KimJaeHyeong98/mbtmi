@@ -18,23 +18,51 @@ public class HeartsCheckService {
         return heartsCheckMapper.findByUsers(fromUser, toUser);
     }
 
-    //하트누르는거 (추가,해제)
+    //내가 하트한 유저 목록 가져오기
+    public List<HeartedUserDTO> getHeartedUsers(int fromUser) {
+        return heartsCheckMapper.findHeartedUsers(fromUser);
+    }
+
+
     public boolean checkHearts(int fromUser, int toUser) {
-        boolean haveHearts = heartsCheckMapper.findByUsers(fromUser, toUser);
-        System.out.println("have하트" + haveHearts);
-        if (haveHearts) {
+        // X가 이미 있으면 먼저 삭제
+        if (heartsCheckMapper.findByUsersX(fromUser, toUser)) {
+            heartsCheckMapper.deleteHeartX(fromUser, toUser);
+        }
+        boolean haveHeart = heartsCheckMapper.findByUsersHeart(fromUser, toUser);
+        if (haveHeart) {
             heartsCheckMapper.deleteHeart(fromUser, toUser);
             return false;
         } else {
             heartsCheckMapper.insertHeart(fromUser, toUser);
             return true;
         }
-
     }
 
-    //내가 하트한 유저 목록 가져오기
-    public List<HeartedUserDTO> getHeartedUsers(int fromUser) {
-        return heartsCheckMapper.findHeartedUsers(fromUser);
+    // X 토글
+    public boolean checkHeartsX(int fromUser, int toUser) {
+        // HEART가 이미 있으면 먼저 삭제
+        if (heartsCheckMapper.findByUsersHeart(fromUser, toUser)) {
+            heartsCheckMapper.deleteHeart(fromUser, toUser);
+        }
+        boolean haveX = heartsCheckMapper.findByUsersX(fromUser, toUser);
+        if (haveX) {
+            heartsCheckMapper.deleteHeartX(fromUser, toUser);
+            return false;
+        } else {
+            heartsCheckMapper.insertHeartX(fromUser, toUser);
+            return true;
+        }
+    }
+
+
+
+    public List<Long> getMyHearts(Long userId) {
+        return heartsCheckMapper.findMyActions(userId, "HEART");
+    }
+
+    public List<Long> getMyX(Long userId) {
+        return heartsCheckMapper.findMyActions(userId, "X");
     }
 
 

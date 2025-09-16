@@ -47,4 +47,31 @@ public class HeartsCheckC {
         return ResponseEntity.ok(users);
     }
 
+    // 관심없음 토글 (x️ 추가 / x 해제)
+    @PostMapping("/toggleX")
+    public ResponseEntity<Boolean> toggleHeartX(
+            @RequestParam int fromUser,
+            @RequestParam int toUser
+    ) {
+        boolean result = heartsCheckService.checkHeartsX(fromUser, toUser);
+        if (result == true) {
+            System.out.println("관심없음 등록됨"+"선택한유저:"+ toUser);
+        }else {
+            System.out.println("관심없음 등록됨해체됨"+"선택해제유저:"+ toUser);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+
+    @GetMapping("/my/{userId}")
+    public ResponseEntity<List<Long>> getMyHearts(@PathVariable Long userId) {
+        return ResponseEntity.ok(heartsCheckService.getMyHearts(userId));
+    }
+
+    @GetMapping("/myX/{userId}")
+    public ResponseEntity<List<Long>> getMyX(@PathVariable Long userId) {
+        return ResponseEntity.ok(heartsCheckService.getMyX(userId));
+    }
+
+
 }
