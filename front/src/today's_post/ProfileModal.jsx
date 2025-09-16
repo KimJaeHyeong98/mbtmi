@@ -71,7 +71,7 @@ const ProfileModal = ({ onClose, profileUser }) => {
           alt="profile"
         />
         <Name>
-          {p.name}({formData.age}) / {mbti}
+          {/* {p.name}({formData.age}) / {mbti} */}
         </Name>
         <Region>{formData.location}</Region>
 
