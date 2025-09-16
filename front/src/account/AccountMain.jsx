@@ -50,8 +50,12 @@ import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "../main/NothingResultHome";
 import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
+
+
+import ProfileModal from "../today's_post/ProfileModal.jsx";
 import TodayPost from "../today's_post/TodayPost";
 import ActivityNav from "../activities/ActivityNav.jsx";
+
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -129,6 +133,10 @@ const AccountMain = () => {
         <Route path="/region" element={<RegionTreeSelect />} />
         <Route path="/profilephoto" element={<ProfilePhoto />} />
         <Route path="/todaypost" element={<TodayPost />} />
+
+        <Route path="/postprofile" element={<ProfileModal />} />
+
+
 
         {/* 간단한 MBTI */}
 

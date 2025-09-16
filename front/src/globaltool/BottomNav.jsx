@@ -42,7 +42,11 @@ const BottomNav = () => {
   return (
     <BottomWrapper>
       <div>
+
+      
+
         <NavBtn  onClick={() => navigate("/home")}>🏠</NavBtn>
+
         <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
         <NavBtn>❤️</NavBtn>
         <NavBtn>➕</NavBtn>
