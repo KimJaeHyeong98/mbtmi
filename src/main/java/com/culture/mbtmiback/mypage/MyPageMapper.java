@@ -113,12 +113,9 @@ public interface MyPageMapper {
     """)
     int insertDesiredHobby(@Param("userId") Long userId, @Param("hobbyName") String hobbyName);
 
-
     // 아이디 중복체크
     @Select("SELECT COUNT(*) FROM USERS WHERE USERNAME = #{username}")
     int countByUsername(@Param("username") String username);
-
-
 
     @Update("""
     UPDATE USERS
