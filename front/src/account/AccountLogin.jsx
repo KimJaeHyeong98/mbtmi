@@ -59,7 +59,7 @@ const AccountLogin = () => {
       <ButtonNeumorphism disabled={!canSubmit} onClick={handleSubmit}>
         로그인
       </ButtonNeumorphism>
-      <Divider>------------------- 또는 -------------------</Divider>
+      
     </Container>
   );
 };
@@ -98,13 +98,6 @@ const LoginInput = styled.input`
     border-color: #a6c1ee;
     box-shadow: 0 0 8px rgba(166, 193, 238, 0.5);
   }
-`;
-
-// 구분 텍스트
-const Divider = styled.div`
-  margin: 20px 0;
-  font-weight: bold;
-  color: #666;
 `;
 
 const Mbtmi = styled.img`
