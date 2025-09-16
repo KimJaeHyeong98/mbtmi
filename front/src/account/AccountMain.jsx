@@ -50,11 +50,9 @@ import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "../main/NothingResultHome";
 import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
-
-
-import ProfileModal from "../today's_post/ProfileModal.jsx";
 import TodayPost from "../today's_post/TodayPost";
 import ActivityNav from "../activities/ActivityNav.jsx";
+import ProfileModal from "../today's_post/ProfileModal.jsx";
 
 
 const AccountMain = () => {
