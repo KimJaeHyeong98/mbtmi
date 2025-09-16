@@ -46,6 +46,15 @@ public class HeartsCheckC {
         System.out.println("내가 하트한 유저들:" + users);
         return ResponseEntity.ok(users);
     }
+    // 나를 하트한 유저 목록 가져오기
+    @GetMapping("/who_hearted_me/{toUser}")
+    public ResponseEntity<List<HeartedUserDTO>> whoHeartedToMe(
+            @PathVariable int toUser
+    ){
+        List<HeartedUserDTO> users = heartsCheckService.whoHeartedToMe(toUser);
+        System.out.println("나를 하트한 유저들:" + users);
+        return ResponseEntity.ok(users);
+    }
 
     // 관심없음 토글 (x️ 추가 / x 해제)
     @PostMapping("/toggleX")

@@ -8,6 +8,7 @@ import ActivityModal from "./ActivityModal";
 
 const ActivityNav = () => {
   const navigate = useNavigate();
+
   const location = useLocation();
   const { currentUser } = location.state || {}; // 여기서 받아야 함
 
@@ -82,7 +83,7 @@ const ActivityNav = () => {
             {activityGiveTake.btn.map((btn, index) => (
               <Btnb
                 key={index}
-                onClick={() => navigate(btn.path)}
+                onClick={() => navigate(btn.path, { state: { currentUser } })}
                 style={{
                   cursor: "pointer",
                 }}

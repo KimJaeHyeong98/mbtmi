@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Account01 from "./account01";
+import Account01 from "./Account01";
 import Home from "../main/Home";
 import AccountLogin from "./AccountLogin";
 import { useAuth } from "../main/AuthContext";
@@ -52,6 +52,7 @@ import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
 import TodayPost from "../today's_post/TodayPost";
 import ActivityNav from "../activities/ActivityNav.jsx";
+import ActivityNavReceived from "../activities/ActivityNavReceived.jsx";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -256,6 +257,7 @@ const AccountMain = () => {
         />
         {/* 준하트, 받은하트 */}
         <Route path="/ActivityNav" element={<ActivityNav />} />
+        <Route path="/ActivityNavReceived" element={<ActivityNavReceived />} />
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
         {/* 홈 모달창 */}
