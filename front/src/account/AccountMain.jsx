@@ -135,6 +135,7 @@ const AccountMain = () => {
                 <Route path="/profilephoto" element={<ProfilePhoto />} />
                 <Route path="/todaypost" element={<TodayPost />} />
                 <Route path="/addpost" element={<AddPost />} />
+                <Route path="/postmain" element={<TodayPost />} />
 
                 <Route path="/postprofile" element={<ProfileModal />} />
 

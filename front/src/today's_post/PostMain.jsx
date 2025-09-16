@@ -11,6 +11,7 @@ const PostMain = () => {
     const [openProfile, setOpenProfile] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
     const [posts, setPosts] = useState([]);
+    const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
     // 서버에서 게시글 가져오기
     useEffect(() => {
@@ -102,7 +103,7 @@ const PostMain = () => {
                         {/* 게시글 이미지 */}
                         {p.image_url ? (
                             <Photo
-                                src={`http://localhost:8080/uploads/${p.image_url}`}
+                                src={`${API_BASE}/uploads/${p.image_url}`}
                                 alt="게시글 이미지"
                             />
                         ) : null}

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Container from "../globaltool/Container";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env?.VITE_API_BASE || "http://localhost:8080";
 
@@ -31,14 +32,14 @@ const AddPost = () => {
 
         try {
             const fd = new FormData();
-            fd.append("title", title);
-            fd.append("body", text); // 백엔드 @RequestPart("body")
+            fd.append("text", text); // 백엔드 @RequestPart("body")
             if (file) fd.append("file", file);
 
             const res = await fetch(`${API_BASE}/posts`, {
                 method: "POST",
                 body: fd,
                 // 인증이 쿠키 기반이면: credentials: "include",
+                credentials: "include",
             });
 
             const contentType = res.headers.get("content-type") || "";
@@ -52,7 +53,8 @@ const AddPost = () => {
                 return;
             }
 
-            alert(`게시물이 등록되었습니다! #${payload?.id ?? ""}`);
+            alert(`게시물이 등록되었습니다! ${payload?.id ?? ""}`);
+            navigate("/postmain"); // ✅페이지 이동
 
             // 폼 초기화
             setTitle("");
@@ -66,16 +68,13 @@ const AddPost = () => {
         }
     };
 
+    const navigate = useNavigate();
+
     return (
         <Container>
             <Form onSubmit={handleSubmit} encType="multipart/form-data">
-                <TitleInput
-                    type="text"
-                    placeholder="제목을 입력하세요"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-
+                <HeaderBox>게시글 작성</HeaderBox>
+                <hr />
                 <ImageBox>
                     {preview ? (
                         <Preview src={preview} alt="preview" />
@@ -111,11 +110,11 @@ const Form = styled.form`
     padding: 20px;
 `;
 
-const TitleInput = styled.input`
-    padding: 10px;
-    font-size: 18px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+const HeaderBox = styled.div`
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
 `;
 
 const ImageBox = styled.div`
