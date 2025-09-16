@@ -9,16 +9,16 @@ import BottomNav from "../globaltool/BottomNav.jsx";
 
 import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "./NothingResultHome";
+
 const Container = styled.div`
   min-height: 100dvh;
   width: 100vw;
   overflow-x: hidden;
   display: flex;
   box-sizing: border-box;
-  flex-direction: column; /* 🔥 하단 네비 배치를 위해 세로 정렬 */
-
+  flex-direction: column;
   background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-  position: relative; /* 🔥 하단 네비 절대위치 기준 */
+  position: relative;
   padding-top: 60px;
 `;
 
@@ -95,8 +95,8 @@ const Btn = styled.span`
 
 const CardWrapper = styled.div`
   display: flex;
-  justify-content: center; /* 혹은 space-between 등 */
-  overflow-x: hidden; /* 슬라이드가 범위를 넘어가면 잘림 */
+  justify-content: center;
+  overflow-x: hidden;
   width: 100%;
 `;
 
@@ -107,13 +107,13 @@ const CardSlide = styled.div`
 `;
 
 const CardItem = styled.div`
-  width: 100%; // 부모 폭에 맞춤
-  flex-shrink: 0; // 카드가 줄어들지 않음
+  width: 100%;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
-// 모달용
+
 const SettingButton = styled.button`
   position: absolute;
   top: 10px;
@@ -121,39 +121,57 @@ const SettingButton = styled.button`
   appearance: none;
   border: none;
   background: #000000ff;
-  font-size: 24px; /* 점 크기 조금 키움 */
+  font-size: 24px;
   padding: 7px 10px;
   border-radius: 16px;
   cursor: pointer;
 `;
+
+const GuideText = styled.div`
+  margin-top: 12px;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+`;
+
 const Home = () => {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(null);
-  console.log("현재 유저:", currentUser);
-  const [randomUsers, setRandomUsers] = useState([]); // 랜덤 유저 50명 배열
-  const [currentIndex, setCurrentIndex] = useState(0); // 현재 카드 인덱스
-  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태 추가
+  const [randomUsers, setRandomUsers] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState({
     gender: null,
     ageDown: null,
     ageUp: null,
     location: null,
-  }); // 필터 상태 유지용
+  });
+  const [noResult, setNoResult] = useState(false);
 
-  const [noResult, setNoResult] = useState(false); // 조건에 맞는 유저 없을 때 상태
+  const [heartedUsers, setHeartedUsers] = useState(new Set());
+  const [noHeartedUsers, setNoHeartedUsers] = useState(new Set());
 
-  // 공용 함수
+  // ✅ 내 액션(하트/X) 불러오기
+  const fetchMyActions = async () => {
+    try {
+      const resHeart = await axios.get(`/api/hearts/my/${currentUser.user_id}`);
+      const resX = await axios.get(`/api/hearts/myX/${currentUser.user_id}`);
+      setHeartedUsers(new Set(resHeart.data));
+      setNoHeartedUsers(new Set(resX.data));
+    } catch (err) {
+      console.error("내 액션 불러오기 실패:", err);
+    }
+  };
+
   const loadRandomUsers = async (filters = {}) => {
     try {
       const res = await axios.get(`/api/users/random/${currentUser.user_id}`, {
         params: filters,
-        // gender, ageDown, ageUp, 로컬 같은 조건 전달
       });
       const users = res.data;
       if (users.length === 0) {
-        // 조건에 맞는 유저가 없는 경우 재검색 요청페이지 있음
-        setNoResult(true); // 새로운 상태 추가
+        setNoResult(true);
       } else {
         setNoResult(false);
         setRandomUsers(users);
@@ -164,43 +182,37 @@ const Home = () => {
     }
   };
 
-  // 처음 유저 불러오기
   const fetchRandomUsers = async () => {
     if (!currentUser) return;
-    await loadRandomUsers(); // 조건 없을 때
+    await loadRandomUsers();
+    await fetchMyActions();
   };
-  // 카드 이전으로 가기
+
   const handlePrev = () => {
     const prevIndex = currentIndex - 1;
     if (prevIndex < 0) {
-      // 첫 카드에서 이전 누르면 마지막 카드로 가거나 막을지 선택
-      // 1) 순환하게 할 경우:
       setCurrentIndex(randomUsers.length - 1);
-
-      // 2) 그냥 막을 경우:
-      return;
     } else {
       setCurrentIndex(prevIndex);
     }
   };
 
-  // 카드 끝났을 때 새로 불러오기
   const handleNext = async () => {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= randomUsers.length) {
-      await loadRandomUsers(filter); // 필터조건 유지하며 새로 불러오기
+      await loadRandomUsers(filter);
+      await fetchMyActions();
     } else {
       setCurrentIndex(nextIndex);
     }
   };
 
   useEffect(() => {
-    // 1️⃣ 현재 로그인한 유저 정보 가져오기
     const fetchCurrentUser = async () => {
       try {
         const res = await axios.get("/api/check-session");
         if (res.data.loggedIn) {
-          setCurrentUser(res.data.user); // currentUser 세팅
+          setCurrentUser(res.data.user);
         }
       } catch (err) {
         console.error("세션 체크 실패:", err);
@@ -213,11 +225,6 @@ const Home = () => {
     if (currentUser) fetchRandomUsers();
   }, [currentUser]);
 
-  const [heartedUsers, setHeartedUsers] = useState(new Set()); // 내가 하트한 유저 저장
-
-  // 하트 누르기 09/11 추가
-  // 하트 누르면 DB에 추가/삭제 요청
-  // 이미 하트한 유저면 취소, 아니면 추가
   const handleHeart = async () => {
     const targetUserId = randomUsers[currentIndex].user_id;
     try {
@@ -229,18 +236,50 @@ const Home = () => {
       });
 
       if (res.data) {
-        alert("하트를 눌렀습니다!");
-        setHeartedUsers((prev) => new Set(prev).add(targetUserId)); // 하트한 유저 추가
+        setHeartedUsers((prev) => new Set(prev).add(targetUserId));
+        setNoHeartedUsers((prev) => {
+          const updated = new Set(prev);
+          updated.delete(targetUserId);
+          return updated;
+        });
       } else {
         setHeartedUsers((prev) => {
           const updated = new Set(prev);
           updated.delete(targetUserId);
           return updated;
         });
-        alert("하트를 취소했습니다.");
       }
     } catch (err) {
       console.error("하트 요청 실패:", err);
+    }
+  };
+
+  const handleNotinterested = async () => {
+    const targetUserId = randomUsers[currentIndex].user_id;
+    try {
+      const res = await axios.post("/api/hearts/toggleX", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: targetUserId,
+        },
+      });
+
+      if (res.data) {
+        setNoHeartedUsers((prev) => new Set(prev).add(targetUserId));
+        setHeartedUsers((prev) => {
+          const updated = new Set(prev);
+          updated.delete(targetUserId);
+          return updated;
+        });
+      } else {
+        setNoHeartedUsers((prev) => {
+          const updated = new Set(prev);
+          updated.delete(targetUserId);
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.error("관심없음 요청 실패:", err);
     }
   };
 
@@ -259,7 +298,6 @@ const Home = () => {
             {randomUsers.map((user) => (
               <CardItem key={user.user_id}>
                 <Card>
-                  {/*검색 세팅 버튼 */}
                   <SettingButton onClick={() => setIsModalOpen(true)}>
                     ☰
                   </SettingButton>
@@ -269,69 +307,55 @@ const Home = () => {
                     <p>MBTI: {user.mbti}</p>
                     <p>자기소개: {user.self_intro}</p>
                   </div>
-                  {/* // 백엔드에서 받아온 태그 중 SELF 타입만 필터링 */}
                   <TagList>
                     {user.tags
-                      .filter((tag) => tag.type === "SELF") // SELF 타입만
+                      .filter((tag) => tag.type === "SELF")
                       .map((tag) => (
                         <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
                       ))}
                   </TagList>
-                  {/* <Btn onClick={handleNext}>Next</Btn> */}
                   <Btns>
-                    {/* 이전버튼 */}
+                    <Btn onClick={handlePrev}>⬅️</Btn>
                     <Btn
                       onClick={() => {
-                        handlePrev(); // 다음 카드로
+                        handleHeart();
+                        setTimeout(handleNext, 1500);
                       }}
                     >
-                      ⬅️
-                    </Btn>
-                    {/* 하트 */}
-                    <Btn
-                      onClick={() => {
-                        handleHeart(); // 하트 누르기
-                        setTimeout(handleNext, 2000); // 초 뒤 다음 카드로
-                      }}
-                    >
-                      {heartedUsers.has(randomUsers[currentIndex].user_id)
+                      {heartedUsers.has(randomUsers[currentIndex]?.user_id)
                         ? "❤️"
                         : "🤍"}
                     </Btn>
-                    {/* 엑스 버튼 */}
                     <Btn
                       onClick={() => {
-                        alert("패스했습니다.");
-                        handleNext();
+                        handleNotinterested();
+                        setTimeout(handleNext, 1500);
                       }}
                     >
-                      ❌
+                      {noHeartedUsers.has(randomUsers[currentIndex]?.user_id)
+                        ? "🚫"
+                        : "❌"}
                     </Btn>
-                    {/* 다음버튼 */}
-                    <Btn
-                      onClick={() => {
-                        handleNext(); // 다음 카드로
-                      }}
-                    >
-                      ➡️
-                    </Btn>
+                    <Btn onClick={handleNext}>➡️</Btn>
                   </Btns>
+                  <GuideText>
+                    🤍 = 하트하기 / ❤️ = 이미 하트함 <br />
+                    ❌ = 관심없음 / 🚫 = 이미 관심없음
+                  </GuideText>
                 </Card>
               </CardItem>
             ))}
-            {/* //여기가 검색결과 없는곳 */}
           </CardSlide>
         )}
       </CardWrapper>
-      {/* ✅ 하단 네비 */}
       <BottomNav currentUser={currentUser} />
       <HomeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelectFilter={(filters) => {
-          console.log("선택된 필터:", filters);
-          setFilter(filters); // state에 저장
-          loadRandomUsers(filters); // 필터 적용해서 새 데이터 불러오기
+          setFilter(filters);
+          loadRandomUsers(filters);
+          fetchMyActions();
         }}
       />
     </Container>

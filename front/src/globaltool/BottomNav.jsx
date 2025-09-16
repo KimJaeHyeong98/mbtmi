@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+
 /* ✅ 하단 네비게이션 */
 const BottomWrapper = styled.nav`
   position: fixed;
@@ -41,7 +42,7 @@ const BottomNav = () => {
   return (
     <BottomWrapper>
       <div>
-        <NavBtn>🏠</NavBtn>
+        <NavBtn  onClick={() => navigate("/home")}>🏠</NavBtn>
         <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
         <NavBtn>❤️</NavBtn>
         <NavBtn>➕</NavBtn>
