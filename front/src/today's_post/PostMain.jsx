@@ -1,72 +1,177 @@
 import styled from "styled-components";
-import AvatarImg from "../assets/img/postsample.jpeg";
-import PostImg from "../assets/img/postsample.jpeg";
+import { useState, useEffect } from "react";
+import AvatarImg from "../assets/img/postsample.jpeg"; // 기본 프로필 이미지
+import { useNavigate } from "react-router-dom";
+import ProfileModal from "../today's_post/ProfileModal";
+import axios from "axios";
+import PlusImg from "../assets/img/plus.png";
 
 const PostMain = () => {
-    const posts = [
-        {
-            id: 1,
-            avatar: "../assets/img/postsample.jpeg",
-            name: "곽여름",
-            mbti: "INFJ",
-            time: "3분전",
-            image: "../assets/img/postsample.jpeg",
-            text: "그래도 해야지",
-            likes: 21,
-        },
-    ];
+    const navigate = useNavigate();
+    const [openProfile, setOpenProfile] = useState(false);
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+
+    // 서버에서 게시글 가져오기
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const res = await axios.get("/posts/postsmain");
+                console.log("서버 응답:", res.data);
+                setPosts(res.data);
+            } catch (err) {
+                console.error("게시글 불러오기 실패:", err);
+            }
+        };
+        fetchPosts();
+    }, []);
+
+    // 좋아요 토글
+    const toggleLike = (id) => {
+        setPosts((prev) =>
+            prev.map((p) =>
+                p.post_id === id
+                    ? {
+                          ...p,
+                          liked: !p.liked,
+                          like_count: p.liked
+                              ? p.like_count - 1
+                              : p.like_count + 1,
+                      }
+                    : p
+            )
+        );
+    };
+
+    // "더보기" 메뉴 토글
+    const toggleMenu = (id) => {
+        setOpenMenuId((prev) => (prev === id ? null : id));
+    };
 
     return (
         <Post>
-            {posts.map((p) => (
-                <PostCard key={p.id}>
-                    <Header>
-                        <User>
-                            <Avatar src={AvatarImg} alt="avatarimg" />
-                            <Meta>
-                                <div className="name">
-                                    <strong>{p.name}</strong>{" "}
-                                    <span className="mbti">({p.mbti})</span>
-                                </div>
-                                <span className="time">{p.time}</span>
-                            </Meta>
-                        </User>
-                        <More aria-label="더 보기">⋯</More>
-                    </Header>
+            {posts.length === 0 ? (
+                <p>게시글이 아직 없습니다.</p>
+            ) : (
+                posts.map((p) => (
+                    <PostCard key={p.post_id}>
+                        {/* 헤더 */}
+                        <Header>
+                            <User>
+                                <Avatar
+                                    src={p.avatar || AvatarImg}
+                                    alt="프로필"
+                                    onClick={() => setOpenProfile(true)}
+                                    style={{ cursor: "pointer" }}
+                                />
+                                <Meta>
+                                    <div className="name">
+                                        <strong>{p.name}</strong>{" "}
+                                        <span className="mbti">{p.mbti}</span>
+                                    </div>
+                                    <span className="time">
+                                        {new Date(
+                                            p.created_at
+                                        ).toLocaleString()}
+                                    </span>
+                                </Meta>
+                            </User>
+                            <MoreWrapper>
+                                <More onClick={() => toggleMenu(p.post_id)}>
+                                    ⋯
+                                </More>
+                                {openMenuId === p.post_id && (
+                                    <Menu>
+                                        <MenuItem
+                                            onClick={() =>
+                                                alert("글 신고하기 클릭됨")
+                                            }>
+                                            글 신고하기
+                                        </MenuItem>
+                                        <MenuItem
+                                            onClick={() =>
+                                                alert("사용자 신고하기 클릭됨")
+                                            }>
+                                            사용자 신고하기
+                                        </MenuItem>
+                                    </Menu>
+                                )}
+                            </MoreWrapper>
+                        </Header>
 
-                    {p.image && <Photo src={PostImg} alt="        " />}
+                        {/* 게시글 이미지 */}
+                        {p.image_url ? (
+                            <Photo
+                                src={`${API_BASE}/uploads/${p.image_url}`}
+                                alt="게시글 이미지"
+                            />
+                        ) : null}
 
-                    {p.text && <Caption>{p.text}</Caption>}
+                        {/* 게시글 텍스트 */}
+                        {p.text && <Caption>{p.text}</Caption>}
 
-                    <Actions>
-                        <Heart>♡</Heart>
-                        <span>좋아요 {p.likes}개</span>
-                    </Actions>
+                        {/* 좋아요 */}
+                        <Actions>
+                            <HeartBtn
+                                filled={p.liked}
+                                onClick={() => toggleLike(p.post_id)}>
+                                ♥
+                            </HeartBtn>
+                            <span>{p.like_count}</span>
+                        </Actions>
 
-                    <Divider />
-                </PostCard>
-            ))}
+                        <Divider />
+                    </PostCard>
+                ))
+            )}
+
+            {/* 모달 */}
+            {openProfile && (
+                <ProfileModal onClose={() => setOpenProfile(false)} />
+            )}
+            <PostBtn onClick={() => navigate("/addpost")}>
+                <Plus src={PlusImg} alt="pluspng" />
+            </PostBtn>
         </Post>
     );
 };
 
 /* ===== 스타일 ===== */
 
-/* 스크롤 되는 메인 영역 (상단/하단바와 겹치지 않게 패딩) */
 const Post = styled.main`
     flex: 1;
     overflow-y: auto;
-    padding: -1px 12px calc(88px + env(safe-area-inset-bottom, 0));
-    /* 상단 탭이 겹치면 padding-top 더 주기 */
+    padding: 12px calc(12px + env(safe-area-inset-left, 0))
+        calc(88px + env(safe-area-inset-bottom, 0))
+        calc(12px + env(safe-area-inset-right, 0));
 `;
 
 const PostCard = styled.article`
-    background: #d5d5d5;
+    background: #ffffff77;
     border-radius: 16px;
     box-shadow: 2px 6px rgba(0, 0, 0, 0.05);
     padding: 16px 14px 12px;
-    width: min(560px, 100% - 20px);
     margin: 0 auto 18px;
+`;
+
+const PostBtn = styled.div`
+    position: fixed;
+    top: 77%;
+    left: 82%;
+    display: flex;
+    width: 44px;
+    height: 45px;
+    border-radius: 100%;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+`;
+
+const Plus = styled.img`
+    width: 54px;
+    height: 54px;
+    border-radius: 100%;
 `;
 
 const Header = styled.header`
@@ -92,7 +197,7 @@ const Avatar = styled.img`
 const Meta = styled.div`
     line-height: 1.2;
     .name {
-        font-size: 18px;
+        font-size: 20px;
         color: black;
     }
     .mbti {
@@ -103,7 +208,7 @@ const Meta = styled.div`
         display: block;
         margin-top: 4px;
         color: #646666;
-        font-size: 14px;
+        font-size: 15px;
     }
 `;
 
@@ -116,6 +221,35 @@ const More = styled.button`
     line-height: 1;
     cursor: pointer;
     color: black;
+`;
+
+const MoreWrapper = styled.div`
+    position: relative;
+`;
+
+const Menu = styled.div`
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 100;
+`;
+
+const MenuItem = styled.button`
+    display: block;
+    width: 140px;
+    padding: 10px 14px;
+    border: none;
+    background: white;
+    text-align: left;
+    font-size: 15px;
+    cursor: pointer;
+    &:hover {
+        background: #f3f3f3;
+    }
 `;
 
 const Photo = styled.img`
@@ -136,16 +270,20 @@ const Caption = styled.p`
 const Actions = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
     font-weight: 700;
     font-size: 18px;
     color: #050505;
 `;
 
-const Heart = styled.span`
+const HeartBtn = styled.button`
+    background: transparent;
     font-size: 28px;
     line-height: 1;
-    color: #f23737;
+    color: ${(props) => (props.filled ? "#f23737" : "#ccc")};
+    padding: 2%;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
 `;
 
 const Divider = styled.hr`

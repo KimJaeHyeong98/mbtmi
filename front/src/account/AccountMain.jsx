@@ -53,6 +53,8 @@ import ProfilePhoto from "./ProfilePhoto";
 import TodayPost from "../today's_post/TodayPost";
 import ActivityNav from "../activities/ActivityNav.jsx";
 import ActivityNavReceived from "../activities/ActivityNavReceived.jsx";
+import ProfileModal from "../today's_post/ProfileModal.jsx";
+import AddPost from "../today's_post/AddPost.jsx";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
@@ -130,9 +132,12 @@ const AccountMain = () => {
         <Route path="/region" element={<RegionTreeSelect />} />
         <Route path="/profilephoto" element={<ProfilePhoto />} />
         <Route path="/todaypost" element={<TodayPost />} />
+        <Route path="/addpost" element={<AddPost />} />
+        <Route path="/postmain" element={<TodayPost />} />
 
-        {/* 간단한 MBTI */}
+        <Route path="/postprofile" element={<ProfileModal />} />
 
+        {/* 간편 mbti 테스트 */}
         <Route
           path="/easymbti1"
           element={
