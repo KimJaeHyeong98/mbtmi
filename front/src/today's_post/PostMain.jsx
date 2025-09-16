@@ -1,8 +1,11 @@
 import styled from "styled-components";
 import AvatarImg from "../assets/img/postsample.jpeg";
 import PostImg from "../assets/img/postsample.jpeg";
+import PlusImg from "../assets/img/plus.png";
+import { useNavigate } from "react-router-dom";
 
 const PostMain = () => {
+    const navigate = useNavigate();
     const posts = [
         {
             id: 1,
@@ -33,19 +36,18 @@ const PostMain = () => {
                         </User>
                         <More aria-label="더 보기">⋯</More>
                     </Header>
-
                     {p.image && <Photo src={PostImg} alt="        " />}
-
                     {p.text && <Caption>{p.text}</Caption>}
-
                     <Actions>
                         <Heart>♡</Heart>
                         <span>좋아요 {p.likes}개</span>
                     </Actions>
-
                     <Divider />
                 </PostCard>
             ))}
+            <PostBtn onClick={() => navigate("/addpost")}>
+                <Plus src={PlusImg} alt="pluspng" />
+            </PostBtn>
         </Post>
     );
 };
@@ -65,8 +67,26 @@ const PostCard = styled.article`
     border-radius: 16px;
     box-shadow: 2px 6px rgba(0, 0, 0, 0.05);
     padding: 16px 14px 12px;
-    width: min(560px, 100% - 20px);
     margin: 0 auto 18px;
+`;
+
+const PostBtn = styled.div`
+    position: fixed;
+    top: 77%;
+    left: 82%;
+    display: flex;
+    width: 44px;
+    height: 45px;
+    border-radius: 100%;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+`;
+
+const Plus = styled.img`
+    width: 54px;
+    height: 54px;
+    border-radius: 100%;
 `;
 
 const Header = styled.header`
