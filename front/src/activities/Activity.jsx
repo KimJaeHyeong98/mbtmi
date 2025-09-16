@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
-const Activity = ({ name, activity, btn, profileImage }) => {
+const Activity = ({ name, activity, btn, profileImage, onClick }) => {
   // const profile = {
   //   name: "유지민",
   //   activity: "유지민님께 하트를 보냈습니다.",
@@ -9,7 +9,7 @@ const Activity = ({ name, activity, btn, profileImage }) => {
   // };
 
   return (
-    <Container>
+    <Container onClick={onClick}>
       <ProfileBlock>
         {/* 프로필 이미지 */}
         <ProfileImage
@@ -17,10 +17,8 @@ const Activity = ({ name, activity, btn, profileImage }) => {
           alt={`${name} 프로필`}
           style={{ userSelect: "none", WebkitUserDrag: "none" }}
         />
-
         {/* 활동 텍스트 */}
         <Give>{activity}</Give>
-
         {/* 버튼 */}
         <Btn>{btn}</Btn>
       </ProfileBlock>

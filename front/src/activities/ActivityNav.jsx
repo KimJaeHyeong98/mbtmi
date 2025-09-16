@@ -2,10 +2,12 @@ import styled from "styled-components";
 import Activity from "./Activity";
 import BottomNav from "../globaltool/BottomNav";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import ActivityModal from "./ActivityModal";
 
 const ActivityNav = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { currentUser } = location.state || {}; // 여기서 받아야 함
 
@@ -19,8 +21,15 @@ const ActivityNav = () => {
   };
 
   const activityGiveTake = {
-    btn: ["보낸 내역", "받은 내역"],
+    btn: [
+      { label: "보낸 내역", path: "/ActivityNav" },
+      { label: "받은 내역", path: "/ActivityNavReceived" },
+    ],
   };
+  // 모달 상태 관리
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  // 모달 열기 핸들러
 
   useEffect(() => {
     console.log(
@@ -71,7 +80,15 @@ const ActivityNav = () => {
           <Name>{like.name}</Name>
           <Btns>
             {activityGiveTake.btn.map((btn, index) => (
-              <Btnb key={index}>{btn}</Btnb>
+              <Btnb
+                key={index}
+                onClick={() => navigate(btn.path)}
+                style={{
+                  cursor: "pointer",
+                }}
+              >
+                {btn.label} {/* ← 여기 수정 */}
+              </Btnb>
             ))}
           </Btns>
         </Nav>
@@ -84,6 +101,10 @@ const ActivityNav = () => {
           activity={`${profile.name}님께 하트를 보냈습니다.`}
           btn={profile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
           profileImage={profile.photoUrl}
+          onClick={() => {
+            setSelectedProfile(profile); // ✅ 클릭된 프로필 저장
+            setIsModalOpen(true); // ✅ 모달 열기
+          }}
         />
       ))}
       <div style={{ height: "50px" }}>{/*  */}</div>
@@ -91,7 +112,17 @@ const ActivityNav = () => {
         <div key={idx}>
           {idx} - {profile.name} - {profile.photoUrl}
         </div>
-      ))} */}
+      ))} */}{" "}
+      {/* // 디버깅용 */}
+      {isModalOpen && selectedProfile && (
+        <ActivityModal
+          name={selectedProfile.name}
+          activity={`${selectedProfile.name}님께 하트를 보냈습니다.`}
+          btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
+          profileImage={selectedProfile.photoUrl}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
       <BottomNav />
     </Container>
   );

@@ -9,7 +9,6 @@ const BottomWrapper = styled.nav`
   bottom: 0;
   background: #ecf0f3; /* 밝은 회색톤 */
   padding: 12px 0 calc(env(safe-area-inset-bottom, 0) + 12px);
-
   display: flex;
   justify-content: space-evenly;
 
@@ -36,14 +35,18 @@ const NavBtn = styled.button`
   }
 `;
 
-const BottomNav = () => {
+const BottomNav = ({ currentUser }) => {
   const navigate = useNavigate();
   return (
     <BottomWrapper>
       <div>
-        <NavBtn>🏠</NavBtn>
+        <NavBtn onClick={() => navigate("/home")}>🏠</NavBtn>
         <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
-        <NavBtn>❤️</NavBtn>
+        <NavBtn
+          onClick={() => navigate("/ActivityNav", { state: { currentUser } })}
+        >
+          ❤️
+        </NavBtn>
         <NavBtn>➕</NavBtn>
         <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
         <NavBtn onClick={() => navigate("/chat")}>💌</NavBtn>

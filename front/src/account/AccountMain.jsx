@@ -254,7 +254,8 @@ const AccountMain = () => {
             </>
           }
         />
-
+        {/* 준하트, 받은하트 */}
+        <Route path="/ActivityNav" element={<ActivityNav />} />
         {/* 회원탈퇴 */}
         <Route path="/AccountDelConfirm" element={<AccountDelConfirm />} />
         {/* 홈 모달창 */}
