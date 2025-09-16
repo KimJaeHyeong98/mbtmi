@@ -92,6 +92,23 @@ public interface HeartsCheckMapper {
     """)
     List<HeartedUserDTO> findHeartedUsers(@Param("fromUser") int fromUser);
 
+//나한테 하트를 준 인간 조회
+@Select("""
+    SELECT 
+        u.user_id AS userId,
+        u.name,
+        u.photo_url AS photoUrl,
+        CASE WHEN h2.to_user IS NOT NULL THEN 1 ELSE 0 END AS mutualHeart
+    FROM HEARTS h
+    JOIN USERS u 
+        ON h.from_user = u.user_id
+    LEFT JOIN HEARTS h2 
+        ON h2.from_user = #{toUser}
+       AND h2.to_user = u.user_id
+    WHERE h.to_user = #{toUser}
+      AND h.action_type = 'HEART'
+""")
+List<HeartedUserDTO> findUsersWhoHeartedMe(@Param("toUser") int toUser);
 
     // Mapper
     @Select("SELECT to_user FROM HEARTS WHERE from_user = #{userId} AND action_type = #{actionType}")

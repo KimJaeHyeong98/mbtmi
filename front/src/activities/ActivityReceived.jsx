@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
-const Activity = ({ name, activity, btn, profileImage, onClick }) => {
+const ActivityReceived = ({ name, activity, btn, profileImage, onClick }) => {
   // const profile = {
   //   name: "유지민",
   //   activity: "유지민님께 하트를 보냈습니다.",
@@ -20,8 +20,8 @@ const Activity = ({ name, activity, btn, profileImage, onClick }) => {
         {/* 활동 텍스트 */}
         <Give>{activity}</Give>
         {/* 버튼 */}
-        {/* <Btn>{btn}</Btn> */}
-        {/* 내가 보낸 페이지에는 없어도 괜찮음 */}
+        <Btn>{btn}</Btn>
+        {/* 여기에는 있어야 함 */}
       </ProfileBlock>
     </Container>
   );
@@ -62,4 +62,4 @@ const Btn = styled.button`
   opacity: 80%;
 `;
 
-export default Activity;
+export default ActivityReceived;
