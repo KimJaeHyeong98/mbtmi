@@ -221,3 +221,13 @@ FROM HEARTS h
          JOIN USERS u
               ON h.to_user = u.user_id
 WHERE h.from_user = 4;
+
+SELECT
+    u.user_id AS userId,
+    u.name,
+    u.photo_url AS photoUrl
+FROM HEARTS h
+         JOIN USERS u
+              ON h.from_user = u.user_id
+WHERE h.to_user = 230
+      AND h.action_type = 'HEART'
