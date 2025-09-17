@@ -18,4 +18,7 @@ public class PostsService {
         return postsMapper.getAllPosts();
     }
 
+    public int deletePost(Long postId) {
+        return postsMapper.deletePost(postId);
+    }
 }

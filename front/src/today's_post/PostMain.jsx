@@ -4,12 +4,16 @@ import AvatarImg from "../assets/img/postsample.jpeg"; // 기본 프로필 이�
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "../today's_post/ProfileModal";
 import axios from "axios";
+import { useAuth } from "../main/AuthContext";
 
 const PostMain = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // ✅ 로그인된 사용자 정보
+  const currentUserId = user?.user_id; // ✅ 로그인한 사용자 id
   const [openProfile, setOpenProfile] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [profileUser, setProfileUser] = useState(null); // 선택된 프로필 유저 저장
 
   // 서버에서 게시글 가져오기
   useEffect(() => {
@@ -45,6 +49,18 @@ const PostMain = () => {
     setOpenMenuId((prev) => (prev === id ? null : id));
   };
 
+  const handleDelete = async (postId) => {
+    if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`/posts/${postId}`);
+      setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+    } catch (err) {
+      console.error("게시글 삭제 실패:", err);
+      alert("삭제에 실패했습니다.");
+    }
+  };
+
   return (
     <Post>
       {posts.length === 0 ? (
@@ -56,11 +72,19 @@ const PostMain = () => {
             <Header>
               <User>
                 <Avatar
-                  src={p.avatar || AvatarImg}
+                  src={
+                    p.photo_url
+                      ? `http://localhost:8080/uploads/${p.photo_url}`
+                      : AvatarImg
+                  }
                   alt="프로필"
-                  onClick={() => setOpenProfile(true)}
+                  onClick={() => {
+                    setProfileUser(p); // 클릭한 게시글 작성자의 데이터 저장
+                    setOpenProfile(true);
+                  }}
                   style={{ cursor: "pointer" }}
                 />
+
                 <Meta>
                   <div className="name">
                     <strong>{p.name}</strong>{" "}
@@ -75,12 +99,27 @@ const PostMain = () => {
                 <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
                 {openMenuId === p.post_id && (
                   <Menu>
-                    <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
-                      글 신고하기
-                    </MenuItem>
-                    <MenuItem onClick={() => alert("사용자 신고하기 클릭됨")}>
-                      사용자 신고하기
-                    </MenuItem>
+                    {p.user_id === currentUserId ? (
+                      <>
+                        <MenuItem onClick={() => handleEdit(p)}>
+                          글 수정하기
+                        </MenuItem>
+                        <MenuItem onClick={() => handleDelete(p.post_id)}>
+                          글 삭제하기
+                        </MenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
+                          글 신고하기
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => alert("사용자 신고하기 클릭됨")}
+                        >
+                          사용자 신고하기
+                        </MenuItem>
+                      </>
+                    )}
                   </Menu>
                 )}
               </MoreWrapper>
@@ -109,9 +148,13 @@ const PostMain = () => {
           </PostCard>
         ))
       )}
-
       {/* 모달 */}
-      {openProfile && <ProfileModal onClose={() => setOpenProfile(false)} />}
+      {openProfile && (
+        <ProfileModal
+          onClose={() => setOpenProfile(false)}
+          profileUser={profileUser} // 작성자 정보 전달
+        />
+      )}
     </Post>
   );
 };

@@ -42,35 +42,6 @@ ALTER TABLE USERS
 ALTER TABLE USERS
     ADD location VARCHAR2(50);
 
-MERGE INTO USERS u
-USING (
-    SELECT user_id,
-           ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE) AS rn
-    FROM USERS
-    WHERE location IS NULL
-) t
-ON (u.user_id = t.user_id)
-WHEN MATCHED THEN
-    UPDATE SET u.location = CASE MOD(t.rn - 1, 17) + 1
-                                WHEN 1 THEN '서울특별시'
-                                WHEN 2 THEN '부산광역시'
-                                WHEN 3 THEN '대구광역시'
-                                WHEN 4 THEN '인천광역시'
-                                WHEN 5 THEN '광주광역시'
-                                WHEN 6 THEN '대전광역시'
-                                WHEN 7 THEN '울산광역시'
-                                WHEN 8 THEN '세종특별자치시'
-                                WHEN 9 THEN '경기도'
-                                WHEN 10 THEN '강원도'
-                                WHEN 11 THEN '충청북도'
-                                WHEN 12 THEN '충청남도'
-                                WHEN 13 THEN '전라북도'
-                                WHEN 14 THEN '전라남도'
-                                WHEN 15 THEN '경상북도'
-                                WHEN 16 THEN '경상남도'
-                                WHEN 17 THEN '제주특별자치도'
-        END;
-
 -- 오늘의 글 테이블
 CREATE TABLE POSTS
 ( post_id NUMBER PRIMARY KEY,
@@ -97,6 +68,12 @@ FROM user_cons_columns
 WHERE table_name = 'USERS';
 
 select * from users order by user_id;
+
+CREATE SEQUENCE hearts_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
 
 SELECT user_id, username, name, photo_url FROM users WHERE username = 'user30';
 
@@ -134,7 +111,9 @@ select * from POST_LIKES;
 
 select Count(post_id) as count from post_likes where post_id = 3;
 
-select * from POSTS;
+select * from POSTS order by post_id;
+
+delete from POSTS where post_id = 2 ;
 
 
 SELECT
@@ -145,10 +124,13 @@ SELECT
     p.created_at,
     u.name,
     u.mbti,
+    u.location,
+    u.photo_url,
+    u.BIRTH_DATE,
     COUNT(pl.user_id) AS like_count
 FROM posts p
          JOIN users u ON p.user_id = u.user_id
          LEFT JOIN post_likes pl ON p.post_id = pl.post_id
 GROUP BY
-    p.post_id, p.user_id, p.text, p.image_url, p.created_at, u.name, u.mbti
+    p.post_id, p.user_id, p.text, p.image_url, p.created_at, u.name, u.mbti, u.location, u.photo_url, u.BIRTH_DATE
 ORDER BY p.created_at DESC;
