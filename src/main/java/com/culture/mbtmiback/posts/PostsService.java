@@ -21,4 +21,7 @@ public class PostsService {
     public void insertPost(Long userId, String text, String fileName) {
         postsMapper.insertPost(userId, text, fileName);
     }
+    public int deletePost(Long postId) {
+        return postsMapper.deletePost(postId);
+    }
 }
