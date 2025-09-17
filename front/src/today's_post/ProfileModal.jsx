@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
+import { useSignup } from "../SignupProvider";
 import logoimage from "../assets/img/mbtmi.jpg";
 import axios from "axios";
 import { useAuth } from "../main/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const ProfileModal = ({ onClose, profileUser }) => {
+  const { formData } = useSignup();
   const navigate = useNavigate();
-  const { user: currentUser } = useAuth(); // 로그인한 유저
   const [heartedUsers, setHeartedUsers] = useState(new Set()); // 내가 하트한 유저 저장
+  const { user: currentUser } = useAuth(); // ✅ 현재 로그인한 유저
+
+  const mbti = `${formData?.mbti?.EI ?? ""}${formData?.mbti?.SN ?? ""}${
+    formData?.mbti?.TF ?? ""
+  }${formData?.mbti?.JP ?? ""}`;
 
   // ESC로 닫기 + 바디 스크롤 잠금
   useEffect(() => {
@@ -104,7 +110,7 @@ const ProfileModal = ({ onClose, profileUser }) => {
 
 export default ProfileModal;
 
-/* ===== styled ===== */
+// ===== styled =====
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
@@ -160,6 +166,31 @@ const Region = styled.div`
   font-weight: bold;
 `;
 
+const PreZone = styled.div`
+  /* 카드 안에서 줄바꿈되며 감싸지기 */
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap; /* ⭐ 줄바꿈 */
+  gap: 10px 8px;
+  justify-content: center;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const Tag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  background: #fbc2eb;
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+`;
+
 const Buttons = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -174,7 +205,9 @@ const Btn = styled.button`
   background: transparent;
   cursor: pointer;
   transition: 0.2s;
+
   color: ${(props) => (props.$active ? "#f23737" : "#555")};
+
   &:hover {
     transform: scale(1.1);
   }

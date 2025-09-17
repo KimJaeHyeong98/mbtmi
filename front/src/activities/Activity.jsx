@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
-const Activity = ({ name, activity, btn, profileImage }) => {
+const Activity = ({ name, activity, btn, profileImage, onClick }) => {
   // const profile = {
   //   name: "유지민",
   //   activity: "유지민님께 하트를 보냈습니다.",
@@ -9,7 +9,7 @@ const Activity = ({ name, activity, btn, profileImage }) => {
   // };
 
   return (
-    <Container>
+    <Container onClick={onClick}>
       <ProfileBlock>
         {/* 프로필 이미지 */}
         <ProfileImage
@@ -17,12 +17,11 @@ const Activity = ({ name, activity, btn, profileImage }) => {
           alt={`${name} 프로필`}
           style={{ userSelect: "none", WebkitUserDrag: "none" }}
         />
-
         {/* 활동 텍스트 */}
         <Give>{activity}</Give>
-
         {/* 버튼 */}
-        <Btn>{btn}</Btn>
+        {/* <Btn>{btn}</Btn> */}
+        {/* 내가 보낸 페이지에는 없어도 괜찮음 */}
       </ProfileBlock>
     </Container>
   );
@@ -30,7 +29,7 @@ const Activity = ({ name, activity, btn, profileImage }) => {
 
 const Container = styled.div`
   margin: 10px 0;
-  width: 100vw;
+  min-width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,6 +37,7 @@ const Container = styled.div`
 
 const ProfileBlock = styled.div`
   display: flex;
+  width: 350px;
   align-items: center;
   gap: 10px; /* 이미지-텍스트-버튼 간 간격 */
 `;

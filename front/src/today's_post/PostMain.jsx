@@ -14,6 +14,7 @@ const PostMain = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [posts, setPosts] = useState([]);
   const [profileUser, setProfileUser] = useState(null); // 선택된 프로필 유저 저장
+  const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
   // 서버에서 게시글 가져오기
   useEffect(() => {
@@ -49,18 +50,6 @@ const PostMain = () => {
     setOpenMenuId((prev) => (prev === id ? null : id));
   };
 
-  const handleDelete = async (postId) => {
-    if (!window.confirm("정말로 삭제하시겠습니까?")) return;
-
-    try {
-      await axios.delete(`/posts/${postId}`);
-      setPosts((prev) => prev.filter((p) => p.post_id !== postId));
-    } catch (err) {
-      console.error("게시글 삭제 실패:", err);
-      alert("삭제에 실패했습니다.");
-    }
-  };
-
   return (
     <Post>
       {posts.length === 0 ? (
@@ -72,19 +61,11 @@ const PostMain = () => {
             <Header>
               <User>
                 <Avatar
-                  src={
-                    p.photo_url
-                      ? `http://localhost:8080/uploads/${p.photo_url}`
-                      : AvatarImg
-                  }
+                  src={p.avatar || AvatarImg}
                   alt="프로필"
-                  onClick={() => {
-                    setProfileUser(p); // 클릭한 게시글 작성자의 데이터 저장
-                    setOpenProfile(true);
-                  }}
+                  onClick={() => setOpenProfile(true)}
                   style={{ cursor: "pointer" }}
                 />
-
                 <Meta>
                   <div className="name">
                     <strong>{p.name}</strong>{" "}
@@ -99,27 +80,12 @@ const PostMain = () => {
                 <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
                 {openMenuId === p.post_id && (
                   <Menu>
-                    {p.user_id === currentUserId ? (
-                      <>
-                        <MenuItem onClick={() => handleEdit(p)}>
-                          글 수정하기
-                        </MenuItem>
-                        <MenuItem onClick={() => handleDelete(p.post_id)}>
-                          글 삭제하기
-                        </MenuItem>
-                      </>
-                    ) : (
-                      <>
-                        <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
-                          글 신고하기
-                        </MenuItem>
-                        <MenuItem
-                          onClick={() => alert("사용자 신고하기 클릭됨")}
-                        >
-                          사용자 신고하기
-                        </MenuItem>
-                      </>
-                    )}
+                    <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
+                      글 신고하기
+                    </MenuItem>
+                    <MenuItem onClick={() => alert("사용자 신고하기 클릭됨")}>
+                      사용자 신고하기
+                    </MenuItem>
                   </Menu>
                 )}
               </MoreWrapper>
@@ -128,7 +94,7 @@ const PostMain = () => {
             {/* 게시글 이미지 */}
             {p.image_url ? (
               <Photo
-                src={`http://localhost:8080/uploads/${p.image_url}`}
+                src={`${API_BASE}/uploads/${p.image_url}`}
                 alt="게시글 이미지"
               />
             ) : null}
@@ -148,16 +114,127 @@ const PostMain = () => {
           </PostCard>
         ))
       )}
+
       {/* 모달 */}
-      {openProfile && (
-        <ProfileModal
-          onClose={() => setOpenProfile(false)}
-          profileUser={profileUser} // 작성자 정보 전달
-        />
-      )}
+      {openProfile && <ProfileModal onClose={() => setOpenProfile(false)} />}
+      <PostBtn onClick={() => navigate("/addpost")}>
+        <Plus src={PlusImg} alt="pluspng" />
+      </PostBtn>
     </Post>
   );
 };
+
+// "더보기" 메뉴 토글
+const toggleMenu = (id) => {
+  setOpenMenuId((prev) => (prev === id ? null : id));
+};
+
+const handleDelete = async (postId) => {
+  if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+
+  try {
+    await axios.delete(`/posts/${postId}`);
+    setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+  } catch (err) {
+    console.error("게시글 삭제 실패:", err);
+    alert("삭제에 실패했습니다.");
+  }
+};
+
+return (
+  <Post>
+    {posts.length === 0 ? (
+      <p>게시글이 아직 없습니다.</p>
+    ) : (
+      posts.map((p) => (
+        <PostCard key={p.post_id}>
+          {/* 헤더 */}
+          <Header>
+            <User>
+              <Avatar
+                src={
+                  p.photo_url
+                    ? `http://localhost:8080/uploads/${p.photo_url}`
+                    : AvatarImg
+                }
+                alt="프로필"
+                onClick={() => {
+                  setProfileUser(p); // 클릭한 게시글 작성자의 데이터 저장
+                  setOpenProfile(true);
+                }}
+                style={{ cursor: "pointer" }}
+              />
+
+              <Meta>
+                <div className="name">
+                  <strong>{p.name}</strong>{" "}
+                  <span className="mbti">{p.mbti}</span>
+                </div>
+                <span className="time">
+                  {new Date(p.created_at).toLocaleString()}
+                </span>
+              </Meta>
+            </User>
+            <MoreWrapper>
+              <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
+              {openMenuId === p.post_id && (
+                <Menu>
+                  {p.user_id === currentUserId ? (
+                    <>
+                      <MenuItem onClick={() => handleEdit(p)}>
+                        글 수정하기
+                      </MenuItem>
+                      <MenuItem onClick={() => handleDelete(p.post_id)}>
+                        글 삭제하기
+                      </MenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
+                        글 신고하기
+                      </MenuItem>
+                      <MenuItem onClick={() => alert("사용자 신고하기 클릭됨")}>
+                        사용자 신고하기
+                      </MenuItem>
+                    </>
+                  )}
+                </Menu>
+              )}
+            </MoreWrapper>
+          </Header>
+
+          {/* 게시글 이미지 */}
+          {p.image_url ? (
+            <Photo
+              src={`http://localhost:8080/uploads/${p.image_url}`}
+              alt="게시글 이미지"
+            />
+          ) : null}
+
+          {/* 게시글 텍스트 */}
+          {p.text && <Caption>{p.text}</Caption>}
+
+          {/* 좋아요 */}
+          <Actions>
+            <HeartBtn filled={p.liked} onClick={() => toggleLike(p.post_id)}>
+              ♥
+            </HeartBtn>
+            <span>{p.like_count}</span>
+          </Actions>
+
+          <Divider />
+        </PostCard>
+      ))
+    )}
+    {/* 모달 */}
+    {openProfile && (
+      <ProfileModal
+        onClose={() => setOpenProfile(false)}
+        profileUser={profileUser} // 작성자 정보 전달
+      />
+    )}
+  </Post>
+);
 
 /* ===== 스타일 ===== */
 
@@ -175,6 +252,25 @@ const PostCard = styled.article`
   box-shadow: 2px 6px rgba(0, 0, 0, 0.05);
   padding: 16px 14px 12px;
   margin: 0 auto 18px;
+`;
+
+const PostBtn = styled.div`
+  position: fixed;
+  top: 77%;
+  left: 82%;
+  display: flex;
+  width: 44px;
+  height: 45px;
+  border-radius: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+`;
+
+const Plus = styled.img`
+  width: 54px;
+  height: 54px;
+  border-radius: 100%;
 `;
 
 const Header = styled.header`

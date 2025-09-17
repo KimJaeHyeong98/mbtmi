@@ -23,6 +23,10 @@ public class HeartsCheckService {
         return heartsCheckMapper.findHeartedUsers(fromUser);
     }
 
+    //내가 받은 하트목록 갖고오기
+    public List<HeartedUserDTO> whoHeartedToMe(int toUser){
+        return heartsCheckMapper.findUsersWhoHeartedMe(toUser);
+    }
 
     public boolean checkHearts(int fromUser, int toUser) {
         // X가 이미 있으면 먼저 삭제
