@@ -31,14 +31,19 @@ public class PostsC {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createPost(
-            @RequestPart("text") String text,
+            @RequestParam("text") String text,
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpSession session
     )
 
 
     {
-        System.out.println(text+file.getContentType());
+        if(file !=null) {
+            System.out.println(text+file.getContentType());
+        } else{
+            System.out.println("text: " + text + ", file 없음");
+        }
+
         try {
             AccountModel sessionUser = (AccountModel) session.getAttribute("user");
             if (sessionUser == null) {

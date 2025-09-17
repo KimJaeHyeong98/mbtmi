@@ -20,7 +20,7 @@ public interface PostsMapper {
 
     // 게시글 등록
     @Insert("INSERT INTO posts (post_id, user_id, text, image_url, created_at, like_count) " +
-            "VALUES (posts_seq.NEXTVAL, #{userId}, #{text}, #{imageUrl}, SYSDATE, 0)")
+            "VALUES (posts_seq.NEXTVAL, #{userId}, #{text}, #{imageUrl,jdbcType=VARCHAR}, SYSDATE, 0)")
     void insertPost(
             @Param("userId") Long userId,
             @Param("text") String text,
