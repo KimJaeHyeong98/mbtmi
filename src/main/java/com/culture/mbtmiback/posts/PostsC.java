@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,5 +70,17 @@ public class PostsC {
             return ResponseEntity.status(500).body("서버 에러: " + e.getMessage());
         }
 
+    }
+
+    // 게시글 삭제 API
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId) {
+        int result = postsService.deletePost(postId);
+        if (result > 0) {
+            return ResponseEntity.ok("게시글이 삭제되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("해당 ID의 게시글을 찾을 수 없습니다.");
+        }
     }
 }
