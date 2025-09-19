@@ -83,4 +83,54 @@ public class PostsC {
                     .body("해당 ID의 게시글을 찾을 수 없습니다.");
         }
     }
+
+    // 게시글 수정 API
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updatePost(
+            @PathVariable Long postId,
+            @RequestPart("text") String text,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpSession session
+    ) {
+        try {
+            AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+            if (sessionUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+            }
+
+            String fileName = null;
+            if (file != null && !file.isEmpty()) {
+                fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
+                Files.createDirectories(uploadDir);
+                Path savePath = uploadDir.resolve(fileName);
+                file.transferTo(savePath.toFile());
+                System.out.println("수정된 파일 저장 완료: " + savePath.toAbsolutePath());
+            }
+
+            int result = postsService.updatePost(postId, sessionUser.getUser_id(), text, fileName);
+
+            if (result > 0) {
+                return ResponseEntity.ok("게시글 수정 완료");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없음");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("서버 에러: " + e.getMessage());
+        }
+    }
+
+    // 게시글 단일 조회
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostsModel> getPostById(@PathVariable Long postId) {
+        PostsModel post = postsService.getPostById(postId);
+        if (post != null) {
+            return ResponseEntity.ok(post);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
 }

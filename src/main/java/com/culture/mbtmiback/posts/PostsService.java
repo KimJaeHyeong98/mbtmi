@@ -24,4 +24,12 @@ public class PostsService {
     public int deletePost(Long postId) {
         return postsMapper.deletePost(postId);
     }
+
+    public int updatePost(Long postId, Long userId, String text, String fileName) {
+        return postsMapper.updatePost(postId, userId, text, fileName);
+    }
+
+    public PostsModel getPostById(Long postId) {
+        return postsMapper.getPostById(postId);
+    }
 }
