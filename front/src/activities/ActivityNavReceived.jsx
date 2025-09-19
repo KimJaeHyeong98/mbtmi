@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import styled from "styled-components";
 import Activity from "./Activity";
 import ActivityModal from "./ActivityModal"; // 모달도 쓰니까 import
@@ -16,6 +16,12 @@ const ActivityNavReceived = () => {
   const navigate = useNavigate(); // ✅ 여기서 훅 생성
   const location = useLocation();
   const { currentUser } = location.state || {};
+  console.log("location.state:", location.state);
+
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // 한 페이지당 ?개
+  const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const like = { name: "Like💜" };
 
@@ -50,8 +56,38 @@ const ActivityNavReceived = () => {
     receivedActivities();
   }, [currentUser]);
 
+  //상호하트용 유즈이펙트
+  useEffect(() => {
+    if (!selectedProfile) return;
+    const checkMutualHeart = async () => {
+      try {
+        const res = await axios.post("/api/hearts/mutual_check", null, {
+          params: {
+            fromUser: selectedProfile.userId,
+            toUser: currentUser.user_id,
+          },
+        });
+        const updatedData = data.map((p) =>
+          p.userId === selectedProfile.userId
+            ? { ...p, mutualHeart: res.data } // ✅ data 배열 업데이트
+            : p
+        );
+        setData(updatedData);
+        console.log("mutual 상태 (받은 쪽):", res.data);
+      } catch (err) {
+        console.error("상호 하트 확인 실패:", err);
+        setMutualStatus(false); // 오류 시 false로 설정
+      }
+    };
+    checkMutualHeart();
+  }, [selectedProfile]);
+
   if (isLoading) return <div>받은 하트를 불러오는 중...</div>;
   if (data.length === 0) return <div>아직 받은 하트가 없어요.</div>;
+
+  // 현재 페이지에 맞는 데이터 자르기
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <Container>
@@ -70,25 +106,46 @@ const ActivityNavReceived = () => {
           </Btns>
         </Nav>
       </Div>
-      {data.map((profile, idx) => (
+
+      {currentData.map((profile, idx) => (
         <ActivityReceived
           key={idx}
-          name={profile.name}
-          activity={`${profile.name}님이 나에게 하트를 보냈습니다.`}
-          btn={profile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
-          profileImage={profile.photoUrl}
-          onClick={() => {
+          profile={profile}
+          currentUser={currentUser}
+          onMutualUpdate={(updatedProfile) =>
+            setData(
+              currentData.map((p) =>
+                p.userId === updatedProfile.userId ? updatedProfile : p
+              )
+            )
+          }
+          onOpenModal={(profile) => {
             setSelectedProfile(profile);
             setIsModalOpen(true);
           }}
         />
       ))}
+      {/* 페이지 번호 네비게이션 */}
+      <Pagination>
+        {Array.from({ length: totalPages }, (_, idx) => (
+          <PageButton
+            key={idx}
+            onClick={() => setCurrentPage(idx + 1)}
+            $active={currentPage === idx + 1}
+          >
+            {idx + 1}
+          </PageButton>
+        ))}
+      </Pagination>
       {isModalOpen && selectedProfile && (
         <ActivityModal
           name={selectedProfile.name}
           activity={`${selectedProfile.name}님이 나에게 하트를 보냈습니다.`}
           btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
           profileImage={selectedProfile.photoUrl}
+          mutual={selectedProfile.mutualHeart} // ✅ 추가
+          currentUser={currentUser} // 채팅 시 필요
+          targetUser={selectedProfile} // 상대방 정보
           onClose={() => setIsModalOpen(false)}
         />
       )}
@@ -98,8 +155,8 @@ const ActivityNavReceived = () => {
 };
 const Div = styled.div`
   display: flex;
-  width: 400px;
-  align-items: left;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Container = styled.div`
@@ -114,8 +171,8 @@ const Container = styled.div`
 `;
 
 const Nav = styled.div`
-  margin: 20px 10px;
-  align-items: center;
+  margin-right: 50px;
+  margin-top: 30px;
 `;
 
 const Name = styled.h2`
@@ -136,4 +193,26 @@ const Btnb = styled.button`
   opacity: 80%;
   cursor: pointer;
 `;
+/* 페이지네이션 스타일 */
+const Pagination = styled.div`
+  position: fixed;
+  bottom: 80px; /* BottomNav 위쪽 정도에 고정 */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+`;
+const PageButton = styled.button`
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: ${({ $active }) => ($active ? "#4a90e2" : "#eee")};
+  color: ${({ $active }) => ($active ? "#fff" : "#333")};
+  cursor: pointer;
+  font-size: 14px;
+`;
+
 export default ActivityNavReceived;

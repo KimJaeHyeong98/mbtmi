@@ -9,6 +9,7 @@ import BottomNav from "../globaltool/BottomNav.jsx";
 
 import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "./NothingResultHome";
+import { useAuth } from "./AuthContext.jsx";
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -136,8 +137,8 @@ const GuideText = styled.div`
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user: currentUser, loggedIn, loading } = useAuth();
 
-  const [currentUser, setCurrentUser] = useState(null);
   const [randomUsers, setRandomUsers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -207,19 +208,21 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const res = await axios.get("/api/check-session");
-        if (res.data.loggedIn) {
-          setCurrentUser(res.data.user);
-        }
-      } catch (err) {
-        console.error("세션 체크 실패:", err);
-      }
-    };
-    fetchCurrentUser();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCurrentUser = async () => {
+  //     try {
+  //       const res = await axios.get("/api/check-session");
+  //       if (res.data.loggedIn) {
+  //         setCurrentUser(res.data.user);
+  //       }
+  //     } catch (err) {
+  //       console.error("세션 체크 실패:", err);
+  //     }
+  //   };
+  //   fetchCurrentUser();
+  // }, []);
+  if (loading) return <p>로딩중...</p>;
+  if (!loggedIn) return <p>로그인 해주세요</p>;
 
   useEffect(() => {
     if (currentUser) fetchRandomUsers();
@@ -339,8 +342,8 @@ const Home = () => {
                     <Btn onClick={handleNext}>➡️</Btn>
                   </Btns>
                   <GuideText>
-                    🤍 = 하트하기 / ❤️ = 이미 하트함 <br />
-                    ❌ = 관심없음 / 🚫 = 이미 관심없음
+                    🤍 = 하트하기 / ❤️ = 이미 하트함 <br />❌ = 관심없음 / 🚫 =
+                    이미 관심없음
                   </GuideText>
                 </Card>
               </CardItem>
