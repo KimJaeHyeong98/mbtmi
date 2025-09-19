@@ -91,6 +91,7 @@ const PostMain = () => {
       alert("삭제에 실패했습니다.");
     }
   };
+
   const handleEdit = async (postId) => {
     try {
       const res = await axios.put(`/posts/${postId}`, {
