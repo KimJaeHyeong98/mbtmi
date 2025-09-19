@@ -13,9 +13,15 @@ public class HeartsCheckService {
         this.heartsCheckMapper = heartsCheckMapper;
     }
 
-    //하트가 있는지?
+    //하트가 있는지? // 잘못만듬. 후에 삭제예정
     public boolean hasHearts(int fromUser, int toUser) {
         return heartsCheckMapper.findByUsers(fromUser, toUser);
+    }
+    // ✅ 상호 하트 여부 확인 (추가) (신설)
+    public boolean isMutualHearts(int fromUser, int toUser) {
+        boolean u1toU2 = hasHearts(fromUser, toUser);
+        boolean u2toU1 = hasHearts(toUser, fromUser);
+        return u1toU2 && u2toU1;
     }
 
     //내가 하트한 유저 목록 가져오기

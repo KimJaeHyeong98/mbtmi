@@ -3,12 +3,12 @@ import Container from "../globaltool/Container";
 import PostMain from "./PostMain";
 import TopNav from "../globaltool/TopNav";
 
-const TodayPost = () => {
+const TodayPost = ({ currentUser }) => {
   return (
     <Container>
       <TopNav />
       <PostMain />
-      <BottomNav />
+      <BottomNav currentUser={currentUser} />
     </Container>
   );
 };

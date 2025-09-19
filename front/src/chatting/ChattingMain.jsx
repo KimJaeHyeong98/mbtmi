@@ -1,20 +1,21 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
-const ChattingMain = ({room, onClick}) => {
+const ChattingMain = ({ room, onClick }) => {
   const chatting = {
-    roomId : room.room_id,
-    user2Id : room.user2_id,
+    roomId: room.room_id,
+    user2Id: room.user2_id,
     name: room.opponent_name,
-    pic : room.opponent_pic
-
+    pic: room.opponent_pic,
   };
+
+  const profileSrc = chatting.pic ? `/uploads/${chatting.pic}` : profileimage;
 
   return (
     <Container onClick={onClick}>
       <ProfileBlock>
         <ProfileImage
-          src={profileimage}
+          src={profileSrc}
           alt=""
           style={{ userSelect: "none", WebkitUserDrag: "none" }}
         />
