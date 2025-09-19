@@ -1,11 +1,7 @@
 package com.culture.mbtmiback.posts;
 
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -29,4 +25,20 @@ public interface PostsMapper {
             @Param("text") String text,
             @Param("imageUrl") String imageUrl
     );
+
+    @Update("UPDATE posts SET text = #{text},image_url = #{fileName, jdbcType = VARCHAR} WHERE post_id=#{postId} AND user_id = #{userId}")
+    int updatePost(
+           @Param("postId") Long postId,
+           @Param("userId") Long userId,
+           @Param("text") String text,
+           @Param("fileName") String fileName);
+
+
+    // PostsMapper.java
+    @Select("SELECT p.post_id, p.user_id, p.text, p.image_url, p.like_count, p.created_at, " +
+            "u.name, u.mbti " +
+            "FROM posts p " +
+            "JOIN users u ON p.user_id = u.user_id " +
+            "WHERE p.post_id = #{postId}")
+    PostsModel getPostById(@Param("postId") Long postId);
 }
