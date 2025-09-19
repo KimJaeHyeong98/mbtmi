@@ -4,14 +4,47 @@ import AvatarImg from "../assets/img/postsample.jpeg"; // 기본 프로필 이�
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "../today's_post/ProfileModal";
 import axios from "axios";
+import { useAuth } from "../main/AuthContext";
 import PlusImg from "../assets/img/plus.png";
 
 const PostMain = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // ✅ 로그인된 사용자 정보
+  const currentUserId = user?.user_id; // ✅ 로그인한 사용자 id
   const [openProfile, setOpenProfile] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [profileUser, setProfileUser] = useState(null); // 선택된 프로필 유저 저장
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+  const [openReportId, setOpenReportId] = useState(null);
+  const [reportReason, setReportReason] = useState("");
+  const [reportContent, setReportContent] = useState("");
+
+  // 신고 제출
+  const handleReportSubmit = async (reportedUserId) => {
+    if (!reportReason || !reportContent) {
+      alert("신고 사유와 내용을 입력해주세요.");
+      return;
+    }
+
+    try {
+      await axios.post("/reports", {
+        reported_id: reportedUserId,
+        reporter_id: currentUserId,
+        reason: reportReason,
+        content: reportContent,
+      });
+
+      alert("신고가 접수되었습니다.");
+      // 초기화
+      setOpenReportId(null);
+      setReportReason("");
+      setReportContent("");
+    } catch (err) {
+      console.error("신고 실패:", err);
+      alert("신고 접수에 실패했습니다.");
+    }
+  };
 
   // 서버에서 게시글 가져오기
   useEffect(() => {
@@ -47,6 +80,36 @@ const PostMain = () => {
     setOpenMenuId((prev) => (prev === id ? null : id));
   };
 
+  const handleDelete = async (postId) => {
+    if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`/posts/${postId}`);
+      setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+    } catch (err) {
+      console.error("게시글 삭제 실패:", err);
+      alert("삭제에 실패했습니다.");
+    }
+  };
+  const handleEdit = async (postId) => {
+    try {
+      const res = await axios.put(`/posts/${postId}`, {
+        text: newText, // 바꿀 내용
+        // 필요하다면 imageUrl 같은 다른 필드도 함께
+      });
+
+      // 백엔드가 성공적으로 응답하면 프론트 state도 업데이트
+      setPosts((prev) =>
+        prev.map((p) => (p.post_id === postId ? { ...p, text: newText } : p))
+      );
+
+      alert("게시글이 수정되었습니다!");
+    } catch (err) {
+      console.error("게시글 수정 실패:", err);
+      alert("수정에 실패했습니다.");
+    }
+  };
+
   return (
     <Post>
       {posts.length === 0 ? (
@@ -58,11 +121,19 @@ const PostMain = () => {
             <Header>
               <User>
                 <Avatar
-                  src={p.avatar || AvatarImg}
+                  src={
+                    p.photo_url
+                      ? `http://localhost:8080/uploads/${p.photo_url}`
+                      : AvatarImg
+                  }
                   alt="프로필"
-                  onClick={() => setOpenProfile(true)}
+                  onClick={() => {
+                    setProfileUser(p); // 클릭한 게시글 작성자의 데이터 저장
+                    setOpenProfile(true);
+                  }}
                   style={{ cursor: "pointer" }}
                 />
+
                 <Meta>
                   <div className="name">
                     <strong>{p.name}</strong>{" "}
@@ -77,12 +148,24 @@ const PostMain = () => {
                 <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
                 {openMenuId === p.post_id && (
                   <Menu>
-                    <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
-                      글 신고하기
-                    </MenuItem>
-                    <MenuItem onClick={() => alert("사용자 신고하기 클릭됨")}>
-                      사용자 신고하기
-                    </MenuItem>
+                    {p.user_id === currentUserId ? (
+                      <>
+                        <MenuItem
+                          onClick={() => navigate(`/updatepost/${p.post_id}`)}
+                        >
+                          글 수정하기
+                        </MenuItem>
+                        <MenuItem onClick={() => handleDelete(p.post_id)}>
+                          글 삭제하기
+                        </MenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <MenuItem onClick={() => setOpenReportId(p.post_id)}>
+                          사용자 신고하기
+                        </MenuItem>
+                      </>
+                    )}
                   </Menu>
                 )}
               </MoreWrapper>
@@ -91,7 +174,7 @@ const PostMain = () => {
             {/* 게시글 이미지 */}
             {p.image_url ? (
               <Photo
-                src={`${API_BASE}/uploads/${p.image_url}`}
+                src={`http://localhost:8080/uploads/${p.image_url}`}
                 alt="게시글 이미지"
               />
             ) : null}
@@ -107,13 +190,38 @@ const PostMain = () => {
               <span>{p.like_count}</span>
             </Actions>
 
+            {/* ✅ 조건부 렌더링: 신고 입력창 */}
+            {openReportId === p.post_id && (
+              <ReportBox>
+                <input
+                  type="text"
+                  placeholder="신고 사유"
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                />
+                <textarea
+                  placeholder="신고 상세 내역"
+                  value={reportContent}
+                  onChange={(e) => setReportContent(e.target.value)}
+                />
+                <button onClick={() => handleReportSubmit(p.user_id)}>
+                  신고 제출
+                </button>
+                <button onClick={() => setOpenReportId(null)}>취소</button>
+              </ReportBox>
+            )}
+
             <Divider />
           </PostCard>
         ))
       )}
-
       {/* 모달 */}
-      {openProfile && <ProfileModal onClose={() => setOpenProfile(false)} />}
+      {openProfile && (
+        <ProfileModal
+          onClose={() => setOpenProfile(false)}
+          profileUser={profileUser} // 작성자 정보 전달
+        />
+      )}
       <PostBtn onClick={() => navigate("/addpost")}>
         <Plus src={PlusImg} alt="pluspng" />
       </PostBtn>
@@ -274,6 +382,40 @@ const Divider = styled.hr`
   border: 0;
   border-top: 1px solid #cfe8ee;
   margin: 18px 0 6px;
+`;
+
+//아래는 조건부 랜더링 창 스타일드 컴포넌트
+const ReportBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fafafa;
+
+  input,
+  textarea {
+    width: inherit;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  textarea {
+    min-height: 80px;
+    resize: none;
+  }
+
+  button {
+    margin-right: 8px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
 `;
 
 export default PostMain;
