@@ -14,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -24,9 +26,16 @@ public class PostsC {
     @Autowired
     private PostsService postsService;
 
-    @GetMapping ("/postsmain")
-    public List<PostsModel> getAllPosts() {
-        return postsService.getAllPosts();
+    @GetMapping("/postsmain")
+    public ResponseEntity<List<PostsModel>> getAllPosts(HttpSession session) {
+        // 1. 세션에서 로그인된 사용자 ID를 가져옵니다.
+        AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+        // 로그인이 안 되어 있다면 -1 (또는 0)과 같은 임시 ID를 사용하거나 비로그인 처리를 합니다.
+        Long currentUserId = (sessionUser != null) ? sessionUser.getUser_id() : null;
+
+        // 2. Service에 게시글 목록과 사용자 ID를 전달합니다.
+        List<PostsModel> posts = postsService.getAllPosts(currentUserId);
+        return ResponseEntity.ok(posts);
     }
 
 
@@ -83,4 +92,28 @@ public class PostsC {
                     .body("해당 ID의 게시글을 찾을 수 없습니다.");
         }
     }
+
+    // 좋아요 토글
+    @PostMapping("/toggleLike")
+    public ResponseEntity<Map<String, Object>> toggleLike(
+            @RequestParam Long postId,
+            @RequestParam Long userId
+    ) {
+        System.out.println("toggleLike 호출 - postId: " + postId + ", userId: " + userId);
+        try {
+            boolean liked = postsService.toggleLike(postId, userId);
+            int likeCount = postsService.getLikeCount(postId);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("liked", liked);
+            result.put("likeCount", likeCount);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace(); // 어떤 예외가 나는지 콘솔 확인
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
 }

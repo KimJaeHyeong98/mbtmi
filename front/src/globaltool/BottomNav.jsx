@@ -47,7 +47,7 @@ const BottomNav = ({ currentUser }) => {
         >
           ❤️
         </NavBtn>
-        <NavBtn>➕</NavBtn>
+        <NavBtn onClick={() => navigate("/map")}>🗺️</NavBtn>
         <NavBtn onClick={() => navigate("/mypage")}>🔔</NavBtn>
         <NavBtn onClick={() => navigate("/chat")}>💌</NavBtn>
       </div>

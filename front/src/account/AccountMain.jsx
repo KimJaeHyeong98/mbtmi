@@ -56,6 +56,8 @@ import ActivityNavReceived from "../activities/ActivityNavReceived.jsx";
 import ProfileModal from "../today's_post/ProfileModal.jsx";
 import AddPost from "../today's_post/AddPost.jsx";
 
+import Map from "../map/Map.jsx";
+
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
 
@@ -269,6 +271,8 @@ const AccountMain = () => {
         <Route path="HomeModal" element={<HomeModal />} />
         {/* 결과화면 없을때 보여주는 창 */}
         <Route path="/NothingResultHome" element={<NothingResultHome />} />
+
+        <Route path="/map" element={<Map />} />
       </Routes>
     </SignupProvider>
   );

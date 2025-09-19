@@ -1,27 +1,30 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import AvatarImg from "../assets/img/postsample.jpeg"; // 기본 프로필 이미지
+import AvatarImg from "../assets/img/postsample.jpeg";
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "../today's_post/ProfileModal";
 import axios from "axios";
 import { useAuth } from "../main/AuthContext";
+import PlusImg from "../assets/img/plus.png";
 
 const PostMain = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // ✅ 로그인된 사용자 정보
-  const currentUserId = user?.user_id; // ✅ 로그인한 사용자 id
+  const { user } = useAuth();
+  const currentUserId = user?.user_id;
   const [openProfile, setOpenProfile] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [profileUser, setProfileUser] = useState(null); // 선택된 프로필 유저 저장
+  const [profileUser, setProfileUser] = useState(null);
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+  console.log(API_BASE);
 
   // 서버에서 게시글 가져오기
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get("/posts/postsmain");
-        console.log("서버 응답:", res.data);
+        const res = await axios.get(`${API_BASE}/posts/postsmain`, {
+          withCredentials: true,
+        });
         setPosts(res.data);
       } catch (err) {
         console.error("게시글 불러오기 실패:", err);
@@ -30,34 +33,46 @@ const PostMain = () => {
     fetchPosts();
   }, []);
 
-  // 좋아요 토글
-  const toggleLike = (id) => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.post_id === id
-          ? {
-              ...p,
-              liked: !p.liked,
-              like_count: p.liked ? p.like_count - 1 : p.like_count + 1,
-            }
-          : p
-      )
-    );
+  // 좋아요 토글 (DB 반영 + 화면 업데이트)
+  const toggleLike = async (postId) => {
+    if (!user) return alert("로그인이 필요합니다!");
+
+    try {
+      // 1️⃣ 서버 요청
+      const res = await axios.post(
+        `${API_BASE}/posts/toggleLike`,
+        null, // POST body는 없음
+        { params: { postId, userId: user.user_id }, withCredentials: true }
+      );
+
+      // 2️⃣ 응답 반영
+      const { liked, likeCount } = res.data;
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.post_id === postId
+            ? { ...p, liked: liked, like_count: likeCount }
+            : p
+        )
+      );
+    } catch (err) {
+      console.error("좋아요 실패:", err);
+    }
   };
 
   // "더보기" 메뉴 토글
-  const toggleMenu = (id) => {
-    setOpenMenuId((prev) => (prev === id ? null : id));
-  };
+  const toggleMenu = (id) => setOpenMenuId((prev) => (prev === id ? null : id));
 
+  // 게시글 삭제
   const handleDelete = async (postId) => {
     if (!window.confirm("정말로 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`/posts/${postId}`);
+      await axios.delete(`${API_BASE}/posts/${postId}`, {
+        withCredentials: true,
+      });
       setPosts((prev) => prev.filter((p) => p.post_id !== postId));
     } catch (err) {
-      console.error("게시글 삭제 실패:", err);
+      console.error("삭제 실패:", err);
       alert("삭제에 실패했습니다.");
     }
   };
@@ -69,23 +84,21 @@ const PostMain = () => {
       ) : (
         posts.map((p) => (
           <PostCard key={p.post_id}>
-            {/* 헤더 */}
             <Header>
               <User>
                 <Avatar
                   src={
                     p.photo_url
-                      ? `http://localhost:8080/uploads/${p.photo_url}`
+                      ? `${API_BASE}/uploads/${p.photo_url}`
                       : AvatarImg
                   }
                   alt="프로필"
                   onClick={() => {
-                    setProfileUser(p); // 클릭한 게시글 작성자의 데이터 저장
+                    setProfileUser(p);
                     setOpenProfile(true);
                   }}
                   style={{ cursor: "pointer" }}
                 />
-
                 <Meta>
                   <div className="name">
                     <strong>{p.name}</strong>{" "}
@@ -102,7 +115,7 @@ const PostMain = () => {
                   <Menu>
                     {p.user_id === currentUserId ? (
                       <>
-                        <MenuItem onClick={() => handleEdit(p)}>
+                        <MenuItem onClick={() => alert("글 수정하기 클릭")}>
                           글 수정하기
                         </MenuItem>
                         <MenuItem onClick={() => handleDelete(p.post_id)}>
@@ -111,12 +124,10 @@ const PostMain = () => {
                       </>
                     ) : (
                       <>
-                        <MenuItem onClick={() => alert("글 신고하기 클릭됨")}>
+                        <MenuItem onClick={() => alert("글 신고")}>
                           글 신고하기
                         </MenuItem>
-                        <MenuItem
-                          onClick={() => alert("사용자 신고하기 클릭됨")}
-                        >
+                        <MenuItem onClick={() => alert("사용자 신고")}>
                           사용자 신고하기
                         </MenuItem>
                       </>
@@ -126,18 +137,14 @@ const PostMain = () => {
               </MoreWrapper>
             </Header>
 
-            {/* 게시글 이미지 */}
-            {p.image_url ? (
+            {p.image_url && (
               <Photo
-                src={`http://localhost:8080/uploads/${p.image_url}`}
+                src={`${API_BASE}/uploads/${p.image_url}`}
                 alt="게시글 이미지"
               />
-            ) : null}
-
-            {/* 게시글 텍스트 */}
+            )}
             {p.text && <Caption>{p.text}</Caption>}
 
-            {/* 좋아요 */}
             <Actions>
               <HeartBtn filled={p.liked} onClick={() => toggleLike(p.post_id)}>
                 ♥
@@ -149,19 +156,22 @@ const PostMain = () => {
           </PostCard>
         ))
       )}
-      {/* 모달 */}
+
       {openProfile && (
         <ProfileModal
           onClose={() => setOpenProfile(false)}
-          profileUser={profileUser} // 작성자 정보 전달
+          profileUser={profileUser}
         />
       )}
+
+      <PostBtn onClick={() => navigate("/addpost")}>
+        <Plus src={PlusImg} alt="pluspng" />
+      </PostBtn>
     </Post>
   );
 };
 
 /* ===== 스타일 ===== */
-
 const Post = styled.main`
   flex: 1;
   overflow-y: auto;

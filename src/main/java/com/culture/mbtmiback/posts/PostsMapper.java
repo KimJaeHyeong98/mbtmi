@@ -1,22 +1,21 @@
 package com.culture.mbtmiback.posts;
 
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface PostsMapper {
     // 게시글 전체 조회
-    @Select("SELECT p.post_id, p.user_id, p.text, p.image_url, p.like_count, p.created_at, " +
-            "u.name, u.mbti,u.location, u.photo_url, u.birth_date " +
-            "FROM posts p " +
-            "JOIN users u ON p.user_id = u.user_id " +
-            "ORDER BY p.created_at DESC")
+    @Select(
+            "SELECT p.post_id, p.user_id, p.text, p.image_url, " +
+                    "(SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.post_id) AS like_count, " +
+                    "p.created_at, u.name, u.mbti, u.location, u.photo_url, u.birth_date " +
+                    "FROM posts p " +
+                    "JOIN users u ON p.user_id = u.user_id " +
+                    "ORDER BY p.created_at DESC"
+    )
     List<PostsModel> getAllPosts();
 
    @Delete("delete from posts where post_id=#{post_id}")
@@ -29,4 +28,35 @@ public interface PostsMapper {
             @Param("text") String text,
             @Param("imageUrl") String imageUrl
     );
+
+    // 좋아요 관련 모두 Long으로 변경
+    @Select("""
+            SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+            FROM post_likes
+            WHERE post_id = #{postId} AND user_id = #{userId}
+        """)
+    boolean hasLiked(@Param("postId") Long postId, @Param("userId") Long userId);
+
+    @Insert("""
+            INSERT INTO post_likes (post_id, user_id, created_at)
+            VALUES ( #{postId}, #{userId}, SYSDATE)
+        """)
+    void insertLike(@Param("postId") Long postId, @Param("userId") Long userId);
+
+    @Delete("""
+            DELETE FROM post_likes
+            WHERE post_id = #{postId} AND user_id = #{userId}
+        """)
+    void deleteLike(@Param("postId") Long postId, @Param("userId") Long userId);
+
+    // 게시글 좋아요 수
+    @Select("SELECT COUNT(*) FROM post_likes WHERE post_id = #{postId}")
+    int getLikeCount(@Param("postId") Long postId);
+
+    @Update("UPDATE posts SET like_count = like_count + 1 WHERE post_id = #{postId}")
+    void increaseLikeCount(@Param("postId") Long postId);
+
+    @Update("UPDATE posts SET like_count = like_count - 1 WHERE post_id = #{postId}")
+    void decreaseLikeCount(@Param("postId") Long postId);
+
 }
