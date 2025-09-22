@@ -19,5 +19,15 @@ public class ChatService {
         return chatList;
     }
 
+    public Long createRoom(Long user1Id, Long user2Id) {
+        Long existingRoom = chatMapper.findExistingRoom(user1Id, user2Id);
+        if (existingRoom != null) {
+            System.out.println("기존채팅방호출(서비스)" + existingRoom);
+            return existingRoom; // 이미 있으면 기존 roomId 반환
+        }
+        System.out.println("채팅방 생성(서비스)" + user1Id + "/" + user2Id);
+        return chatMapper.createChatRoom(user1Id, user2Id);
+    }
+
 
 }
