@@ -68,7 +68,7 @@ export default function KakaoMap({ lat = 37.4979, lng = 127.0276, level = 3 }) {
                 // 여기까지 오면 네트워크/차단/도메인 문제
                 console.error(e);
             });
-
+        console.log("Kakao key:", import.meta.env.VITE_KAKAO_KEY);
         return () => {
             destroyed = true;
             if (ref.current) ref.current.innerHTML = "";
