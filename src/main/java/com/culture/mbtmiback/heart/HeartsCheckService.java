@@ -45,16 +45,23 @@ public class HeartsCheckService {
 
     // X 토글
     public boolean checkHeartsX(int fromUser, int toUser) {
-        // HEART가 이미 있으면 먼저 삭제
-        if (heartsCheckMapper.findByUsersHeart(fromUser, toUser)) {
+        boolean haveHeart = heartsCheckMapper.findByUsersHeart(fromUser, toUser);
+        if (haveHeart) {
+            // 이미 있으면 삭제 → 하트 해제
             heartsCheckMapper.deleteHeart(fromUser, toUser);
-        }
-        boolean haveX = heartsCheckMapper.findByUsersX(fromUser, toUser);
-        if (haveX) {
-            heartsCheckMapper.deleteHeartX(fromUser, toUser);
             return false;
         } else {
-            heartsCheckMapper.insertHeartX(fromUser, toUser);
+            // 없으면 하트 추가
+            heartsCheckMapper.insertHeart(fromUser, toUser);
+
+            // ✅ 상대방도 나를 하트했는지 확인 (쌍방체크)
+            boolean mutual = heartsCheckMapper.findByUsersHeart(toUser, fromUser);
+
+            if (mutual) {
+                // TODO: 채팅방 생성 로직 추가 (ChatRoomMapper 등 활용)
+                System.out.println("💬 쌍방 하트 → 채팅방 생성 필요!");
+            }
+
             return true;
         }
     }

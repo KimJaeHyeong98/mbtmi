@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "rc-slider": "^11.1.9",
+    "socket.io-client": "^4.8.1"
+  }
+}
