@@ -60,6 +60,21 @@ const PostMain = () => {
     fetchPosts();
   }, []);
 
+
+  // 좋아요 토글
+  const toggleLike = (id) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.post_id === id
+          ? {
+              ...p,
+              liked: !p.liked,
+              like_count: p.liked ? p.like_count - 1 : p.like_count + 1,
+            }
+          : p
+      )
+    );
+
   // 좋아요 토글 (DB 반영 + 화면 업데이트)
   const toggleLike = async (postId) => {
     if (!user) return alert("로그인이 필요합니다!");
@@ -84,6 +99,7 @@ const PostMain = () => {
     } catch (err) {
       console.error("좋아요 실패:", err);
     }
+
   };
 
   // "더보기" 메뉴 토글
@@ -102,6 +118,9 @@ const PostMain = () => {
       alert("삭제에 실패했습니다.");
     }
   };
+
+
+
   const handleEdit = async (postId) => {
     try {
       const res = await axios.put(`/posts/${postId}`, {
@@ -209,12 +228,21 @@ const PostMain = () => {
                   placeholder="신고 사유"
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
+
                 />
                 <textarea
                   placeholder="신고 상세 내역"
                   value={reportContent}
                   onChange={(e) => setReportContent(e.target.value)}
                 />
+
+                />
+                <textarea
+                  placeholder="신고 상세 내역"
+                  value={reportContent}
+                  onChange={(e) => setReportContent(e.target.value)}
+                />
+
                 <button onClick={() => handleReportSubmit(p.user_id)}>
                   신고 제출
                 </button>

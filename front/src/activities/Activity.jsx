@@ -2,12 +2,6 @@ import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
 
 const Activity = ({ name, activity, btn, profileImage, onClick }) => {
-  // const profile = {
-  //   name: "유지민",
-  //   activity: "유지민님께 하트를 보냈습니다.",
-  //   btn: "하트 보내기",
-  // };
-
   return (
     <Container onClick={onClick}>
       <ProfileBlock>
