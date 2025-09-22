@@ -5,6 +5,7 @@ import styled from "styled-components";
 /* ---------- UI ---------- */
 const Section = styled.div`
     width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -14,6 +15,9 @@ const SearchBar = styled.form`
     gap: 8px;
     padding: 0 12px;
     padding-top: 10px;
+    position: fixed;
+    top: 28px;
+    width: 93%;
 `;
 const Input = styled.input`
     flex: 1;
@@ -89,7 +93,7 @@ const OptBtn = styled.button`
 
 const Wrap = styled.div`
     width: 100%;
-    height: clamp(480px, 60vh, 520px);
+    height: 400px;
     border-radius: 12px;
     overflow: hidden;
 `;
