@@ -143,6 +143,8 @@ const AccountMain = () => {
 
         <Route path="/postprofile" element={<ProfileModal />} />
 
+        <Route path="/map" element={<Map />} />
+
         {/* 간편 mbti 테스트 */}
         <Route
           path="/easymbti1"
