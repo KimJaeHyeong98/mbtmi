@@ -35,7 +35,7 @@ const ActivityNav = () => {
 
   const activityGiveTake = {
     btn: [
-      { label: "보낸 내역", path: "/ActivityNav" },
+      { label: "보낸 내역", path: "/activityNav" },
       { label: "받은 내역", path: "/ActivityNavReceived" },
     ],
   };

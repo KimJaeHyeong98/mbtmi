@@ -17,6 +17,7 @@ public class PostsModel {
     private int like_count; // 좋아요 수
     private String location;
     private String photo_url;
+    private boolean liked;
 
     @JsonFormat(pattern = "yyyy", timezone = "Asia/Seoul")
     private Date birth_date;

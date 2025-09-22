@@ -67,7 +67,7 @@ public class HeartsCheckC {
             @PathVariable int toUser
     ) {
         List<HeartedUserDTO> users = heartsCheckService.whoHeartedToMe(toUser);
-        System.out.println("나를 하트한 유저들:" + users);
+        System.out.println("나를 하트한 유저들:" +  users);
         return ResponseEntity.ok(users);
     }
 

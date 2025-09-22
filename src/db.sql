@@ -42,6 +42,8 @@ ALTER TABLE USERS
 ALTER TABLE USERS
     ADD location VARCHAR2(50);
 
+ALTER TABLE POSTS DROP COLUMN LIKE_COUNT;
+
 -- 오늘의 글 테이블
 CREATE TABLE POSTS
 ( post_id NUMBER PRIMARY KEY,
@@ -109,7 +111,7 @@ select * from POSTS;
 
 select * from POST_LIKES;
 
-select Count(post_id) as count from post_likes where post_id = 3;
+select Count(post_id) as count from post_likes where post_id = 27;
 
 select * from POSTS order by post_id;
 
@@ -134,6 +136,16 @@ FROM posts p
 GROUP BY
     p.post_id, p.user_id, p.text, p.image_url, p.created_at, u.name, u.mbti, u.location, u.photo_url, u.BIRTH_DATE
 ORDER BY p.created_at DESC;
+
+
+
+SELECT p.post_id, p.user_id, p.text, p.image_url,
+       (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.post_id) AS like_count,
+       p.created_at,
+       u.name, u.mbti, u.location, u.photo_url, u.birth_date
+FROM posts p
+         JOIN users u ON p.user_id = u.user_id
+ORDER BY p.created_at DESC
 
 
 SELECT * from users order by user_id;
@@ -172,3 +184,19 @@ VALUES (1, 107, 27, '욕설', '게시글 내용에 지속적으로 욕설이 포
 
 
 SELECT * FROM reports;
+
+
+SELECT r.report_id,
+       u1.username AS reported_user,
+       u2.username AS reporter_user,
+       p.text AS post_text,
+       r.reason,
+       r.status,
+       r.created_at
+FROM reports r
+         JOIN users u1 ON r.reported_id = u1.user_id
+         JOIN users u2 ON r.reporter_id = u2.user_id
+         JOIN posts p ON r.post_id = p.post_id
+ORDER BY r.created_at DESC;
+ALTER TABLE POSTS
+    ADD (LIKE_COUNT NUMBER DEFAULT 0 NOT NULL);

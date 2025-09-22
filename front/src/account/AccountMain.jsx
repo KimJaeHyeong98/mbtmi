@@ -58,6 +58,8 @@ import AddPost from "../today's_post/AddPost.jsx";
 import UpdatePost from "../today's_post/UpdatePost.jsx";
 import Report from "../report/Report.jsx";
 
+import Map from "../map/Map.jsx";
+
 const AccountMain = () => {
     const { loggedIn, loading } = useAuth(); // loading 상태 추가
 
@@ -285,6 +287,7 @@ const AccountMain = () => {
                     path="/NothingResultHome"
                     element={<NothingResultHome />}
                 />
+                <Route path="/map" element={<Map />} />
             </Routes>
         </SignupProvider>
     );

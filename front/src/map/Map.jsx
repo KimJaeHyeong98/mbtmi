@@ -7,7 +7,6 @@ const Map = () => {
     return (
         <Container>
             <MapSearch />
-            {/* <KakaoMap /> */}
             <BottomNav />
         </Container>
     );
