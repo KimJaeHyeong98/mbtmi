@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useState, useEffect } from "react";
 import AvatarImg from "../assets/img/postsample.jpeg"; // 기본 프로필 이미지
 import { useNavigate } from "react-router-dom";
-import ProfileModal from "../today's_post/ProfileModal";
+import ProfileModal from "./ProfileModal";
 import axios from "axios";
 import { useAuth } from "../main/AuthContext";
 import PlusImg from "../assets/img/plus.png";
@@ -60,7 +60,6 @@ const PostMain = () => {
     fetchPosts();
   }, []);
 
-
   // 좋아요 토글
   const toggleLike = (id) => {
     setPosts((prev) =>
@@ -75,69 +74,67 @@ const PostMain = () => {
       )
     );
 
-  // 좋아요 토글 (DB 반영 + 화면 업데이트)
-  const toggleLike = async (postId) => {
-    if (!user) return alert("로그인이 필요합니다!");
+    // 좋아요 토글 (DB 반영 + 화면 업데이트)
+    const toggleLike = async (postId) => {
+      if (!user) return alert("로그인이 필요합니다!");
 
-    try {
-      // 1️⃣ 서버 요청
-      const res = await axios.post(
-        `${API_BASE}/posts/toggleLike`,
-        null, // POST body는 없음
-        { params: { postId, userId: user.user_id }, withCredentials: true }
-      );
+      try {
+        // 1️⃣ 서버 요청
+        const res = await axios.post(
+          `${API_BASE}/posts/toggleLike`,
+          null, // POST body는 없음
+          { params: { postId, userId: user.user_id }, withCredentials: true }
+        );
 
-      // 2️⃣ 응답 반영
-      const { liked, likeCount } = res.data;
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.post_id === postId
-            ? { ...p, liked: liked, like_count: likeCount }
-            : p
-        )
-      );
-    } catch (err) {
-      console.error("좋아요 실패:", err);
-    }
+        // 2️⃣ 응답 반영
+        const { liked, likeCount } = res.data;
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.post_id === postId
+              ? { ...p, liked: liked, like_count: likeCount }
+              : p
+          )
+        );
+      } catch (err) {
+        console.error("좋아요 실패:", err);
+      }
+    };
 
-  };
+    // "더보기" 메뉴 토글
+    const toggleMenu = (id) => {
+      setOpenMenuId((prev) => (prev === id ? null : id));
+    };
 
-  // "더보기" 메뉴 토글
-  const toggleMenu = (id) => {
-    setOpenMenuId((prev) => (prev === id ? null : id));
-  };
+    const handleDelete = async (postId) => {
+      if (!window.confirm("정말로 삭제하시겠습니까?")) return;
 
-  const handleDelete = async (postId) => {
-    if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+      try {
+        await axios.delete(`/posts/${postId}`);
+        setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+      } catch (err) {
+        console.error("게시글 삭제 실패:", err);
+        alert("삭제에 실패했습니다.");
+      }
+    };
 
-    try {
-      await axios.delete(`/posts/${postId}`);
-      setPosts((prev) => prev.filter((p) => p.post_id !== postId));
-    } catch (err) {
-      console.error("게시글 삭제 실패:", err);
-      alert("삭제에 실패했습니다.");
-    }
-  };
+    const handleEdit = async (postId) => {
+      try {
+        const res = await axios.put(`/posts/${postId}`, {
+          text: newText, // 바꿀 내용
+          // 필요하다면 imageUrl 같은 다른 필드도 함께
+        });
 
+        // 백엔드가 성공적으로 응답하면 프론트 state도 업데이트
+        setPosts((prev) =>
+          prev.map((p) => (p.post_id === postId ? { ...p, text: newText } : p))
+        );
 
-
-  const handleEdit = async (postId) => {
-    try {
-      const res = await axios.put(`/posts/${postId}`, {
-        text: newText, // 바꿀 내용
-        // 필요하다면 imageUrl 같은 다른 필드도 함께
-      });
-
-      // 백엔드가 성공적으로 응답하면 프론트 state도 업데이트
-      setPosts((prev) =>
-        prev.map((p) => (p.post_id === postId ? { ...p, text: newText } : p))
-      );
-
-      alert("게시글이 수정되었습니다!");
-    } catch (err) {
-      console.error("게시글 수정 실패:", err);
-      alert("수정에 실패했습니다.");
-    }
+        alert("게시글이 수정되었습니다!");
+      } catch (err) {
+        console.error("게시글 수정 실패:", err);
+        alert("수정에 실패했습니다.");
+      }
+    };
   };
 
   return (
@@ -228,7 +225,6 @@ const PostMain = () => {
                   placeholder="신고 사유"
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
-
                 />
                 <textarea
                   placeholder="신고 상세 내역"
@@ -236,7 +232,6 @@ const PostMain = () => {
                   onChange={(e) => setReportContent(e.target.value)}
                 />
 
-                />
                 <textarea
                   placeholder="신고 상세 내역"
                   value={reportContent}
