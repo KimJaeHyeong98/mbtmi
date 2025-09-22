@@ -59,4 +59,20 @@ public interface PostsMapper {
     @Update("UPDATE posts SET like_count = like_count - 1 WHERE post_id = #{postId}")
     void decreaseLikeCount(@Param("postId") Long postId);
 
+
+    @Update("UPDATE posts SET text = #{text},image_url = #{fileName, jdbcType = VARCHAR} WHERE post_id=#{postId} AND user_id = #{userId}")
+    int updatePost(
+           @Param("postId") Long postId,
+           @Param("userId") Long userId,
+           @Param("text") String text,
+           @Param("fileName") String fileName);
+
+
+    // PostsMapper.java
+    @Select("SELECT p.post_id, p.user_id, p.text, p.image_url, p.like_count, p.created_at, " +
+            "u.name, u.mbti " +
+            "FROM posts p " +
+            "JOIN users u ON p.user_id = u.user_id " +
+            "WHERE p.post_id = #{postId}")
+    PostsModel getPostById(@Param("postId") Long postId);
 }

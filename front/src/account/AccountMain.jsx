@@ -55,6 +55,8 @@ import ActivityNav from "../activities/ActivityNav.jsx";
 import ActivityNavReceived from "../activities/ActivityNavReceived.jsx";
 import ProfileModal from "../today's_post/ProfileModal.jsx";
 import AddPost from "../today's_post/AddPost.jsx";
+import UpdatePost from "../today's_post/UpdatePost.jsx";
+import Report from "../report/Report.jsx";
 
 import Map from "../map/Map.jsx";
 
@@ -135,7 +137,9 @@ const AccountMain = () => {
         <Route path="/profilephoto" element={<ProfilePhoto />} />
         <Route path="/todaypost" element={<TodayPost />} />
         <Route path="/addpost" element={<AddPost />} />
+        <Route path="/updatepost/:postId" element={<UpdatePost />} />
         <Route path="/postmain" element={<TodayPost />} />
+        <Route path="/report" element={<Report />} />
 
         <Route path="/postprofile" element={<ProfileModal />} />
 
@@ -271,8 +275,6 @@ const AccountMain = () => {
         <Route path="HomeModal" element={<HomeModal />} />
         {/* 결과화면 없을때 보여주는 창 */}
         <Route path="/NothingResultHome" element={<NothingResultHome />} />
-
-        <Route path="/map" element={<Map />} />
       </Routes>
     </SignupProvider>
   );

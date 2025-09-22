@@ -1,5 +1,6 @@
 package com.culture.mbtmiback.posts;
 
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,4 +51,12 @@ public class PostsService {
         return postsMapper.getLikeCount(postId);
     }
 
+
+    public int updatePost(Long postId, Long userId, String text, String fileName) {
+        return postsMapper.updatePost(postId, userId, text, fileName);
+    }
+
+    public PostsModel getPostById(Long postId) {
+        return postsMapper.getPostById(postId);
+    }
 }
