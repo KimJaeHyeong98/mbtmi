@@ -185,5 +185,18 @@ VALUES (1, 107, 27, '욕설', '게시글 내용에 지속적으로 욕설이 포
 
 SELECT * FROM reports;
 
+
+SELECT r.report_id,
+       u1.username AS reported_user,
+       u2.username AS reporter_user,
+       p.text AS post_text,
+       r.reason,
+       r.status,
+       r.created_at
+FROM reports r
+         JOIN users u1 ON r.reported_id = u1.user_id
+         JOIN users u2 ON r.reporter_id = u2.user_id
+         JOIN posts p ON r.post_id = p.post_id
+ORDER BY r.created_at DESC;
 ALTER TABLE POSTS
     ADD (LIKE_COUNT NUMBER DEFAULT 0 NOT NULL);
