@@ -21,8 +21,8 @@ public interface PostsMapper {
    @Delete("delete from posts where post_id=#{post_id}")
     int deletePost(@Param("post_id") Long postId);
     // 게시글 등록
-    @Insert("INSERT INTO posts (post_id, user_id, text, image_url, created_at, like_count) " +
-            "VALUES (posts_seq.NEXTVAL, #{userId}, #{text}, #{imageUrl,jdbcType=VARCHAR}, SYSDATE, 0)")
+    @Insert("INSERT INTO posts (post_id, user_id, text, image_url, created_at) " +
+            "VALUES (posts_seq.NEXTVAL, #{userId}, #{text}, #{imageUrl,jdbcType=VARCHAR}, SYSDATE)")
     void insertPost(
             @Param("userId") Long userId,
             @Param("text") String text,
@@ -69,7 +69,7 @@ public interface PostsMapper {
 
 
     // PostsMapper.java
-    @Select("SELECT p.post_id, p.user_id, p.text, p.image_url, p.like_count, p.created_at, " +
+    @Select("SELECT p.post_id, p.user_id, p.text, p.image_url, p.created_at, " +
             "u.name, u.mbti " +
             "FROM posts p " +
             "JOIN users u ON p.user_id = u.user_id " +

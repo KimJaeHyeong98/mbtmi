@@ -143,8 +143,6 @@ const AccountMain = () => {
 
         <Route path="/postprofile" element={<ProfileModal />} />
 
-        <Route path="/map" element={<Map />} />
-
         {/* 간편 mbti 테스트 */}
         <Route
           path="/easymbti1"
@@ -277,6 +275,7 @@ const AccountMain = () => {
         <Route path="HomeModal" element={<HomeModal />} />
         {/* 결과화면 없을때 보여주는 창 */}
         <Route path="/NothingResultHome" element={<NothingResultHome />} />
+        <Route path="/map" element={<Map />} />
       </Routes>
     </SignupProvider>
   );
