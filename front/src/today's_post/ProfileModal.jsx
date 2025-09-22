@@ -95,12 +95,18 @@ const ProfileModal = ({ onClose, profileUser }) => {
 
         {/* 하트 버튼 */}
         <Buttons>
-          <Btn
-            $active={heartedUsers.has(profileUser.user_id)}
-            onClick={handleHeart}
-          >
-            {heartedUsers.has(profileUser.user_id) ? "❤️" : "🤍"}
-          </Btn>
+          {currentUser?.user_id !== profileUser.user_id && (
+            <Btn
+              $active={heartedUsers.has(profileUser.user_id)}
+              onClick={handleHeart}
+            >
+              {heartedUsers.has(profileUser.user_id) ? "❤️" : "🤍"}
+            </Btn>
+          )}
+
+          {currentUser?.user_id === profileUser.user_id && (
+            <p style={{ margin: 0, color: "#999" }}>나의 프로필</p>
+          )}
         </Buttons>
       </Dialog>
     </Overlay>,
