@@ -50,12 +50,12 @@ import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "../main/NothingResultHome";
 import GenderSelect from "../homeSearchModal/GenderSelect";
 import ProfilePhoto from "./ProfilePhoto";
-import TodayPost from "../today's_post/TodayPost";
+import TodayPost from "../todays_post/TodayPost.jsx";
 import ActivityNav from "../activities/ActivityNav.jsx";
 import ActivityNavReceived from "../activities/ActivityNavReceived.jsx";
-import ProfileModal from "../today's_post/ProfileModal.jsx";
-import AddPost from "../today's_post/AddPost.jsx";
-import UpdatePost from "../today's_post/UpdatePost.jsx";
+import ProfileModal from "../todays_post/ProfileModal.jsx";
+import AddPost from "../todays_post/AddPost.jsx";
+import UpdatePost from "../todays_post/UpdatePost.jsx";
 import Report from "../report/Report.jsx";
 
 import Map from "../map/Map.jsx";
