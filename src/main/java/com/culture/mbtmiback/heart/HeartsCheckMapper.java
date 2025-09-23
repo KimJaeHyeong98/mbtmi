@@ -80,7 +80,7 @@ public interface HeartsCheckMapper {
                 SELECT 
                     u.user_id AS userId,
                     u.name,
-                    u.photo_url AS photoUrl,
+                    u.photo_url AS "photoUrl",
                     CASE WHEN h2.from_user IS NOT NULL THEN 1 ELSE 0 END AS mutualHeart
                 FROM HEARTS h
                 JOIN USERS u 
@@ -98,7 +98,7 @@ public interface HeartsCheckMapper {
                 SELECT 
                     u.user_id AS userId,
                     u.name,
-                    u.photo_url AS photoUrl,
+                    u.photo_url AS "photoUrl",
                     CASE WHEN h2.to_user IS NOT NULL THEN 1 ELSE 0 END AS mutualHeart
                 FROM HEARTS h
                 JOIN USERS u 
