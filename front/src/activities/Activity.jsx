@@ -3,14 +3,12 @@ import profileimage from "../assets/img/kar.jpg";
 import axios from "axios";
 
 const Activity = ({
-  name,
   currentUser,
   activity,
-  profile,
   btn,
-  profileImage,
   onClick,
   onDelete,
+  profileUser,
 }) => {
   const delHeartHandler = async (e) => {
     e.stopPropagation();
@@ -18,12 +16,12 @@ const Activity = ({
       const res = await axios.post("/api/hearts/toggle", null, {
         params: {
           fromUser: currentUser.user_id,
-          toUser: profile.userId,
+          toUser: profileUser.userId,
         },
       });
       console.log("하트 토글 결과(성공):", res.data);
       // ✅ 부모에게 알림 → 리스트에서 제거
-      if (onDelete) onDelete(profile.userId);
+      if (onDelete) onDelete(profileUser.userId);
     } catch (err) {
       console.error("하트 토글 실패:", err);
     }
@@ -33,9 +31,13 @@ const Activity = ({
       <ProfileBlock>
         {/* 프로필 이미지 */}
         <ProfileImage
-          src={profileImage} // ✅ props로 받은 이미지
-          alt={`${name} 프로필`}
-          style={{ userSelect: "none", WebkitUserDrag: "none" }}
+          src={
+            profileUser?.photoUrl
+              ? `http://localhost:8080/uploads/${profileUser.photoUrl}`
+              : "/default-profile.png"
+          }
+          alt={`${profileUser?.name} 프로필`}
+          draggable={false}
         />
         {/* 활동 텍스트 */}
         <Give>{activity}</Give>
@@ -47,6 +49,16 @@ const Activity = ({
   );
 };
 
+export default Activity;
+const Btn = styled.button`
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #252424ff;
+  color: white;
+  cursor: pointer;
+`;
+/* ===== styled ===== */
 const Container = styled.div`
   margin: 10px 0;
   min-width: 350px;
@@ -59,7 +71,7 @@ const ProfileBlock = styled.div`
   display: flex;
   width: 350px;
   align-items: center;
-  gap: 10px; /* 이미지-텍스트-버튼 간 간격 */
+  gap: 10px;
 `;
 
 const Give = styled.h2`
@@ -73,13 +85,3 @@ const ProfileImage = styled.img`
   border-radius: 100%;
   object-fit: cover;
 `;
-
-const Btn = styled.button`
-  margin-left: 10px;
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 10px;
-  opacity: 80%;
-`;
-
-export default Activity;

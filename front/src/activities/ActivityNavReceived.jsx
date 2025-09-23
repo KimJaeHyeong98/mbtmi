@@ -1,11 +1,10 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Activity from "./Activity";
-import ActivityModal from "./ActivityModal"; // 모달도 쓰니까 import
-import BottomNav from "../globaltool/BottomNav";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
 import ActivityReceived from "./ActivityReceived";
+import ActivityModal from "./ActivityModal";
+import BottomNav from "../globaltool/BottomNav";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ActivityNavReceived = () => {
   const [data, setData] = useState([]);
@@ -13,14 +12,14 @@ const ActivityNavReceived = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const navigate = useNavigate(); // ✅ 여기서 훅 생성
+  const navigate = useNavigate();
   const location = useLocation();
   const { currentUser } = location.state || {};
   console.log("location.state:", location.state);
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // 한 페이지당 ?개
+  const itemsPerPage = 6;
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const like = { name: "Like💜" };
@@ -49,14 +48,14 @@ const ActivityNavReceived = () => {
       } catch (err) {
         console.error("받은 하트 불러오기 실패:", err);
       } finally {
-        setIsLoading(false); // 로딩 상태를 완료로 설정
+        setIsLoading(false);
       }
     };
 
     receivedActivities();
   }, [currentUser]);
 
-  //상호하트용 유즈이펙트
+  // 상호하트 확인
   useEffect(() => {
     if (!selectedProfile) return;
     const checkMutualHeart = async () => {
@@ -69,36 +68,36 @@ const ActivityNavReceived = () => {
         });
         const updatedData = data.map((p) =>
           p.userId === selectedProfile.userId
-            ? { ...p, mutualHeart: res.data } // ✅ data 배열 업데이트
+            ? { ...p, mutualHeart: res.data }
             : p
         );
         setData(updatedData);
         console.log("mutual 상태 (받은 쪽):", res.data);
       } catch (err) {
         console.error("상호 하트 확인 실패:", err);
-        setMutualStatus(false); // 오류 시 false로 설정
       }
     };
     checkMutualHeart();
   }, [selectedProfile]);
 
-  if (isLoading) return <div>받은 하트를 불러오는 중...</div>;
-  if (data.length === 0) return <div>아직 받은 하트가 없어요.</div>;
-
-  // 현재 페이지에 맞는 데이터 자르기
+  // 현재 페이지 데이터
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = data.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <Container>
       <Div>
-        <Nav style={{ border: "1px solid lightgray", padding: "10px" }}>
+        <Nav>
           <Name>{like.name} - 받은 내역</Name>
           <Btns>
             {activityGiveTake.btn.map((btn, index) => (
               <Btnb
                 key={index}
-                onClick={() => navigate(btn.path, { state: { currentUser } })}
+                onClick={() =>
+                  navigate(btn.path, {
+                    state: { currentUser },
+                  })
+                }
               >
                 {btn.label}
               </Btnb>
@@ -107,52 +106,86 @@ const ActivityNavReceived = () => {
         </Nav>
       </Div>
 
-      {currentData.map((profile, idx) => (
-        <ActivityReceived
-          key={idx}
-          profile={profile}
-          currentUser={currentUser}
-          onMutualUpdate={(updatedProfile) =>
-            setData((prev) =>
-              prev.map((p) =>
-                p.userId === updatedProfile.userId ? updatedProfile : p
-              )
-            )
-          }
-          onOpenModal={(profile) => {
-            setSelectedProfile(profile);
-            setIsModalOpen(true);
-          }}
-        />
-      ))}
-      {/* 페이지 번호 네비게이션 */}
-      <Pagination>
-        {Array.from({ length: totalPages }, (_, idx) => (
-          <PageButton
-            key={idx}
-            onClick={() => setCurrentPage(idx + 1)}
-            $active={currentPage === idx + 1}
-          >
-            {idx + 1}
-          </PageButton>
-        ))}
-      </Pagination>
+      {/* 로딩 중 */}
+      {isLoading && (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          받은 하트를 불러오는 중...
+        </div>
+      )}
+
+      {/* 데이터 없음 */}
+      {!isLoading && data.length === 0 && (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          아직 받은 하트가 없어요.
+        </div>
+      )}
+
+      {/* 데이터 있을 때 */}
+      {!isLoading &&
+        data.length > 0 &&
+        currentData.map((profile, idx) => {
+          console.log("map에서 내려가는 profile:", profile);
+          console.log("photoUrl 값:", profile.photoUrl);
+
+          return (
+            <ActivityReceived
+              key={idx}
+              profile={profile}
+              currentUser={currentUser}
+              onMutualUpdate={(updatedProfile) =>
+                setData(
+                  data.map((p) =>
+                    p.userId === updatedProfile.userId ? updatedProfile : p
+                  )
+                )
+              }
+              onOpenModal={(profile) => {
+                setSelectedProfile(profile);
+                setIsModalOpen(true);
+              }}
+            />
+          );
+        })}
+
+      {/* 페이지네이션 */}
+      {data.length > 0 && (
+        <Pagination>
+          {Array.from({ length: totalPages }, (_, idx) => (
+            <PageButton
+              key={idx}
+              onClick={() => setCurrentPage(idx + 1)}
+              $active={currentPage === idx + 1}
+            >
+              {idx + 1}
+            </PageButton>
+          ))}
+        </Pagination>
+      )}
+
+      {/* 모달 */}
       {isModalOpen && selectedProfile && (
         <ActivityModal
           name={selectedProfile.name}
           activity={`${selectedProfile.name}님이 나에게 하트를 보냈습니다.`}
           btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
-          profileImage={selectedProfile.photoUrl}
-          mutual={selectedProfile.mutualHeart} // ✅ 추가
-          currentUser={currentUser} // 채팅 시 필요
-          targetUser={selectedProfile} // 상대방 정보
+          profileImage={
+            selectedProfile.photoUrl
+              ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
+              : "/default-profile.png"
+          }
+          mutual={selectedProfile.mutualHeart}
+          currentUser={currentUser}
+          targetUser={selectedProfile}
           onClose={() => setIsModalOpen(false)}
         />
       )}
-      <BottomNav />
+
+      <BottomNav currentUser={currentUser} />
     </Container>
   );
 };
+
+// styled-components
 const Div = styled.div`
   display: flex;
   justify-content: center;
@@ -171,7 +204,6 @@ const Container = styled.div`
 `;
 
 const Nav = styled.div`
-  margin-right: 50px;
   margin-top: 30px;
 `;
 
@@ -193,10 +225,10 @@ const Btnb = styled.button`
   opacity: 80%;
   cursor: pointer;
 `;
-/* 페이지네이션 스타일 */
+
 const Pagination = styled.div`
   position: fixed;
-  bottom: 80px; /* BottomNav 위쪽 정도에 고정 */
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -205,6 +237,7 @@ const Pagination = styled.div`
   padding: 10px 16px;
   border-radius: 12px;
 `;
+
 const PageButton = styled.button`
   padding: 6px 12px;
   border-radius: 8px;

@@ -29,6 +29,10 @@ const ActivityNav = () => {
   const itemsPerPage = 6; // 한 페이지당 ?개
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
+  // 현재 페이지에 맞는 데이터 자르기
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
+
   const like = {
     name: "Like💜",
   };
@@ -95,73 +99,106 @@ const ActivityNav = () => {
     checkMutualHeart();
   }, [selectedProfile]);
 
-  // 4. 로딩 중일 때는 로딩 메시지를 반환하여 아무것도 보여주지 않습니다.
-  if (isLoading) {
-    return <div>활동 내역을 불러오는 중...</div>;
-  }
+  // // 4. 로딩 중일 때는 로딩 메시지를 반환하여 아무것도 보여주지 않습니다.
+  // if (isLoading) {
+  //   return <div>활동 내역을 불러오는 중...</div>;
+  // }
 
-  // 5. 로딩이 끝난 후, 데이터가 없다면 빈 화면을 보여줍니다.
-  if (data.length === 0) {
-    return <div>아직 주고받은 하트가 없어요.</div>;
+  {
+    /* Activity 여러 개 반복 (페이지 단위로 표시) */
   }
+  {
+    currentData.map((profile, idx) => (
+      <Activity
+        key={startIndex + idx}
+        name={profile.name}
+        activity={`${profile.name}님께 하트를 보냈습니다.`}
+        btn="하트취소"
+        currentUser={currentUser}
+        profile={profile} // ✅ 이 줄 추가
+        profileImage={profile.photoUrl}
+        onClick={() => {
+          setSelectedProfile(profile);
+          setIsModalOpen(true);
+        }}
+        onDelete={(deleteId) => {
+          // 하트 취소 한 후 상태 리로드용
+          setData((prev) => prev.filter((p) => p.userId !== deleteId));
+        }}
+      />
+    ));
+  }
+  // // 5. 로딩이 끝난 후, 데이터가 없다면 빈 화면을 보여줍니다.
+  // if (data.length === 0) {
+  //   return <div>아직 주고받은 하트가 없어요.</div>;
+  // }
 
-  // 현재 페이지에 맞는 데이터 자르기
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
   return (
     <Container>
       <Div>
-        <Nav style={{ border: "1px solid lightgray", padding: "10px" }}>
+        <Nav>
           <Name>{like.name} - 보낸 내역</Name>
           <Btns>
             {activityGiveTake.btn.map((btn, index) => (
               <Btnb
                 key={index}
-                onClick={() => navigate(btn.path, { state: { currentUser } })}
-                style={{
-                  cursor: "pointer",
-                }}
+                onClick={() =>
+                  navigate(btn.path, {
+                    state: { currentUser },
+                  })
+                }
               >
-                {btn.label} {/* ← 여기 수정 */}
+                {btn.label}
               </Btnb>
             ))}
           </Btns>
         </Nav>
       </Div>
 
-      {/* Activity 여러 개 반복 (페이지 단위로 표시) */}
-      {currentData.map((profile, idx) => (
-        <Activity
-          key={startIndex + idx}
-          name={profile.name}
-          activity={`${profile.name}님께 하트를 보냈습니다.`}
-          btn="하트취소"
-          currentUser={currentUser}
-          profile={profile} // ✅ 이 줄 추가
-          profileImage={profile.photoUrl}
-          onClick={() => {
-            setSelectedProfile(profile);
-            setIsModalOpen(true);
-          }}
-          onDelete={(deleteId) => {
-            // 하트 취소 한 후 상태 리로드용
-            setData((prev) => prev.filter((p) => p.userId !== deleteId));
-          }}
-        />
-      ))}
+      {/* 로딩 중일 때 */}
+      {isLoading && (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          활동 내역을 불러오는 중...
+        </div>
+      )}
 
-      {/* 페이지 번호 네비게이션 */}
-      <Pagination>
-        {Array.from({ length: totalPages }, (_, idx) => (
-          <PageButton
-            key={idx}
-            onClick={() => setCurrentPage(idx + 1)}
-            $active={currentPage === idx + 1}
-          >
-            {idx + 1}
-          </PageButton>
+      {/* 데이터가 없을 때 */}
+      {!isLoading && data.length === 0 && (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          누른 내역이 없습니다.
+        </div>
+      )}
+
+      {/* 데이터 있을 때 */}
+      {!isLoading &&
+        data.length > 0 &&
+        currentData.map((profile, idx) => (
+          <Activity
+            key={startIndex + idx}
+            profileUser={profile}
+            activity={`${profile.name}님께 하트를 보냈습니다.`}
+            btn="채팅 시작"
+            onClick={() => {
+              setSelectedProfile(profile);
+              setIsModalOpen(true);
+            }}
+          />
         ))}
-      </Pagination>
+
+      {/* 페이지네이션 */}
+      {data.length > 0 && (
+        <Pagination>
+          {Array.from({ length: totalPages }, (_, idx) => (
+            <PageButton
+              key={idx}
+              onClick={() => setCurrentPage(idx + 1)}
+              $active={currentPage === idx + 1}
+            >
+              {idx + 1}
+            </PageButton>
+          ))}
+        </Pagination>
+      )}
 
       {/* 모달 */}
       {isModalOpen && selectedProfile && (
@@ -170,12 +207,13 @@ const ActivityNav = () => {
           activity={`${selectedProfile.name}님께 하트를 보냈습니다.`}
           btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
           profileImage={selectedProfile.photoUrl}
-          mutual={mutualStatus} // 색상 활성/비활성 제어용
-          currentUser={currentUser} // 채팅 시 필요
-          targetUser={selectedProfile} // 상대방 정보
+          mutual={mutualStatus}
+          currentUser={currentUser}
+          targetUser={selectedProfile}
           onClose={() => setIsModalOpen(false)}
         />
       )}
+
       <BottomNav currentUser={currentUser} />
     </Container>
   );
@@ -185,6 +223,7 @@ const Div = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  align-content: center;
 `;
 const Container = styled.div`
   min-height: 100dvh;
@@ -197,7 +236,7 @@ const Container = styled.div`
   position: relative; /* 🔥 하단 네비 절대위치 기준 */
 `;
 const Nav = styled.div`
-  margin-right: 50px;
+  /* margin-right: 50px; */
   margin-top: 30px;
 `;
 

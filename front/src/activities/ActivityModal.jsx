@@ -54,15 +54,13 @@ const ActivityModal = ({
       console.error("채팅방 생성 실패:", error);
     }
   };
+  console.log("넘어온 profileImage:", profileImage);
   return (
     <Overlay onClick={onClose}>
       <CardWrapper onClick={(e) => e.stopPropagation()}>
         <Contents>
           <div className="activity-item">
-            <img
-              src={profileImage}
-              // alt={`${name} 프로필`}
-            />
+            <img src={profileImage} alt={`${name} 프로필`} />
             <div>
               <p>{activity}</p>
               <ChatButton $isActive={mutual} onClick={handleCreateChat}>
@@ -96,6 +94,7 @@ const Overlay = styled.div`
   z-index: 998;
 `;
 const Contents = styled.div`
+<<<<<<< HEAD
   .activity-item {
     display: flex;
     min-height: 150px;
@@ -118,5 +117,13 @@ const Contents = styled.div`
     margin-top: 30px; /* 위쪽 여백 */
     font-size: 1rem; /* 선택: 글자 크기 */
   }
+=======
+    .activity-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+>>>>>>> e12fbc135bbeddf4042174701ee1612dce860be5
 `;
 export default ActivityModal;
