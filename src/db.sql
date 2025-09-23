@@ -199,4 +199,27 @@ FROM reports r
          JOIN posts p ON r.post_id = p.post_id
 ORDER BY r.created_at DESC;
 ALTER TABLE POSTS
-    ADD (LIKE_COUNT NUMBER DEFAULT 0 NOT NULL);\
+    ADD (LIKE_COUNT NUMBER DEFAULT 0 NOT NULL);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
