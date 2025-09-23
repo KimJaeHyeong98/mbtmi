@@ -118,7 +118,11 @@ const ActivityNav = () => {
             {activityGiveTake.btn.map((btn, index) => (
               <Btnb
                 key={index}
-                onClick={() => navigate(btn.path, { state: { currentUser } })}
+                onClick={() =>
+                  navigate(btn.path, {
+                    state: { currentUser },
+                  })
+                }
               >
                 {btn.label}
               </Btnb>
@@ -130,7 +134,7 @@ const ActivityNav = () => {
       {/* 로딩 중일 때 */}
       {isLoading && (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-          보낸 내역을 불러오는 중...
+          활동 내역을 불러오는 중...
         </div>
       )}
 
@@ -147,14 +151,9 @@ const ActivityNav = () => {
         currentData.map((profile, idx) => (
           <Activity
             key={startIndex + idx}
-            name={profile.name}
+            profileUser={profile}
             activity={`${profile.name}님께 하트를 보냈습니다.`}
             btn="채팅 시작"
-            profileImage={
-              profile.photo_url
-                ? `http://localhost:8080/uploads/${profile.photo_url}`
-                : logoimage // import 해서 사용
-            }
             onClick={() => {
               setSelectedProfile(profile);
               setIsModalOpen(true);
@@ -183,7 +182,7 @@ const ActivityNav = () => {
           name={selectedProfile.name}
           activity={`${selectedProfile.name}님께 하트를 보냈습니다.`}
           btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
-          profileImage={selectedProfile.photoUrl}
+          profileImage={selectedProfile.photoUrl} // ✅ profileUser.photoUrl을 직접 사용
           mutual={mutualStatus}
           currentUser={currentUser}
           targetUser={selectedProfile}
@@ -200,6 +199,7 @@ const Div = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  align-content: center;
 `;
 const Container = styled.div`
   min-height: 100dvh;
@@ -212,6 +212,7 @@ const Container = styled.div`
   position: relative; /* 🔥 하단 네비 절대위치 기준 */
 `;
 const Nav = styled.div`
+  /* margin-right: 50px; */
   margin-top: 30px;
 `;
 

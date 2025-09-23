@@ -5,6 +5,7 @@ import ActivityModal from "./ActivityModal";
 import BottomNav from "../globaltool/BottomNav";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../main/AuthContext";
 
 const ActivityNavReceived = () => {
   const [data, setData] = useState([]);
@@ -12,10 +13,14 @@ const ActivityNavReceived = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 모달 열기 핸들러
+  const [mutualStatus, setMutualStatus] = useState(false); // mutual 상태
+
   const navigate = useNavigate();
-  const location = useLocation();
-  const { currentUser } = location.state || {};
+  // const location = useLocation();
+  // const { currentUser } = location.state || {};
   console.log("location.state:", location.state);
+  const { user: currentUser } = useAuth(); // ✅ 전역 user
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -121,9 +126,9 @@ const ActivityNavReceived = () => {
         data.length > 0 &&
         currentData.map((profile, idx) => (
           <ActivityReceived
-            key={idx}
+            key={startIndex + idx}
             profile={profile}
-            currentUser={currentUser}
+            // currentUser={currentUser}
             onMutualUpdate={(updatedProfile) =>
               setData(
                 data.map((p) =>
@@ -159,14 +164,17 @@ const ActivityNavReceived = () => {
           name={selectedProfile.name}
           activity={`${selectedProfile.name}님이 나에게 하트를 보냈습니다.`}
           btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
-          profileImage={selectedProfile.photoUrl}
-          mutual={selectedProfile.mutualHeart}
+          profileImage={
+            selectedProfile.photoUrl ||
+            selectedProfile.photo_url ||
+            "/default-profile.png"
+          } // ✅ 여러 경우 처리
+          mutual={mutualStatus}
           currentUser={currentUser}
           targetUser={selectedProfile}
           onClose={() => setIsModalOpen(false)}
         />
       )}
-
       <BottomNav currentUser={currentUser} />
     </Container>
   );

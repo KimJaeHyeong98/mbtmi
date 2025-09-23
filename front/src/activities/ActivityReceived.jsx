@@ -41,7 +41,11 @@ const ActivityReceived = ({
           }}
         >
           <ProfileImage
-            src={profile.photoUrl || "/default-profile.png"}
+            src={
+              profile.photo_url
+                ? `http://localhost:8080/uploads/${profile.photo_url}`
+                : "/default-profile.png"
+            }
             alt={`${profile.name} 프로필`}
             draggable={false}
           />
