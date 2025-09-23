@@ -80,7 +80,7 @@ const ActivityNav = () => {
 
   // 채팅시작을 위한 useeffect
   useEffect(() => {
-    if (!selectedProfile) return;
+    if (!selectedProfile || !currentUser) return; // currentUser 없으면 실행 안 함
     const checkMutualHeart = async () => {
       try {
         const res = await axios.post("/api/hearts/mutual_check", null, {
@@ -104,30 +104,6 @@ const ActivityNav = () => {
   //   return <div>활동 내역을 불러오는 중...</div>;
   // }
 
-  {
-    /* Activity 여러 개 반복 (페이지 단위로 표시) */
-  }
-  {
-    currentData.map((profile, idx) => (
-      <Activity
-        key={startIndex + idx}
-        name={profile.name}
-        activity={`${profile.name}님께 하트를 보냈습니다.`}
-        btn="하트취소"
-        currentUser={currentUser}
-        profile={profile} // ✅ 이 줄 추가
-        profileImage={profile.photoUrl}
-        onClick={() => {
-          setSelectedProfile(profile);
-          setIsModalOpen(true);
-        }}
-        onDelete={(deleteId) => {
-          // 하트 취소 한 후 상태 리로드용
-          setData((prev) => prev.filter((p) => p.userId !== deleteId));
-        }}
-      />
-    ));
-  }
   // // 5. 로딩이 끝난 후, 데이터가 없다면 빈 화면을 보여줍니다.
   // if (data.length === 0) {
   //   return <div>아직 주고받은 하트가 없어요.</div>;
@@ -154,38 +130,36 @@ const ActivityNav = () => {
           </Btns>
         </Nav>
       </Div>
-
       {/* 로딩 중일 때 */}
       {isLoading && (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
           활동 내역을 불러오는 중...
         </div>
       )}
-
       {/* 데이터가 없을 때 */}
       {!isLoading && data.length === 0 && (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
           누른 내역이 없습니다.
         </div>
       )}
-
       {/* 데이터 있을 때 */}
       {!isLoading &&
-        data.length > 0 &&
+        currentUser &&
         currentData.map((profile, idx) => (
           <Activity
             key={startIndex + idx}
+            currentUser={currentUser}
+            profile={profile}
             profileUser={profile}
+            btn="하트취소"
             activity={`${profile.name}님께 하트를 보냈습니다.`}
-            btn="채팅 시작"
-            onClick={() => {
-              setSelectedProfile(profile);
-              setIsModalOpen(true);
-            }}
+            onClick={() => setSelectedProfile(profile)}
+            onDelete={(id) =>
+              setData((prev) => prev.filter((p) => p.userId !== id))
+            }
           />
         ))}
-
-      {/* 페이지네이션 */}
+      ;{/* 페이지네이션 */}
       {data.length > 0 && (
         <Pagination>
           {Array.from({ length: totalPages }, (_, idx) => (
@@ -199,7 +173,6 @@ const ActivityNav = () => {
           ))}
         </Pagination>
       )}
-
       {/* 모달 */}
       {isModalOpen && selectedProfile && (
         <ActivityModal
@@ -213,7 +186,6 @@ const ActivityNav = () => {
           onClose={() => setIsModalOpen(false)}
         />
       )}
-
       <BottomNav currentUser={currentUser} />
     </Container>
   );
