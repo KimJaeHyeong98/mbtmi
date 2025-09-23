@@ -135,11 +135,17 @@ const ActivityNav = () => {
           key={startIndex + idx}
           name={profile.name}
           activity={`${profile.name}님께 하트를 보냈습니다.`}
-          btn="채팅 시작"
+          btn="하트취소"
+          currentUser={currentUser}
+          profile={profile} // ✅ 이 줄 추가
           profileImage={profile.photoUrl}
           onClick={() => {
             setSelectedProfile(profile);
             setIsModalOpen(true);
+          }}
+          onDelete={(deleteId) => {
+            // 하트 취소 한 후 상태 리로드용
+            setData((prev) => prev.filter((p) => p.userId !== deleteId));
           }}
         />
       ))}

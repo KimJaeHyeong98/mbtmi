@@ -113,8 +113,8 @@ const ActivityNavReceived = () => {
           profile={profile}
           currentUser={currentUser}
           onMutualUpdate={(updatedProfile) =>
-            setData(
-              currentData.map((p) =>
+            setData((prev) =>
+              prev.map((p) =>
                 p.userId === updatedProfile.userId ? updatedProfile : p
               )
             )

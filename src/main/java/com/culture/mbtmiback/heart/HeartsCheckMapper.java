@@ -90,6 +90,7 @@ public interface HeartsCheckMapper {
                    AND h2.to_user = h.from_user
                 WHERE h.from_user = #{fromUser}
                   AND h.action_type = 'HEART'
+                ORDER BY h.created_at DESC
             """)
     List<HeartedUserDTO> findHeartedUsers(@Param("fromUser") int fromUser);
 
@@ -108,6 +109,7 @@ public interface HeartsCheckMapper {
                    AND h2.to_user = u.user_id
                 WHERE h.to_user = #{toUser}
                   AND h.action_type = 'HEART'
+                 ORDER BY h.created_at DESC
             """)
     List<HeartedUserDTO> findUsersWhoHeartedMe(@Param("toUser") int toUser);
 

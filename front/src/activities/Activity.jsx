@@ -1,7 +1,33 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
+import axios from "axios";
 
-const Activity = ({ name, activity, btn, profileImage, onClick }) => {
+const Activity = ({
+  name,
+  currentUser,
+  activity,
+  profile,
+  btn,
+  profileImage,
+  onClick,
+  onDelete,
+}) => {
+  const delHeartHandler = async (e) => {
+    e.stopPropagation();
+    try {
+      const res = await axios.post("/api/hearts/toggle", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: profile.userId,
+        },
+      });
+      console.log("하트 토글 결과(성공):", res.data);
+      // ✅ 부모에게 알림 → 리스트에서 제거
+      if (onDelete) onDelete(profile.userId);
+    } catch (err) {
+      console.error("하트 토글 실패:", err);
+    }
+  };
   return (
     <Container onClick={onClick}>
       <ProfileBlock>
@@ -14,7 +40,7 @@ const Activity = ({ name, activity, btn, profileImage, onClick }) => {
         {/* 활동 텍스트 */}
         <Give>{activity}</Give>
         {/* 버튼 */}
-        {/* <Btn>{btn}</Btn> */}
+        <Btn onClick={delHeartHandler}>{btn}</Btn>
         {/* 내가 보낸 페이지에는 없어도 괜찮음 */}
       </ProfileBlock>
     </Container>

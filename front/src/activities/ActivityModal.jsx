@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const CardWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-width: 300px;
   height: 400px;
   position: fixed;
@@ -55,7 +59,10 @@ const ActivityModal = ({
       <CardWrapper onClick={(e) => e.stopPropagation()}>
         <Contents>
           <div className="activity-item">
-            <img src={profileImage} alt={`${name} 프로필`} />
+            <img
+              src={profileImage}
+              // alt={`${name} 프로필`}
+            />
             <div>
               <p>{activity}</p>
               <ChatButton $isActive={mutual} onClick={handleCreateChat}>
@@ -91,9 +98,25 @@ const Overlay = styled.div`
 const Contents = styled.div`
   .activity-item {
     display: flex;
+    min-height: 150px;
+    margin-bottom: 20px;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    justify-content: center;
+  }
+
+  .activity-item img {
+    margin-top: 20px; /* 위쪽 여백 */
+    width: 200px; /* 가로 */
+    height: 280px; /* 세로 */
+    object-fit: cover; /* 이미지 비율 유지하면서 채우기 */
+    border-radius: 8px; /* 선택: 모서리 둥글게 */
+  }
+
+  .activity-item p {
+    margin-top: 30px; /* 위쪽 여백 */
+    font-size: 1rem; /* 선택: 글자 크기 */
   }
 `;
 export default ActivityModal;
