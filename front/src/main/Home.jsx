@@ -104,7 +104,7 @@ const CardWrapper = styled.div`
 const CardSlide = styled.div`
   display: flex;
   transition: transform 0.3s ease;
-  transform: translateX(${(props) => -props.index * 100}%);
+  transform: translateX(${(props) => -props.$index * 100}%);
 `;
 
 const CardItem = styled.div`
@@ -135,11 +135,13 @@ const GuideText = styled.div`
   text-align: center;
 `;
 
-const Home = () => {
+const Home = ({ homeState, setHomeState }) => {
   const navigate = useNavigate();
   const { user: currentUser, loggedIn, loading } = useAuth();
 
-  const [randomUsers, setRandomUsers] = useState([]);
+  // const [randomUsers, setRandomUsers] = useState([]);
+  const [randomUsers, setRandomUsers] = useState(homeState?.randomUsers || []);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState({
@@ -150,8 +152,40 @@ const Home = () => {
   });
   const [noResult, setNoResult] = useState(false);
 
-  const [heartedUsers, setHeartedUsers] = useState(new Set());
-  const [noHeartedUsers, setNoHeartedUsers] = useState(new Set());
+  // const [heartedUsers, setHeartedUsers] = useState(new Set());
+  const [heartedUsers, setHeartedUsers] = useState(
+    homeState?.heartedUsers || new Set()
+  );
+
+  // const [noHeartedUsers, setNoHeartedUsers] = useState(new Set());
+  const [noHeartedUsers, setNoHeartedUsers] = useState(
+    homeState?.noHeartedUsers || new Set()
+  );
+
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (!initialized && currentUser) {
+      if (homeState) {
+        setRandomUsers(homeState.randomUsers);
+        setHeartedUsers(homeState.heartedUsers);
+        setNoHeartedUsers(homeState.noHeartedUsers);
+        setCurrentIndex(homeState.currentIndex || 0);
+      } else {
+        fetchRandomUsers();
+      }
+      setInitialized(true); // 한 번만 실행
+    }
+  }, [currentUser, homeState, initialized]);
+
+  // 상태 변경 시 상위에 저장
+  useEffect(() => {
+    setHomeState({
+      randomUsers,
+      heartedUsers,
+      noHeartedUsers,
+      currentIndex, // 추가
+    });
+  }, [randomUsers, heartedUsers, noHeartedUsers, currentIndex]);
 
   // ✅ 내 액션(하트/X) 불러오기
   const fetchMyActions = async () => {
@@ -198,35 +232,34 @@ const Home = () => {
     }
   };
 
+  // const handleNext = async () => {
+  //   const nextIndex = currentIndex + 1;
+  //   if (nextIndex >= randomUsers.length) {
+  //     await loadRandomUsers(filter);
+  //     await fetchMyActions();
+  //   } else {
+  //     setCurrentIndex(nextIndex);
+  //   }
+  // };
   const handleNext = async () => {
     const nextIndex = currentIndex + 1;
+
     if (nextIndex >= randomUsers.length) {
-      await loadRandomUsers(filter);
+      // 다음 20명 불러오기
+      const users = await loadRandomUsers(filter); // loadRandomUsers가 users 반환하도록 수정
+      setCurrentIndex(0); // 새 유저 20명 중 첫 번째
+      // 선택 유저 모달이 있으면 selectedUser는 그대로 유지하거나 새 유저 첫 번째로 설정
+      // setSelectedUser(users[0]); // 필요 시
       await fetchMyActions();
     } else {
       setCurrentIndex(nextIndex);
+      // 선택 유저도 다음 유저로 변경
+      // setSelectedUser(randomUsers[nextIndex]);
     }
   };
 
-  // useEffect(() => {
-  //   const fetchCurrentUser = async () => {
-  //     try {
-  //       const res = await axios.get("/api/check-session");
-  //       if (res.data.loggedIn) {
-  //         setCurrentUser(res.data.user);
-  //       }
-  //     } catch (err) {
-  //       console.error("세션 체크 실패:", err);
-  //     }
-  //   };
-  //   fetchCurrentUser();
-  // }, []);
   if (loading) return <p>로딩중...</p>;
   if (!loggedIn) return <p>로그인 해주세요</p>;
-
-  useEffect(() => {
-    if (currentUser) fetchRandomUsers();
-  }, [currentUser]);
 
   const handleHeart = async () => {
     const targetUserId = randomUsers[currentIndex].user_id;
@@ -297,7 +330,7 @@ const Home = () => {
         {noResult ? (
           <NothingResultHome onOpenModal={() => setIsModalOpen(true)} />
         ) : (
-          <CardSlide index={currentIndex}>
+          <CardSlide $index={currentIndex}>
             {randomUsers.map((user) => (
               <CardItem key={user.user_id}>
                 <Card>

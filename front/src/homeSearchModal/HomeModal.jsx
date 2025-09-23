@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import styled from "styled-components";
 import GenderSelect from "./GenderSelect";
 import LocalSelect from "./LocalSelect";
@@ -54,10 +54,20 @@ const AgeAndRange = styled.div`
   margin-top: 10px;
 `;
 
-const HomeModal = ({ isOpen, onClose, onSelectFilter }) => {
+const HomeModal = ({ isOpen, onClose, onSelectFilter, initialFilter }) => {
   const [selectedGender, setSelectedGender] = useState("");
-  const [ageRange, setAgeRange] = useState([null, null]); // null = 제한 없음
-  const [selectedLocal, setSelectedLocal] = useState(""); // ✅ 지역 상태 추가
+  const [ageRange, setAgeRange] = useState([null, null]);
+  const [selectedLocal, setSelectedLocal] = useState("");
+  (""); // ✅ 지역 상태 추가
+
+  // 모달 열릴 때 부모 필터 기반 초기값 설정
+  useEffect(() => {
+    if (isOpen && initialFilter) {
+      setSelectedGender(initialFilter.gender || "");
+      setAgeRange([initialFilter.ageDown ?? null, initialFilter.ageUp ?? null]);
+      setSelectedLocal(initialFilter.location || "");
+    }
+  }, [isOpen, initialFilter]);
 
   if (!isOpen) return null; // 열리지 않았으면 아무것도 렌더링 안 함
 

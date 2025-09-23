@@ -28,7 +28,7 @@ import EasyMbti10 from "../easyMbtiTest/EasyMbti10";
 import EasyMbti11 from "../easyMbtiTest/EasyMbti11";
 import EasyMbti12 from "../easyMbtiTest/EasyMbti12";
 import ResultMbti from "../easyMbtiTest/ResultMbti";
-import Mymbit from "../setting/MyMbit";
+import Mymbit from "../setting/Mymbit";
 import Summary from "./Summary";
 
 import Myprofile from "../setting/Myprofile";
@@ -59,9 +59,11 @@ import UpdatePost from "../todays_post/UpdatePost.jsx";
 import Report from "../report/Report.jsx";
 
 import Map from "../map/Map.jsx";
+import { useState } from "react";
 
 const AccountMain = () => {
   const { loggedIn, loading } = useAuth(); // loading 상태 추가
+  const [homeState, setHomeState] = useState(null);
 
   // ✅ 세션 확인 완료 전에는 아무것도 렌더링하지 않음
   if (loading) {
@@ -90,7 +92,13 @@ const AccountMain = () => {
         />
 
         <Route path="/account01" element={<Account01 />} />
-        <Route path="/home" element={<Home />} />
+        {/* 홈 화면 */}
+        {/* <Route path="/home" element={<Home />} /> */}
+        <Route
+          path="/home"
+          element={<Home homeState={homeState} setHomeState={setHomeState} />}
+        />
+
         <Route path="/login" element={<AccountLogin />} />
 
         {/* My page */}
