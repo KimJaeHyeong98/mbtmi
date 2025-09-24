@@ -19,22 +19,18 @@ const Container = styled.div`
   box-sizing: border-box;
   flex-direction: column;
   background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-  position: relative;
-  padding-top: 60px;
 `;
 
 const LogoImage = styled.img`
-  position: absolute;
-  top: 0px;
-  left: 30px;
   object-fit: cover;
-  width: 150px;
+  width: 100px;
   align-items: center;
 `;
 
 const Card = styled.div`
   width: 100%;
   max-width: 350px;
+  height: 550px;
   padding: 24px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.15);
@@ -53,16 +49,29 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 80px;
+  margin-bottom: 10px;
 `;
 
-const ProfileImage = styled.img`
-  width: 80%;
+const ProfileImageWrapper = styled.div`
+  width: 270px;
+  height: 320px;
   border-radius: 20px;
-  object-fit: cover;
+  overflow: hidden; /* 넘치면 숨김 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5; /* 이미지 없는 경우 대비 배경 */
+`;
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 꽉 채우고 잘라냄 */
+  object-position: center; /* 중앙 기준 */
 `;
 
 const Name = styled.h2`
+  margin-top: 5px;
+  margin-bottom: 0px;
   font-size: 1.5rem;
 `;
 
@@ -141,7 +150,7 @@ const Home = ({ homeState, setHomeState }) => {
 
   // const [randomUsers, setRandomUsers] = useState([]);
   const [randomUsers, setRandomUsers] = useState(homeState?.randomUsers || []);
-
+  console.log(randomUsers);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState({
@@ -232,15 +241,6 @@ const Home = ({ homeState, setHomeState }) => {
     }
   };
 
-  // const handleNext = async () => {
-  //   const nextIndex = currentIndex + 1;
-  //   if (nextIndex >= randomUsers.length) {
-  //     await loadRandomUsers(filter);
-  //     await fetchMyActions();
-  //   } else {
-  //     setCurrentIndex(nextIndex);
-  //   }
-  // };
   const handleNext = async () => {
     const nextIndex = currentIndex + 1;
 
@@ -338,10 +338,21 @@ const Home = ({ homeState, setHomeState }) => {
                     ☰
                   </SettingButton>
                   <div>
-                    <ProfileImage src={user.photo_url} alt="profile" />
-                    <Name>이름: {user.name}</Name>
-                    <p>MBTI: {user.mbti}</p>
-                    <p>자기소개: {user.self_intro}</p>
+                    {/* 프로필 이미지 */}
+                    <ProfileImageWrapper>
+                      <ProfileImage
+                        src={
+                          user?.photo_url
+                            ? `http://localhost:8080/uploads/${user.photo_url}`
+                            : "/default-profile.png"
+                        }
+                        alt={`${user?.name} 프로필`}
+                        draggable={false}
+                      />
+                    </ProfileImageWrapper>
+                    <Name>{user.name}</Name>
+                    <P>MBTI: {user.mbti}</P>
+                    <P>{user.self_intro}</P>
                   </div>
                   <TagList>
                     {user.tags
@@ -374,10 +385,10 @@ const Home = ({ homeState, setHomeState }) => {
                     </Btn>
                     <Btn onClick={handleNext}>➡️</Btn>
                   </Btns>
-                  <GuideText>
+                  {/* <GuideText>
                     🤍 = 하트하기 / ❤️ = 이미 하트함 <br />❌ = 관심없음 / 🚫 =
                     이미 관심없음
-                  </GuideText>
+                  </GuideText> */}
                 </Card>
               </CardItem>
             ))}
@@ -397,5 +408,7 @@ const Home = ({ homeState, setHomeState }) => {
     </Container>
   );
 };
-
+const P = styled.div`
+  margin: 8px;
+`;
 export default Home;

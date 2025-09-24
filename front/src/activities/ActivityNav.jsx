@@ -153,7 +153,10 @@ const ActivityNav = () => {
             profileUser={profile}
             btn="하트취소"
             activity={`${profile.name}님께 하트를 보냈습니다.`}
-            onClick={() => setSelectedProfile(profile)}
+            onClick={() => {
+              setSelectedProfile(profile);
+              setIsModalOpen(true);
+            }}
             onDelete={(id) =>
               setData((prev) => prev.filter((p) => p.userId !== id))
             }
