@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import ActivityReceived from "./ActivityReceived";
 import ActivityModal from "./ActivityModal";
 import BottomNav from "../globaltool/BottomNav";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../main/AuthContext";
+import Activity from "./Activity";
+import ActivityReceived from "./ActivityReceived";
 
 const ActivityNavReceived = () => {
   const [data, setData] = useState([]);
@@ -13,14 +14,8 @@ const ActivityNavReceived = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 모달 열기 핸들러
-  const [mutualStatus, setMutualStatus] = useState(false); // mutual 상태
-
   const navigate = useNavigate();
-  // const location = useLocation();
-  // const { currentUser } = location.state || {};
-  console.log("location.state:", location.state);
-  const { user: currentUser } = useAuth(); // ✅ 전역 user
+  const { user: currentUser } = useAuth();
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,9 +31,9 @@ const ActivityNavReceived = () => {
     ],
   };
 
+  // 받은 하트 불러오기
   useEffect(() => {
     if (!currentUser?.user_id) {
-      console.log("currentUser가 없으므로 데이터 로딩을 건너뜁니다.");
       setIsLoading(false);
       return;
     }
@@ -49,7 +44,6 @@ const ActivityNavReceived = () => {
           `/api/hearts/who_hearted_me/${currentUser.user_id}`
         );
         setData(res.data);
-        console.log("받은 하트 목록:", res.data);
       } catch (err) {
         console.error("받은 하트 불러오기 실패:", err);
       } finally {
@@ -60,7 +54,7 @@ const ActivityNavReceived = () => {
     receivedActivities();
   }, [currentUser]);
 
-  // 상호하트 확인
+  // 상호 하트 확인
   useEffect(() => {
     if (!selectedProfile) return;
     const checkMutualHeart = async () => {
@@ -77,13 +71,35 @@ const ActivityNavReceived = () => {
             : p
         );
         setData(updatedData);
-        console.log("mutual 상태 (받은 쪽):", res.data);
       } catch (err) {
         console.error("상호 하트 확인 실패:", err);
       }
     };
     checkMutualHeart();
   }, [selectedProfile]);
+
+  // 하트 보내기 처리
+  const handleSendHeart = async (targetUser) => {
+    try {
+      await axios.post("/api/hearts/send", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: targetUser.userId,
+        },
+      });
+
+      // 성공 후 mutualHeart 상태 true로 업데이트
+      const updatedData = data.map((p) =>
+        p.userId === targetUser.userId ? { ...p, mutualHeart: true } : p
+      );
+      setData(updatedData);
+
+      alert("하트를 보냈습니다! 💕");
+    } catch (err) {
+      console.error("하트 보내기 실패:", err);
+      alert("하트 보내기에 실패했습니다.");
+    }
+  };
 
   // 현재 페이지 데이터
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -98,7 +114,11 @@ const ActivityNavReceived = () => {
             {activityGiveTake.btn.map((btn, index) => (
               <Btnb
                 key={index}
-                onClick={() => navigate(btn.path, { state: { currentUser } })}
+                onClick={() =>
+                  navigate(btn.path, {
+                    state: { currentUser },
+                  })
+                }
               >
                 {btn.label}
               </Btnb>
@@ -125,10 +145,16 @@ const ActivityNavReceived = () => {
       {!isLoading &&
         data.length > 0 &&
         currentData.map((profile, idx) => (
-          <ActivityReceived
+          <Activity
             key={startIndex + idx}
-            profile={profile}
-            // currentUser={currentUser}
+            profileUser={profile}
+            activity={`${profile.name}님이 하트를 보냈습니다.`}
+            currentUser={currentUser}
+            profileImage={
+              profile.photoUrl
+                ? `http://localhost:8080/uploads/${profile.photoUrl}`
+                : "/default-profile.png"
+            }
             onMutualUpdate={(updatedProfile) =>
               setData(
                 data.map((p) =>
@@ -136,7 +162,7 @@ const ActivityNavReceived = () => {
                 )
               )
             }
-            onOpenModal={(profile) => {
+            onClick={() => {
               setSelectedProfile(profile);
               setIsModalOpen(true);
             }}
@@ -165,13 +191,14 @@ const ActivityNavReceived = () => {
           activity={`${selectedProfile.name}님이 나에게 하트를 보냈습니다.`}
           btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
           profileImage={
-            selectedProfile.photoUrl ||
-            selectedProfile.photo_url ||
-            "/default-profile.png"
-          } // ✅ 여러 경우 처리
-          mutual={mutualStatus}
+            selectedProfile.photoUrl
+              ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
+              : "/default-profile.png"
+          }
+          mutual={selectedProfile.mutualHeart}
           currentUser={currentUser}
           targetUser={selectedProfile}
+          onSendHeart={() => handleSendHeart(selectedProfile)} // 💡 추가
           onClose={() => setIsModalOpen(false)}
         />
       )}

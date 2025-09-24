@@ -159,6 +159,7 @@ const CloseBtn = styled.button`
 const ProfileImage = styled.img`
   width: 85%;
   border-radius: 20px;
+  height: 280px;
   object-fit: cover;
 `;
 
