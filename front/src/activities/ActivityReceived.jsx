@@ -8,8 +8,6 @@ const ActivityReceived = ({
     onMutualUpdate,
     onOpenModal,
 }) => {
-    console.log("받은 profile:", profile);
-    console.log("photoUrl 값:", profile?.photoUrl);
     // 버튼 클릭 시 하트 토글
     const handleSendHeart = async (e) => {
         e.stopPropagation(); // ⚡ 클릭 이벤트 버블링 방지
@@ -23,8 +21,6 @@ const ActivityReceived = ({
 
             const updatedProfile = { ...profile, mutualHeart: res.data };
             onMutualUpdate(updatedProfile); // 부모 상태 갱신
-
-            console.log(res.data ? "하트 등록됨" : "하트 해제됨");
         } catch (err) {
             console.error("하트 토글 실패:", err);
         }
