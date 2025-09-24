@@ -51,7 +51,6 @@ const PostMain = () => {
         const fetchPosts = async () => {
             try {
                 const res = await axios.get("/posts/postsmain");
-                console.log("서버 응답:", res.data);
                 setPosts(res.data);
             } catch (err) {
                 console.error("게시글 불러오기 실패:", err);
