@@ -15,11 +15,11 @@ const ActivityNavReceived = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser } = location.state || {};
-  console.log("location.state:", location.state);
+  // console.log("location.state:", location.state);
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 7;
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const like = { name: "Like💜" };
@@ -33,7 +33,7 @@ const ActivityNavReceived = () => {
 
   useEffect(() => {
     if (!currentUser?.user_id) {
-      console.log("currentUser가 없으므로 데이터 로딩을 건너뜁니다.");
+      // console.log("currentUser가 없으므로 데이터 로딩을 건너뜁니다.");
       setIsLoading(false);
       return;
     }
@@ -44,9 +44,9 @@ const ActivityNavReceived = () => {
           `/api/hearts/who_hearted_me/${currentUser.user_id}`
         );
         setData(res.data);
-        console.log("받은 하트 목록:", res.data);
+        // console.log("받은 하트 목록:", res.data);
       } catch (err) {
-        console.error("받은 하트 불러오기 실패:", err);
+        // console.error("받은 하트 불러오기 실패:", err);
       } finally {
         setIsLoading(false);
       }
@@ -72,9 +72,9 @@ const ActivityNavReceived = () => {
             : p
         );
         setData(updatedData);
-        console.log("mutual 상태 (받은 쪽):", res.data);
+        // console.log("mutual 상태 (받은 쪽):", res.data);
       } catch (err) {
-        console.error("상호 하트 확인 실패:", err);
+        // console.error("상호 하트 확인 실패:", err);
       }
     };
     checkMutualHeart();
@@ -121,31 +121,33 @@ const ActivityNavReceived = () => {
       )}
 
       {/* 데이터 있을 때 */}
-      {!isLoading &&
-        data.length > 0 &&
-        currentData.map((profile, idx) => {
-          console.log("map에서 내려가는 profile:", profile);
-          console.log("photoUrl 값:", profile.photoUrl);
+      <ContainerWrapper>
+        {!isLoading &&
+          data.length > 0 &&
+          currentData.map((profile, idx) => {
+            // console.log("map에서 내려가는 profile:", profile);
+            // console.log("photoUrl 값:", profile.photoUrl);
 
-          return (
-            <ActivityReceived
-              key={idx}
-              profile={profile}
-              currentUser={currentUser}
-              onMutualUpdate={(updatedProfile) =>
-                setData(
-                  data.map((p) =>
-                    p.userId === updatedProfile.userId ? updatedProfile : p
+            return (
+              <ActivityReceived
+                key={idx}
+                profile={profile}
+                currentUser={currentUser}
+                onMutualUpdate={(updatedProfile) =>
+                  setData(
+                    data.map((p) =>
+                      p.userId === updatedProfile.userId ? updatedProfile : p
+                    )
                   )
-                )
-              }
-              onOpenModal={(profile) => {
-                setSelectedProfile(profile);
-                setIsModalOpen(true);
-              }}
-            />
-          );
-        })}
+                }
+                onOpenModal={(profile) => {
+                  setSelectedProfile(profile);
+                  setIsModalOpen(true);
+                }}
+              />
+            );
+          })}
+      </ContainerWrapper>
 
       {/* 페이지네이션 */}
       {data.length > 0 && (
@@ -186,6 +188,9 @@ const ActivityNavReceived = () => {
 };
 
 // styled-components
+const ContainerWrapper = styled.div`
+  margin-top: 30px;
+`;
 const Div = styled.div`
   display: flex;
   justify-content: center;

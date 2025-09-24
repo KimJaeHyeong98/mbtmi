@@ -54,6 +54,7 @@ const Activity = ({
 };
 
 export default Activity;
+
 const Btn = styled.button`
   padding: 5px 10px;
   border: none;
@@ -64,7 +65,7 @@ const Btn = styled.button`
 `;
 /* ===== styled ===== */
 const Container = styled.div`
-  margin: 10px 0;
+  margin: 15px 0;
   min-width: 350px;
   display: flex;
   flex-direction: column;
