@@ -2,23 +2,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-const CardWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 300px;
-    height: 400px;
-    position: fixed;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-    padding: 20px;
-    border-radius: 12px;
-    z-index: 999; // 가장 위에 표시
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-`;
 const ActivityModal = ({
     name,
     activity,
@@ -30,6 +13,9 @@ const ActivityModal = ({
     onClose,
 }) => {
     const navigate = useNavigate(); // 🔹 여기 추가
+    // console.log("ActivityModal mutual:", mutual);
+    // console.log("ActivityModal currentUser:", currentUser);
+    // console.log("ActivityModal targetUser:", targetUser);
     // 🔹 버튼 클릭 시 채팅방 생성 후 이동
     const handleCreateChat = async () => {
         if (!mutual) return; // 쌍방 하트가 아닐 경우 무시
@@ -48,9 +34,10 @@ const ActivityModal = ({
             // 3️⃣ 채팅방으로 이동
             navigate(`/chat/${room.roomId}`, { state: { room } });
         } catch (error) {
-            console.error("채팅방 생성 실패:", error);
+            // console.error("채팅방 생성 실패:", error);
         }
     };
+    // console.log("넘어온 profileImage:", profileImage);
     return (
         <Overlay onClick={onClose}>
             <CardWrapper onClick={(e) => e.stopPropagation()}>
@@ -71,6 +58,25 @@ const ActivityModal = ({
         </Overlay>
     );
 };
+
+const CardWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 300px;
+    height: 400px;
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    padding: 20px;
+    border-radius: 12px;
+    z-index: 999; // 가장 위에 표시
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+`;
+
 const ChatButton = styled.button`
     padding: 10px 20px;
     border-radius: 12px;
@@ -94,12 +100,20 @@ const Overlay = styled.div`
 const Contents = styled.div`
     .activity-item {
         display: flex;
-        min-height: 150px;
-        margin-bottom: 20px;
         flex-direction: column;
         align-items: center;
-        text-align: center;
         justify-content: center;
+        min-width: 300px;
+        height: 400px;
+        position: fixed;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+        padding: 20px;
+        border-radius: 12px;
+        z-index: 999; // 가장 위에 표시
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     .activity-item img {
