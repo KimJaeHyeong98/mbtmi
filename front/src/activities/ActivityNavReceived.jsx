@@ -1,12 +1,212 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import ActivityReceived from "./ActivityReceived";
 import ActivityModal from "./ActivityModal";
 import BottomNav from "../globaltool/BottomNav";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../main/AuthContext";
+import Activity from "./Activity";
+import ActivityReceived from "./ActivityReceived";
 
 const ActivityNavReceived = () => {
+
+  const [data, setData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const like = { name: "Like💜" };
+
+  const activityGiveTake = {
+    btn: [
+      { label: "보낸 내역", path: "/ActivityNav" },
+      { label: "받은 내역", path: "/ActivityNavReceived" },
+    ],
+  };
+
+  // 받은 하트 불러오기
+  useEffect(() => {
+    if (!currentUser?.user_id) {
+      setIsLoading(false);
+      return;
+    }
+
+    const receivedActivities = async () => {
+      try {
+        const res = await axios.get(
+          `/api/hearts/who_hearted_me/${currentUser.user_id}`
+        );
+        setData(res.data);
+      } catch (err) {
+        console.error("받은 하트 불러오기 실패:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    receivedActivities();
+  }, [currentUser]);
+
+  // 상호 하트 확인
+  useEffect(() => {
+    if (!selectedProfile) return;
+    const checkMutualHeart = async () => {
+      try {
+        const res = await axios.post("/api/hearts/mutual_check", null, {
+          params: {
+            fromUser: selectedProfile.userId,
+            toUser: currentUser.user_id,
+          },
+        });
+        const updatedData = data.map((p) =>
+          p.userId === selectedProfile.userId
+            ? { ...p, mutualHeart: res.data }
+            : p
+        );
+        setData(updatedData);
+      } catch (err) {
+        console.error("상호 하트 확인 실패:", err);
+      }
+    };
+    checkMutualHeart();
+  }, [selectedProfile]);
+
+  // 하트 보내기 처리
+  const handleSendHeart = async (targetUser) => {
+    try {
+      await axios.post("/api/hearts/send", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: targetUser.userId,
+        },
+      });
+
+      // 성공 후 mutualHeart 상태 true로 업데이트
+      const updatedData = data.map((p) =>
+        p.userId === targetUser.userId ? { ...p, mutualHeart: true } : p
+      );
+      setData(updatedData);
+
+      alert("하트를 보냈습니다! 💕");
+    } catch (err) {
+      console.error("하트 보내기 실패:", err);
+      alert("하트 보내기에 실패했습니다.");
+    }
+  };
+
+  // 현재 페이지 데이터
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
+
+  return (
+    <Container>
+      <Div>
+        <Nav>
+          <Name>{like.name} - 받은 내역</Name>
+          <Btns>
+            {activityGiveTake.btn.map((btn, index) => (
+              <Btnb
+                key={index}
+                onClick={() =>
+                  navigate(btn.path, {
+                    state: { currentUser },
+                  })
+                }
+              >
+                {btn.label}
+              </Btnb>
+            ))}
+          </Btns>
+        </Nav>
+      </Div>
+
+      {/* 로딩 중 */}
+      {isLoading && (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          받은 하트를 불러오는 중...
+        </div>
+      )}
+
+      {/* 데이터 없음 */}
+      {!isLoading && data.length === 0 && (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          아직 받은 하트가 없어요.
+        </div>
+      )}
+
+      {/* 데이터 있을 때 */}
+      {!isLoading &&
+        data.length > 0 &&
+        currentData.map((profile, idx) => (
+          <Activity
+            key={startIndex + idx}
+            profileUser={profile}
+            activity={`${profile.name}님이 하트를 보냈습니다.`}
+            currentUser={currentUser}
+            profileImage={
+              profile.photoUrl
+                ? `http://localhost:8080/uploads/${profile.photoUrl}`
+                : "/default-profile.png"
+            }
+            onMutualUpdate={(updatedProfile) =>
+              setData(
+                data.map((p) =>
+                  p.userId === updatedProfile.userId ? updatedProfile : p
+                )
+              )
+            }
+            onClick={() => {
+              setSelectedProfile(profile);
+              setIsModalOpen(true);
+            }}
+          />
+        ))}
+
+      {/* 페이지네이션 */}
+      {data.length > 0 && (
+        <Pagination>
+          {Array.from({ length: totalPages }, (_, idx) => (
+            <PageButton
+              key={idx}
+              onClick={() => setCurrentPage(idx + 1)}
+              $active={currentPage === idx + 1}
+            >
+              {idx + 1}
+            </PageButton>
+          ))}
+        </Pagination>
+      )}
+
+      {/* 모달 */}
+      {isModalOpen && selectedProfile && (
+        <ActivityModal
+          name={selectedProfile.name}
+          activity={`${selectedProfile.name}님이 나에게 하트를 보냈습니다.`}
+          btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
+          profileImage={
+            selectedProfile.photoUrl
+              ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
+              : "/default-profile.png"
+          }
+          mutual={selectedProfile.mutualHeart}
+          currentUser={currentUser}
+          targetUser={selectedProfile}
+          onSendHeart={() => handleSendHeart(selectedProfile)} // 💡 추가
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+      <BottomNav currentUser={currentUser} />
+    </Container>
+  );
+
     const [data, setData] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProfile, setSelectedProfile] = useState(null);
@@ -182,6 +382,7 @@ const ActivityNavReceived = () => {
             <BottomNav currentUser={currentUser} />
         </Container>
     );
+
 };
 
 // styled-components
