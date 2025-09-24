@@ -27,6 +27,7 @@ const PostMain = () => {
       return;
     }
 
+
     try {
       await axios.post("/reports", {
         reported_id: reportedUserId,
@@ -69,6 +70,16 @@ const PostMain = () => {
               ...p,
               liked: !p.liked,
               like_count: p.liked ? p.like_count - 1 : p.like_count + 1,
+
+    // 서버에서 게시글 가져오기
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const res = await axios.get("/posts/postsmain");
+                setPosts(res.data);
+            } catch (err) {
+                console.error("게시글 불러오기 실패:", err);
+
             }
           : p
       )
