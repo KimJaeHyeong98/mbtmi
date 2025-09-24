@@ -30,9 +30,9 @@ const ActivityModal = ({
   onClose,
 }) => {
   const navigate = useNavigate(); // 🔹 여기 추가
-  console.log("ActivityModal mutual:", mutual);
-  console.log("ActivityModal currentUser:", currentUser);
-  console.log("ActivityModal targetUser:", targetUser);
+  // console.log("ActivityModal mutual:", mutual);
+  // console.log("ActivityModal currentUser:", currentUser);
+  // console.log("ActivityModal targetUser:", targetUser);
   // 🔹 버튼 클릭 시 채팅방 생성 후 이동
   const handleCreateChat = async () => {
     if (!mutual) return; // 쌍방 하트가 아닐 경우 무시
@@ -51,10 +51,10 @@ const ActivityModal = ({
       // 3️⃣ 채팅방으로 이동
       navigate(`/chat/${room.roomId}`, { state: { room } });
     } catch (error) {
-      console.error("채팅방 생성 실패:", error);
+      // console.error("채팅방 생성 실패:", error);
     }
   };
-  console.log("넘어온 profileImage:", profileImage);
+  // console.log("넘어온 profileImage:", profileImage);
   return (
     <Overlay onClick={onClose}>
       <CardWrapper onClick={(e) => e.stopPropagation()}>
@@ -94,7 +94,6 @@ const Overlay = styled.div`
   z-index: 998;
 `;
 const Contents = styled.div`
-<<<<<<< HEAD
   .activity-item {
     display: flex;
     min-height: 150px;
@@ -117,13 +116,5 @@ const Contents = styled.div`
     margin-top: 30px; /* 위쪽 여백 */
     font-size: 1rem; /* 선택: 글자 크기 */
   }
-=======
-    .activity-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
->>>>>>> e12fbc135bbeddf4042174701ee1612dce860be5
 `;
 export default ActivityModal;
