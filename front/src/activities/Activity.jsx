@@ -6,24 +6,28 @@ const Activity = ({
   currentUser,
   activity,
   btn,
+  profile,
   onClick,
   onDelete,
   profileUser,
 }) => {
   const delHeartHandler = async (e) => {
     e.stopPropagation();
+    if (!currentUser || !currentUser.user_id) {
+      // console.error("currentUser가 없습니다.");
+      return;
+    }
     try {
       const res = await axios.post("/api/hearts/toggle", null, {
         params: {
           fromUser: currentUser.user_id,
-          toUser: profileUser.userId,
+          toUser: profile.userId,
         },
       });
-      console.log("하트 토글 결과(성공):", res.data);
-      // ✅ 부모에게 알림 → 리스트에서 제거
-      if (onDelete) onDelete(profileUser.userId);
+      // console.log("하트 토글 결과(성공):", res.data);
+      if (onDelete) onDelete(profile.userId);
     } catch (err) {
-      console.error("하트 토글 실패:", err);
+      // console.error("하트 토글 실패:", err);
     }
   };
   return (
@@ -77,6 +81,7 @@ const ProfileBlock = styled.div`
 const Give = styled.h2`
   margin-left: 10px;
   font-size: 10pt;
+  min-width: 190px;
 `;
 
 const ProfileImage = styled.img`

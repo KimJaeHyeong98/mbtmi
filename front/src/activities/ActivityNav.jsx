@@ -77,26 +77,25 @@ const ActivityNav = () => {
 
   return (
     <Container>
-      <Div>
-        {/* 상단 네비 */}
-        <Nav>
-          <Name>{like.name} - 보낸 내역</Name>
-          <Btns>
-            {activityGiveTake.btn.map((btn, index) => (
-              <Btnb
-                key={index}
-                onClick={() =>
-                  navigate(btn.path, {
-                    state: { currentUser },
-                  })
-                }
-              >
-                {btn.label}
-              </Btnb>
-            ))}
-          </Btns>
-        </Nav>
-      </Div>
+      {/* 상단 네비 */}
+      <Nav>
+        <Name>{like.name} - 보낸 내역</Name>
+        <Btns>
+          {activityGiveTake.btn.map((btn, index) => (
+            <Btnb
+              key={index}
+              onClick={() =>
+                navigate(btn.path, {
+                  state: { currentUser },
+                })
+              }
+            >
+              {btn.label}
+            </Btnb>
+          ))}
+        </Btns>
+      </Nav>
+
       {/* 로딩 / 데이터 없음 / 데이터 있을 때 */}
       {isLoading && <Message>활동 내역을 불러오는 중...</Message>}
       {!isLoading && data.length === 0 && (
@@ -153,12 +152,6 @@ const ActivityNav = () => {
 };
 
 /* ===== styled ===== */
-const Div = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 const Container = styled.div`
   min-height: 100dvh;
   width: 100vw;
