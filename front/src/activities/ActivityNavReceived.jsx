@@ -5,6 +5,7 @@ import ActivityModal from "./ActivityModal";
 import BottomNav from "../globaltool/BottomNav";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Activity from "./Activity";
 
 const ActivityNavReceived = () => {
   const [data, setData] = useState([]);
@@ -15,7 +16,6 @@ const ActivityNavReceived = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser } = location.state || {};
-  // console.log("location.state:", location.state);
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,9 +31,9 @@ const ActivityNavReceived = () => {
     ],
   };
 
+  // 받은 하트 불러오기
   useEffect(() => {
     if (!currentUser?.user_id) {
-      // console.log("currentUser가 없으므로 데이터 로딩을 건너뜁니다.");
       setIsLoading(false);
       return;
     }
@@ -44,9 +44,8 @@ const ActivityNavReceived = () => {
           `/api/hearts/who_hearted_me/${currentUser.user_id}`
         );
         setData(res.data);
-        // console.log("받은 하트 목록:", res.data);
       } catch (err) {
-        // console.error("받은 하트 불러오기 실패:", err);
+        console.error("받은 하트 불러오기 실패:", err);
       } finally {
         setIsLoading(false);
       }
@@ -72,9 +71,8 @@ const ActivityNavReceived = () => {
             : p
         );
         setData(updatedData);
-        // console.log("mutual 상태 (받은 쪽):", res.data);
       } catch (err) {
-        // console.error("상호 하트 확인 실패:", err);
+        console.error("상호 하트 확인 실패:", err);
       }
     };
     checkMutualHeart();
@@ -121,33 +119,32 @@ const ActivityNavReceived = () => {
       )}
 
       {/* 데이터 있을 때 */}
-      <ContainerWrapper>
-        {!isLoading &&
-          data.length > 0 &&
-          currentData.map((profile, idx) => {
-            // console.log("map에서 내려가는 profile:", profile);
-            // console.log("photoUrl 값:", profile.photoUrl);
-
-            return (
-              <ActivityReceived
-                key={idx}
-                profile={profile}
-                currentUser={currentUser}
-                onMutualUpdate={(updatedProfile) =>
-                  setData(
-                    data.map((p) =>
-                      p.userId === updatedProfile.userId ? updatedProfile : p
-                    )
-                  )
-                }
-                onOpenModal={(profile) => {
-                  setSelectedProfile(profile);
-                  setIsModalOpen(true);
-                }}
-              />
-            );
-          })}
-      </ContainerWrapper>
+      {!isLoading &&
+        data.length > 0 &&
+        currentData.map((profile, idx) => (
+          <Activity
+            key={startIndex + idx}
+            profileUser={profile}
+            activity={`${profile.name}님이 하트를 보냈습니다.`}
+            currentUser={currentUser}
+            profileImage={
+              profile.photoUrl
+                ? `http://localhost:8080/uploads/${profile.photoUrl}`
+                : "/default-profile.png"
+            }
+            onMutualUpdate={(updatedProfile) =>
+              setData(
+                data.map((p) =>
+                  p.userId === updatedProfile.userId ? updatedProfile : p
+                )
+              )
+            }
+            onClick={() => {
+              setSelectedProfile(profile);
+              setIsModalOpen(true);
+            }}
+          />
+        ))}
 
       {/* 페이지네이션 */}
       {data.length > 0 && (
@@ -186,11 +183,7 @@ const ActivityNavReceived = () => {
     </Container>
   );
 };
-
 // styled-components
-const ContainerWrapper = styled.div`
-  margin-top: 30px;
-`;
 const Div = styled.div`
   display: flex;
   justify-content: center;

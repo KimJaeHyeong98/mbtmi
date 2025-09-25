@@ -8,18 +8,12 @@ import ActivityModal from "./ActivityModal";
 import { useAuth } from "../main/AuthContext";
 
 const ActivityNav = () => {
-  // 모달 상태 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
-  // 모달 열기 핸들러
   const [mutualStatus, setMutualStatus] = useState(false); // mutual 상태
 
   const navigate = useNavigate();
-  // const location = useLocation();
-  // const { currentUser } = location.state || {}; // 여기서 받아야 함
   const { user: currentUser } = useAuth(); // ✅ 전역 user 가져오기
-
-  // console.log("currentUser 상태:", currentUser);
 
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // ✅ 로딩 상태 추가
@@ -27,11 +21,6 @@ const ActivityNav = () => {
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7; // 한 페이지당 ?개
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-
-  // 현재 페이지에 맞는 데이터 자르기
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
 
   const like = {
     name: "Like💜",
@@ -45,17 +34,7 @@ const ActivityNav = () => {
   };
 
   useEffect(() => {
-    // console.log(
-    //   "현재 유저 아이디:",
-    //   currentUser.user_id,
-    //   "현재 유저 아이디2:",
-    //   currentUser.userId
-    // );
-
-    // 1. curruntUser가 없으면 API 호출을 하지 않습니다.
-    //    그리고 로딩 상태를 '완료'로 바꿉니다.
     if (!currentUser?.user_id) {
-      // console.log("currentUser가 없으므로 데이터 로딩을 건너뜁니다.");
       setIsLoading(false);
       return;
     }
@@ -66,50 +45,40 @@ const ActivityNav = () => {
           `/api/hearts/hearted/${currentUser.user_id}`
         );
         setData(res.data);
-        // console.log("하트 내역 데이터:", res.data);
       } catch (err) {
-        // console.error("하트 내역 불러오기 실패:", err);
+        console.error("하트 내역 불러오기 실패:", err);
       } finally {
-        // 3. API 호출이 성공하든 실패하든, 마지막에 로딩을 끝냅니다.
         setIsLoading(false);
       }
     };
     fetchActivities();
   }, [currentUser]);
 
-  // 채팅시작을 위한 useeffect
   useEffect(() => {
-    if (!selectedProfile || !currentUser) return; // currentUser 없으면 실행 안 함
+    if (!selectedProfile || !currentUser) return;
+
     const checkMutualHeart = async () => {
       try {
         const res = await axios.post("/api/hearts/mutual_check", null, {
           params: {
             fromUser: currentUser.user_id,
-            toUser: selectedProfile.userId, //상대방아이디
+            toUser: selectedProfile.userId,
           },
         });
         setMutualStatus(res.data);
-        // console.log("mutual 상태:", res.data);
       } catch (err) {
-        // console.error("mutual 상태 불러오기 실패:", err);
-        setMutualStatus(false); // 오류 시 false로 설정
+        setMutualStatus(false);
       }
     };
     checkMutualHeart();
   }, [selectedProfile]);
 
-  // // 4. 로딩 중일 때는 로딩 메시지를 반환하여 아무것도 보여주지 않습니다.
-  // if (isLoading) {
-  //   return <div>활동 내역을 불러오는 중...</div>;
-  // }
-
-  // // 5. 로딩이 끝난 후, 데이터가 없다면 빈 화면을 보여줍니다.
-  // if (data.length === 0) {
-  //   return <div>아직 주고받은 하트가 없어요.</div>;
-  // }
-
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
   return (
     <Container>
+      {/* 상단 네비 */}
       <Div>
         <Nav>
           <Name>{like.name} - 보낸 내역</Name>
@@ -182,8 +151,11 @@ const ActivityNav = () => {
         <ActivityModal
           name={selectedProfile.name}
           activity={`${selectedProfile.name}님께 하트를 보냈습니다.`}
-          btn={selectedProfile.mutualHeart ? "상호 하트💞" : "하트 보내기"}
-          profileImage={selectedProfile.photoUrl}
+          profileImage={
+            selectedProfile.photoUrl
+              ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
+              : "/default-profile.png"
+          }
           mutual={mutualStatus}
           currentUser={currentUser}
           targetUser={selectedProfile}
