@@ -13,8 +13,8 @@ const ActivityNav = () => {
   const [mutualStatus, setMutualStatus] = useState(false);
 
   const navigate = useNavigate();
-
   const { user: currentUser } = useAuth();
+
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,6 +30,7 @@ const ActivityNav = () => {
     ],
   };
 
+  // 보낸 하트 불러오기
   useEffect(() => {
     if (!currentUser?.user_id) {
       setIsLoading(false);
@@ -43,7 +44,7 @@ const ActivityNav = () => {
         );
         setData(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("보낸 하트 불러오기 실패:", err);
       } finally {
         setIsLoading(false);
       }
@@ -55,6 +56,7 @@ const ActivityNav = () => {
   // 쌍방 하트 체크
   useEffect(() => {
     if (!selectedProfile) return;
+
     const checkMutualHeart = async () => {
       try {
         const res = await axios.post("/api/hearts/mutual_check", null, {
@@ -68,9 +70,11 @@ const ActivityNav = () => {
         setMutualStatus(false);
       }
     };
-    checkMutualHeart();
-  }, [selectedProfile]);
 
+    checkMutualHeart();
+  }, [selectedProfile, currentUser]);
+
+  // 페이지네이션 계산
   const startIndex = (currentPage - 1) * itemsPerPage;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const currentData = data.slice(startIndex, startIndex + itemsPerPage);
@@ -110,7 +114,11 @@ const ActivityNav = () => {
             profileUser={profile}
             activity={`${profile.name}님께 하트를 보냈습니다.`}
             btn="채팅 시작"
-            profileImage={profile.photoUrl}
+            profileImage={
+              profile.photoUrl
+                ? `http://localhost:8080/uploads/${profile.photoUrl}`
+                : "/default-profile.png"
+            }
             onClick={() => {
               setSelectedProfile(profile);
               setIsModalOpen(true);
@@ -138,7 +146,11 @@ const ActivityNav = () => {
         <ActivityModal
           name={selectedProfile.name}
           activity={`${selectedProfile.name}님께 하트를 보냈습니다.`}
-          profileImage={selectedProfile.photoUrl}
+          profileImage={
+            selectedProfile.photoUrl
+              ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
+              : "/default-profile.png"
+          }
           mutual={mutualStatus}
           currentUser={currentUser}
           targetUser={selectedProfile}

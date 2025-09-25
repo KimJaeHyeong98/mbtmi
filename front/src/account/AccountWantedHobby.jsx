@@ -73,8 +73,6 @@ const AccountWantedHobby = () => {
         }
     };
 
-    console.log(formData);
-
     const handleNext = () => {
         const currentDe_Hobbies = selectedTags.length || [];
         if (currentDe_Hobbies.length === 0) {
