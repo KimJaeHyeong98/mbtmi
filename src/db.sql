@@ -145,7 +145,7 @@ SELECT p.post_id, p.user_id, p.text, p.image_url,
        u.name, u.mbti, u.location, u.photo_url, u.birth_date
 FROM posts p
          JOIN users u ON p.user_id = u.user_id
-ORDER BY p.created_at DESC
+ORDER BY p.created_at DESC;
 
 
 SELECT * from users order by user_id;
@@ -203,8 +203,58 @@ ALTER TABLE POSTS
 
 
 
-SELECT * from HEARTS where FROM_USER = 231;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 DELETE FROM HEARTS
 WHERE HEART_ID = 1940;
-    ADD (LIKE_COUNT NUMBER DEFAULT 0 NOT NULL);\
+    ADD (LIKE_COUNT NUMBER DEFAULT 0 NOT NULL);
+
+UPDATE USERS SET SELF_INTRO = '안녕하세요 채은성입니다' WHERE user_id = 147;
+UPDATE USERS SET NAME = '이서윤' WHERE user_id = 90;
+SELECT user_id,NAME, self_intro from USERS ORDER BY user_id;
+
+
+
+DELETE FROM USER_HOBBIES WHERE USER_ID = 255;
+DELETE FROM USER_TAGS WHERE USER_ID = 255;
+
+DELETE FROM USERS WHERE USER_ID = 255;
+
+SELECT * FROM USERS WHERE user_id = 255;
+
+
+SELECT * FROM USERS ORDER BY user_id;
+
+
+SELECT * FROM HEARTS WHERE FROM_USER = 255;
+SELECT * FROM HEARTS WHERE TO_USER = 255;
+DELETE FROM HEARTS WHERE HEART_ID = 1981;
+
+
+SELECT * FROM POST_LIKES WHERE user_id = 267;
+SELECT * FROM POSTS WHERE user_id = 267;
+
+
+SELECT * FROM USER_HOBBIES WHERE user_id = 267;
+SELECT * FROM USER_TAGS WHERE user_id = 267;
+

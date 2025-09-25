@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import logoimage from "../assets/img/mbtmi.jpg";
 
 const ActivityModal = ({
   name,
@@ -17,19 +18,20 @@ const ActivityModal = ({
     if (!mutual) return;
 
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         `/api/new_chat_create?fromUser=${currentUser.user_id}&toUser=${targetUser.userId}`
       );
       const room = {
-        roomId: response.data,
+        roomId: res.data,
         user1_id: currentUser.user_id,
         user2_id: targetUser.userId,
       };
       navigate(`/chat/${room.roomId}`, { state: { room } });
-    } catch (error) {
-      console.error("채팅방 생성 실패:", error);
+    } catch (err) {
+      console.error("채팅방 생성 실패:", err);
     }
   };
+
   return (
     <Overlay onClick={onClose}>
       <CardWrapper onClick={(e) => e.stopPropagation()}>

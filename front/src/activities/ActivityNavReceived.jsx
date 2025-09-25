@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import ActivityReceived from "./ActivityReceived";
 import ActivityModal from "./ActivityModal";
 import BottomNav from "../globaltool/BottomNav";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../main/AuthContext";
 import Activity from "./Activity";
 
 const ActivityNavReceived = () => {
@@ -14,8 +14,7 @@ const ActivityNavReceived = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
-  const location = useLocation();
-  const { currentUser } = location.state || {};
+  const { user: currentUser } = useAuth();
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,7 +53,7 @@ const ActivityNavReceived = () => {
     receivedActivities();
   }, [currentUser]);
 
-  // 상호하트 확인
+  // 상호 하트 확인
   useEffect(() => {
     if (!selectedProfile) return;
     const checkMutualHeart = async () => {
@@ -77,6 +76,29 @@ const ActivityNavReceived = () => {
     };
     checkMutualHeart();
   }, [selectedProfile]);
+
+  // 하트 보내기 처리
+  const handleSendHeart = async (targetUser) => {
+    try {
+      await axios.post("/api/hearts/send", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: targetUser.userId,
+        },
+      });
+
+      // 성공 후 mutualHeart 상태 true로 업데이트
+      const updatedData = data.map((p) =>
+        p.userId === targetUser.userId ? { ...p, mutualHeart: true } : p
+      );
+      setData(updatedData);
+
+      alert("하트를 보냈습니다! 💕");
+    } catch (err) {
+      console.error("하트 보내기 실패:", err);
+      alert("하트 보내기에 실패했습니다.");
+    }
+  };
 
   // 현재 페이지 데이터
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -175,10 +197,10 @@ const ActivityNavReceived = () => {
           mutual={selectedProfile.mutualHeart}
           currentUser={currentUser}
           targetUser={selectedProfile}
+          onSendHeart={() => handleSendHeart(selectedProfile)} // 💡 추가
           onClose={() => setIsModalOpen(false)}
         />
       )}
-
       <BottomNav currentUser={currentUser} />
     </Container>
   );
