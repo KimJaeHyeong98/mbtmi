@@ -70,7 +70,6 @@ const ActivityNavReceived = () => {
                         : p
                 );
                 setData(updatedData);
-                console.log("mutual 상태 (받은 쪽):", res.data);
             } catch (err) {
                 console.error("상호 하트 확인 실패:", err);
             }
