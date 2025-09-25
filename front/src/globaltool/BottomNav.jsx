@@ -45,7 +45,7 @@ const BottomNav = ({ currentUser }) => {
                 <NavBtn onClick={() => navigate("/todaypost")}>🔍</NavBtn>
                 <NavBtn
                     onClick={() =>
-                        navigate("/ActivityNav", { state: { currentUser } })
+                        navigate("/activityNav", { state: { currentUser } })
                     }>
                     ❤️
                 </NavBtn>

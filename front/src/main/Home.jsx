@@ -150,7 +150,6 @@ const Home = ({ homeState, setHomeState }) => {
 
   // const [randomUsers, setRandomUsers] = useState([]);
   const [randomUsers, setRandomUsers] = useState(homeState?.randomUsers || []);
-  // console.log(randomUsers);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState({
