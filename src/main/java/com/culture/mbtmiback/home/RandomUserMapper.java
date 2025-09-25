@@ -20,7 +20,7 @@ public interface RandomUserMapper {
 //                  )
 //                  WHERE ROWNUM <= 5
 //            """)
-//    List<RandomUserModel> findRandomUserExcept(@Param("currentUserId") Long currentUserId);
+//    ListloadRandomUsers findRandomUserExcept(@Param("currentUserId") Long currentUserId);
 
     @Select("""
                 SELECT *
@@ -61,5 +61,11 @@ public interface RandomUserMapper {
             "WHERE ut.TAG_ID = t.TAG_ID and  ut.USER_ID = #{userId} and ut.type = 'SELF'")
     List<TagModel> findTagsByUser(Long userId);
 
-
+    @Select("""
+    SELECT uh.user_id, uh.hobby_id, h.hobby_name, uh.type
+    FROM USER_HOBBIES uh
+    JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+    WHERE uh.user_id = #{userId} AND uh.type = 'SELF'
+""")
+    List<HobbyModel> findHobbiesByUser(Long userId);
 }

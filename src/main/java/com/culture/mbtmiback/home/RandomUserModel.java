@@ -19,6 +19,6 @@ public class RandomUserModel {
     private Date birth_date;
     private String location;
 
-
+    private List<HobbyModel> hobbies;
     private List<TagModel> tags;
 }
