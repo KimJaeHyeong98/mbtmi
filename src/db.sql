@@ -203,7 +203,27 @@ ALTER TABLE POSTS
 
 
 
-SELECT * from HEARTS where FROM_USER = 231;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 DELETE FROM HEARTS
 WHERE HEART_ID = 1940;
@@ -237,3 +257,4 @@ SELECT * FROM POSTS WHERE user_id = 267;
 
 SELECT * FROM USER_HOBBIES WHERE user_id = 267;
 SELECT * FROM USER_TAGS WHERE user_id = 267;
+
