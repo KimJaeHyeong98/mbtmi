@@ -71,19 +71,20 @@ const CardWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 300px;
-  height: 400px;
+  max-width: 300px;
+  height: 450px;
   background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
   padding: 20px;
   border-radius: 12px;
   z-index: 999;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  margin-bottom: 90px;
 `;
 const ProfileImage = styled.img`
-  width: 85%;
-  height: 280px;
+  width: 100%;
+  max-height: 350px; /* 최대 높이 제한 */
   border-radius: 20px;
-  object-fit: cover;
+  object-fit: cover; /* 비율 유지 + 넘치면 잘림 */
 `;
 const ActivityText = styled.p`
   text-align: center;
