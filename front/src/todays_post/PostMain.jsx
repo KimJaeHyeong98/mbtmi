@@ -150,13 +150,16 @@ const PostMain = () => {
                                 </Meta>
                             </User>
                             <MoreWrapper>
-                                <More onClick={() => toggleMenu(p.post_id)}>
-                                    ⋯
-                                </More>
-                                {openMenuId === p.post_id && (
-                                    <Menu>
-                                        {p.user_id === currentUserId ? (
-                                            <>
+                                {p.user_id === currentUserId && (
+                                    <>
+                                        <More
+                                            onClick={() =>
+                                                toggleMenu(p.post_id)
+                                            }>
+                                            ⋯
+                                        </More>
+                                        {openMenuId === p.post_id && (
+                                            <Menu>
                                                 <MenuItem
                                                     onClick={() =>
                                                         navigate(
@@ -171,16 +174,9 @@ const PostMain = () => {
                                                     }>
                                                     글 삭제하기
                                                 </MenuItem>
-                                            </>
-                                        ) : (
-                                            <MenuItem
-                                                onClick={() =>
-                                                    setOpenReportId(p.post_id)
-                                                }>
-                                                사용자 신고하기
-                                            </MenuItem>
+                                            </Menu>
                                         )}
-                                    </Menu>
+                                    </>
                                 )}
                             </MoreWrapper>
                         </Header>
@@ -358,6 +354,7 @@ const MenuItem = styled.button`
     display: block;
     width: 140px;
     padding: 10px 14px;
+    color: black;
     border: none;
     background: white;
     text-align: left;
