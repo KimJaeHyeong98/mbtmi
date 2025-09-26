@@ -29,6 +29,9 @@ public class RandomUserService {
 
         for (RandomUserModel row : rows) {
             row.setTags(randomUserMapper.findTagsByUser(row.getUser_id()));
+            row.setHobbies(randomUserMapper.findHobbiesByUser(row.getUser_id())); // 나의 취미
+            row.setDesiredHobbies(randomUserMapper.findHobbiesByDesiredUser(row.getUser_id())); // 원하는 상대방 태그
+            row.setDesiredTags(randomUserMapper.findTagsByDesiredUser(row.getUser_id())); // 원하는 상대방 취미
         }
         if (rows.isEmpty()) return List.of();
         System.out.println(rows);
