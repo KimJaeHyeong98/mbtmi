@@ -47,12 +47,40 @@ const PostMain = () => {
             setPosts((prev) =>
                 prev.map((p) =>
                     p.post_id === postId
-                        ? { ...p, liked: liked, like_count: likeCount }
+                        ? { ...p, liked, like_count: likeCount }
                         : p
                 )
             );
         } catch (err) {
             console.error("좋아요 실패:", err);
+        }
+    };
+
+    // 🚨 게시글 수정
+    const handleEdit = async (postId, newText) => {
+        try {
+            await axios.put(`/posts/${postId}`, { text: newText });
+            setPosts((prev) =>
+                prev.map((p) =>
+                    p.post_id === postId ? { ...p, text: newText } : p
+                )
+            );
+            alert("게시글이 수정되었습니다!");
+        } catch (err) {
+            console.error("게시글 수정 실패:", err);
+            alert("수정에 실패했습니다.");
+        }
+    };
+
+    // 🚨 게시글 삭제
+    const handleDelete = async (postId) => {
+        if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+        try {
+            await axios.delete(`/posts/${postId}`);
+            setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+        } catch (err) {
+            console.error("게시글 삭제 실패:", err);
+            alert("삭제에 실패했습니다.");
         }
     };
 
@@ -62,7 +90,6 @@ const PostMain = () => {
             alert("신고 사유와 내용을 입력해주세요.");
             return;
         }
-
         try {
             await axios.post("/reports", {
                 reported_id: reportedUserId,
@@ -70,7 +97,6 @@ const PostMain = () => {
                 reason: reportReason,
                 content: reportContent,
             });
-
             alert("신고가 접수되었습니다.");
             setOpenReportId(null);
             setReportReason("");
@@ -83,35 +109,6 @@ const PostMain = () => {
 
     const toggleMenu = (id) => {
         setOpenMenuId((prev) => (prev === id ? null : id));
-    };
-
-    const handleDelete = async (postId) => {
-        if (!window.confirm("정말로 삭제하시겠습니까?")) return;
-
-        try {
-            await axios.delete(`/posts/${postId}`);
-            setPosts((prev) => prev.filter((p) => p.post_id !== postId));
-        } catch (err) {
-            console.error("게시글 삭제 실패:", err);
-            alert("삭제에 실패했습니다.");
-        }
-    };
-
-    const handleEdit = async (postId, newText) => {
-        try {
-            const res = await axios.put(`/posts/${postId}`, { text: newText });
-
-            setPosts((prev) =>
-                prev.map((p) =>
-                    p.post_id === postId ? { ...p, text: newText } : p
-                )
-            );
-
-            alert("게시글이 수정되었습니다!");
-        } catch (err) {
-            console.error("게시글 수정 실패:", err);
-            alert("수정에 실패했습니다.");
-        }
     };
 
     return (
@@ -150,16 +147,13 @@ const PostMain = () => {
                                 </Meta>
                             </User>
                             <MoreWrapper>
-                                {p.user_id === currentUserId && (
-                                    <>
-                                        <More
-                                            onClick={() =>
-                                                toggleMenu(p.post_id)
-                                            }>
-                                            ⋯
-                                        </More>
-                                        {openMenuId === p.post_id && (
-                                            <Menu>
+                                <More onClick={() => toggleMenu(p.post_id)}>
+                                    ⋯
+                                </More>
+                                {openMenuId === p.post_id && (
+                                    <Menu>
+                                        {p.user_id === currentUserId ? (
+                                            <>
                                                 <MenuItem
                                                     onClick={() =>
                                                         navigate(
@@ -174,9 +168,16 @@ const PostMain = () => {
                                                     }>
                                                     글 삭제하기
                                                 </MenuItem>
-                                            </Menu>
+                                            </>
+                                        ) : (
+                                            <MenuItem
+                                                onClick={() =>
+                                                    setOpenReportId(p.post_id)
+                                                }>
+                                                사용자 신고하기
+                                            </MenuItem>
                                         )}
-                                    </>
+                                    </Menu>
                                 )}
                             </MoreWrapper>
                         </Header>
@@ -354,7 +355,6 @@ const MenuItem = styled.button`
     display: block;
     width: 140px;
     padding: 10px 14px;
-    color: black;
     border: none;
     background: white;
     text-align: left;
