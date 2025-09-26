@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ActivityModal from "./ActivityModal";
 import { useAuth } from "../main/AuthContext";
+import logoimage from "../assets/img/mbtmi.jpg";
 
 const ActivityNav = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,27 +79,29 @@ const ActivityNav = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const currentData = data.slice(startIndex, startIndex + itemsPerPage);
-
+  console.log(logoimage);
   return (
     <Container>
       {/* 상단 네비 */}
-      <Nav>
-        <Name>{like.name} - 보낸 내역</Name>
-        <Btns>
-          {activityGiveTake.btn.map((btn, index) => (
-            <Btnb
-              key={index}
-              onClick={() =>
-                navigate(btn.path, {
-                  state: { currentUser },
-                })
-              }
-            >
-              {btn.label}
-            </Btnb>
-          ))}
-        </Btns>
-      </Nav>
+      <Div>
+        <Nav>
+          <Name>{like.name} - 보낸 내역</Name>
+          <Btns>
+            {activityGiveTake.btn.map((btn, index) => (
+              <Btnb
+                key={index}
+                onClick={() =>
+                  navigate(btn.path, {
+                    state: { currentUser },
+                  })
+                }
+              >
+                {btn.label}
+              </Btnb>
+            ))}
+          </Btns>
+        </Nav>
+      </Div>
 
       {/* 로딩 / 데이터 없음 / 데이터 있을 때 */}
       {isLoading && <Message>활동 내역을 불러오는 중...</Message>}
@@ -117,7 +120,7 @@ const ActivityNav = () => {
             profileImage={
               profile.photoUrl
                 ? `http://localhost:8080/uploads/${profile.photoUrl}`
-                : "/default-profile.png"
+                : logoimage
             }
             onClick={() => {
               setSelectedProfile(profile);
@@ -149,7 +152,7 @@ const ActivityNav = () => {
           profileImage={
             selectedProfile.photoUrl
               ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
-              : "/default-profile.png"
+              : logoimage
           }
           mutual={mutualStatus}
           currentUser={currentUser}
@@ -162,6 +165,11 @@ const ActivityNav = () => {
     </Container>
   );
 };
+const Div = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -205,6 +213,7 @@ const Pagination = styled.div`
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  justify-content: center;
   gap: 8px;
   padding: 10px 16px;
   border-radius: 12px;

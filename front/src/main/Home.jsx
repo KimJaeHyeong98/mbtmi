@@ -53,19 +53,19 @@ const Card = styled.div`
 `;
 
 const ProfileImageWrapper = styled.div`
-  width: 270px;
-  height: 320px;
+  width: 300px;
+  height: 380px;
   border-radius: 20px;
   overflow: hidden; /* 넘치면 숨김 */
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f5f5; /* 이미지 없는 경우 대비 배경 */
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
 `;
 const ProfileImage = styled.img`
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 꽉 채우고 잘라냄 */
+  // object-fit: cover; /* 꽉 채우고 잘라냄 */
   object-position: center; /* 중앙 기준 */
 `;
 
@@ -135,6 +135,20 @@ const SettingButton = styled.button`
   padding: 7px 10px;
   border-radius: 16px;
   cursor: pointer;
+  width: 55px;
+`;
+const PhotoButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 330px;
+  appearance: none;
+  border: none;
+  background: #000000ff;
+  font-size: 24px;
+  padding: 7px 10px;
+  border-radius: 16px;
+  cursor: pointer;
+  width: 55px;
 `;
 
 const GuideText = styled.div`
@@ -142,6 +156,29 @@ const GuideText = styled.div`
   color: #fff;
   font-size: 14px;
   text-align: center;
+`;
+const PhotoModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+`;
+
+const ModalWrapper = styled.div`
+  display: flex;
 `;
 
 const Home = ({ homeState, setHomeState }) => {
@@ -152,6 +189,8 @@ const Home = ({ homeState, setHomeState }) => {
   const [randomUsers, setRandomUsers] = useState(homeState?.randomUsers || []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
   const [filter, setFilter] = useState({
     gender: null,
     ageDown: null,
@@ -317,7 +356,7 @@ const Home = ({ homeState, setHomeState }) => {
       console.error("관심없음 요청 실패:", err);
     }
   };
-
+  console.log(logoimage);
   return (
     <Container>
       <LogoImage
@@ -333,22 +372,15 @@ const Home = ({ homeState, setHomeState }) => {
             {randomUsers.map((user) => (
               <CardItem key={user.user_id}>
                 <Card>
-                  <SettingButton onClick={() => setIsModalOpen(true)}>
-                    ☰
-                  </SettingButton>
+                  <ModalWrapper>
+                    <PhotoButton onClick={() => setIsPhotoModalOpen(true)}>
+                      🖼️
+                    </PhotoButton>
+                    <SettingButton onClick={() => setIsModalOpen(true)}>
+                      ☰
+                    </SettingButton>
+                  </ModalWrapper>
                   <div>
-                    {/* 프로필 이미지 */}
-                    <ProfileImageWrapper>
-                      <ProfileImage
-                        src={
-                          user?.photo_url
-                            ? `http://localhost:8080/uploads/${user.photo_url}`
-                            : "/default-profile.png"
-                        }
-                        alt={`${user?.name} 프로필`}
-                        draggable={false}
-                      />
-                    </ProfileImageWrapper>
                     <Name>{user.name}</Name>
                     <P>MBTI: {user.mbti}</P>
                     <P>{user.self_intro}</P>
@@ -404,6 +436,23 @@ const Home = ({ homeState, setHomeState }) => {
           fetchMyActions();
         }}
       />
+      {isPhotoModalOpen && (
+        <PhotoModal onClick={() => setIsPhotoModalOpen(false)}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <ProfileImageWrapper>
+              <ProfileImage
+                src={
+                  randomUsers[currentIndex]?.photo_url
+                    ? `http://localhost:8080/uploads/${randomUsers[currentIndex].photo_url}`
+                    : logoimage
+                }
+                alt={`${randomUsers[currentIndex]?.name} 프로필`}
+                draggable={false}
+              />
+            </ProfileImageWrapper>
+          </ModalContent>
+        </PhotoModal>
+      )}
     </Container>
   );
 };
