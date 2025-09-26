@@ -115,7 +115,7 @@ const PostMain = () => {
   return (
     <Post>
       {posts.length === 0 ? (
-        <p>게시글이 아직 없습니다.</p>
+        <p>loading ...</p>
       ) : (
         posts.map((p) => (
           <PostCard key={p.post_id}>
@@ -146,11 +146,11 @@ const PostMain = () => {
                 </Meta>
               </User>
               <MoreWrapper>
-                <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
-                {openMenuId === p.post_id && (
-                  <Menu>
-                    {p.user_id === currentUserId ? (
-                      <>
+                {p.user_id === currentUserId && (
+                  <>
+                    <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
+                    {openMenuId === p.post_id && (
+                      <Menu>
                         <MenuItem
                           onClick={() => navigate(`/updatepost/${p.post_id}`)}
                         >
@@ -159,13 +159,9 @@ const PostMain = () => {
                         <MenuItem onClick={() => handleDelete(p.post_id)}>
                           글 삭제하기
                         </MenuItem>
-                      </>
-                    ) : (
-                      <MenuItem onClick={() => setOpenReportId(p.post_id)}>
-                        사용자 신고하기
-                      </MenuItem>
+                      </Menu>
                     )}
-                  </Menu>
+                  </>
                 )}
               </MoreWrapper>
             </Header>
@@ -336,6 +332,7 @@ const MenuItem = styled.button`
   background: white;
   text-align: left;
   font-size: 15px;
+  color: black;
   cursor: pointer;
   &:hover {
     background: #f3f3f3;

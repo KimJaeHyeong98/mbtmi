@@ -75,11 +75,11 @@ const ActivityNav = () => {
     checkMutualHeart();
   }, [selectedProfile, currentUser]);
 
-  // 페이지네이션 계산
+  // 페이지네이션 데이터
   const startIndex = (currentPage - 1) * itemsPerPage;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const currentData = data.slice(startIndex, startIndex + itemsPerPage);
-  console.log(logoimage);
+
   return (
     <Container>
       {/* 상단 네비 */}
