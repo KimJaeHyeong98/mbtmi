@@ -20,5 +20,8 @@ public class RandomUserModel {
     private String location;
 
 
+    private List<HobbyModel> hobbies;
     private List<TagModel> tags;
+    private List<HobbyModel> desiredHobbies;
+    private List<TagModel> desiredTags;
 }

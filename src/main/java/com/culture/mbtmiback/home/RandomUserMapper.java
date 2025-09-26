@@ -51,4 +51,30 @@ public interface RandomUserMapper {
     List<TagModel> findTagsByUser(Long userId);
 
 
+    @Select("""
+                SELECT uh.user_id, uh.hobby_id, h.hobby_name, uh.type
+                FROM USER_HOBBIES uh
+                JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+                WHERE uh.user_id = #{userId} AND uh.type = 'SELF'
+            """)
+    List<HobbyModel> findHobbiesByUser(Long userId);
+
+    @Select("""
+                SELECT uh.user_id, uh.hobby_id, h.hobby_name, uh.type
+                FROM USER_HOBBIES uh
+                JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+                WHERE uh.user_id = #{userId} AND uh.type = 'DESIRED'
+            """)
+    List<HobbyModel> findHobbiesByDesiredUser(Long userId);
+
+
+    @Select("""
+             SELECT ut.user_id, ut.tag_id, t.tag_name, ut.type
+             FROM USER_TAGS ut
+                      JOIN TAGS t ON ut.tag_id = t.tag_id
+             WHERE ut.user_id = #{userId} AND ut.type = 'DESIRED'
+            """)
+    List<TagModel> findTagsByDesiredUser(Long userId);
+
+
 }
