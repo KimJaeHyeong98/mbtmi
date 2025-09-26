@@ -10,18 +10,6 @@ import java.util.List;
 @Mapper
 public interface RandomUserMapper {
 
-//    @Select("""
-//                  SELECT *
-//                  FROM (
-//                      SELECT USER_ID, USERNAME, NAME, MBTI, DESIRED_MBTI, SELF_INTRO, PHOTO_URL
-//                      FROM USERS
-//                      WHERE USER_ID != #{currentUserId} AND USER_ID != 1
-//                      ORDER BY DBMS_RANDOM.VALUE
-//                  )
-//                  WHERE ROWNUM <= 5
-//            """)
-//    List<RandomUserModel> findRandomUserExcept(@Param("currentUserId") Long currentUserId);
-
     @Select("""
                 SELECT *
                 FROM (
