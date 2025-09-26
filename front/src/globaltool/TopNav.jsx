@@ -5,7 +5,7 @@ const TopNav = () => {
   return (
     <TopBar>
       <TopBow>
-        <Button>오늘의 글</Button>
+        <Button>TMI</Button>
       </TopBow>
       <hr />
     </TopBar>
