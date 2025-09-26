@@ -10,6 +10,7 @@ const Activity = ({
   onClick,
   onDelete,
   profileUser,
+  profileImage,
 }) => {
   const delHeartHandler = async (e) => {
     e.stopPropagation();
@@ -35,11 +36,7 @@ const Activity = ({
       <ProfileBlock>
         {/* 프로필 이미지 */}
         <ProfileImage
-          src={
-            profileUser?.photoUrl
-              ? `http://localhost:8080/uploads/${profileUser.photoUrl}`
-              : "/default-profile.png"
-          }
+          src={profileImage ?? logoimage} // profileImage가 있으면 그대로, 없으면 기본 이미지
           alt={`${profileUser?.name} 프로필`}
           draggable={false}
         />
@@ -54,6 +51,7 @@ const Activity = ({
 };
 
 export default Activity;
+
 const Btn = styled.button`
   padding: 5px 10px;
   border: none;
@@ -64,7 +62,7 @@ const Btn = styled.button`
 `;
 /* ===== styled ===== */
 const Container = styled.div`
-  margin: 10px 0;
+  margin: 15px 0;
   min-width: 350px;
   display: flex;
   flex-direction: column;

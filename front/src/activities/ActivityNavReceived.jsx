@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../main/AuthContext";
 import ActivityReceived from "./ActivityReceived";
-
+import logoimage from "../assets/img/mbtmi.jpg";
 const ActivityNavReceived = () => {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -163,7 +163,7 @@ const ActivityNavReceived = () => {
           profileImage={
             selectedProfile.photoUrl
               ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
-              : "/default-profile.png"
+              : logoimage // import된 기본 이미지 사용
           }
           mutual={selectedProfile.mutualHeart}
           currentUser={currentUser}
@@ -176,7 +176,6 @@ const ActivityNavReceived = () => {
     </Container>
   );
 };
-
 // styled-components
 const Div = styled.div`
   display: flex;

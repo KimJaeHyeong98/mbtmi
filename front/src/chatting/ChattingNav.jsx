@@ -10,15 +10,15 @@ const ChattingNav = () => {
   // room이 없으면 기본 값 사용
   const opponentName = room?.opponent_name || "이름 없음";
   const opponentPic = room?.opponent_pic
-    ? `/uploads/${room.opponent_pic}` // public/uploads 기준
-    : profileImg;
+    ? `http://localhost:8080/uploads/${room.opponent_pic}` // 백엔드 서버 URL 기준
+    : profileImg; // 기본 이미지
 
   return (
     <HeaderContainer>
       <LeftSection>
         <BackButton onClick={() => navigate(-1)}>{"<"}</BackButton>
-        {/* <Profile src={profileImg} alt="프로필" />
-         */}
+        {/* <Profile src={profileImg} alt="프로필" /> */}
+
         <Profile src={opponentPic} alt="프로필" />
         <NameSection>
           {/* <Name>유지aa민</Name> */}
