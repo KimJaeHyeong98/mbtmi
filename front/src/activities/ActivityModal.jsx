@@ -37,8 +37,6 @@ const ActivityModal = ({
       <CardWrapper onClick={(e) => e.stopPropagation()}>
         <ProfileImage
           src={
-
-
             profileImage === logoimage
               ? logoimage // import된 기본 이미지 그대로 사용
               : profileImage
