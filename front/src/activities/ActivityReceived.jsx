@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import axios from "axios";
-
+import logoimage from "../assets/img/mbtmi.jpg";
 const ActivityReceived = ({
   profile,
   currentUser,
@@ -44,7 +44,7 @@ const ActivityReceived = ({
             src={
               profile.photoUrl
                 ? `http://localhost:8080/uploads/${profile.photoUrl}`
-                : "/default-profile.png"
+                : logoimage // import된 기본 이미지 사용
             }
             alt={`${profile.name} 프로필`}
             draggable={false}

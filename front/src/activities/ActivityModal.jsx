@@ -37,7 +37,11 @@ const ActivityModal = ({
       <CardWrapper onClick={(e) => e.stopPropagation()}>
         <ProfileImage
           src={
-            profileImage
+
+
+            profileImage === logoimage
+              ? logoimage // import된 기본 이미지 그대로 사용
+              : profileImage
               ? profileImage.startsWith("http")
                 ? profileImage
                 : `http://localhost:8080/${profileImage}`
@@ -55,7 +59,6 @@ const ActivityModal = ({
   );
 };
 
-/* ===== styled ===== */
 const Overlay = styled.div`
   position: fixed;
   inset: 0;

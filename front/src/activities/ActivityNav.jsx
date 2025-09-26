@@ -6,30 +6,32 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ActivityModal from "./ActivityModal";
 import { useAuth } from "../main/AuthContext";
+import logoimage from "../assets/img/mbtmi.jpg";
 
 const ActivityNav = () => {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [mutualStatus, setMutualStatus] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
 
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   const like = { name: "Like💜" };
+
   const activityGiveTake = {
     btn: [
       { label: "보낸 내역", path: "/activityNav" },
-      { label: "받은 내역", path: "/activityNavReceived" },
+      { label: "받은 내역", path: "/ActivityNavReceived" },
     ],
   };
 
-  // 하트 보낸 내역 불러오기
+  // 보낸 하트 불러오기
   useEffect(() => {
     if (!currentUser?.user_id) {
       setIsLoading(false);
@@ -43,7 +45,7 @@ const ActivityNav = () => {
         );
         setData(res.data);
       } catch (err) {
-        console.error("하트 내역 불러오기 실패:", err);
+        console.error("보낸 하트 불러오기 실패:", err);
       } finally {
         setIsLoading(false);
       }
@@ -52,7 +54,7 @@ const ActivityNav = () => {
     fetchActivities();
   }, [currentUser]);
 
-  // 쌍방 하트 확인
+  // 쌍방 하트 체크
   useEffect(() => {
     if (!selectedProfile) return;
 
@@ -66,7 +68,6 @@ const ActivityNav = () => {
         });
         setMutualStatus(res.data);
       } catch (err) {
-        console.error("mutual 상태 불러오기 실패:", err);
         setMutualStatus(false);
       }
     };
@@ -74,11 +75,11 @@ const ActivityNav = () => {
     checkMutualHeart();
   }, [selectedProfile, currentUser]);
 
-  // 페이지네이션 데이터
+  // 페이지네이션 계산
   const startIndex = (currentPage - 1) * itemsPerPage;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const currentData = data.slice(startIndex, startIndex + itemsPerPage);
-
+  console.log(logoimage);
   return (
     <Container>
       {/* 상단 네비 */}
@@ -107,6 +108,7 @@ const ActivityNav = () => {
       {!isLoading && data.length === 0 && (
         <Message>누른 내역이 없습니다.</Message>
       )}
+
       {!isLoading &&
         data.length > 0 &&
         currentData.map((profile, idx) => (
@@ -118,7 +120,7 @@ const ActivityNav = () => {
             profileImage={
               profile.photoUrl
                 ? `http://localhost:8080/uploads/${profile.photoUrl}`
-                : "/default-profile.png"
+                : logoimage
             }
             onClick={() => {
               setSelectedProfile(profile);
@@ -150,7 +152,7 @@ const ActivityNav = () => {
           profileImage={
             selectedProfile.photoUrl
               ? `http://localhost:8080/uploads/${selectedProfile.photoUrl}`
-              : "/default-profile.png"
+              : logoimage
           }
           mutual={mutualStatus}
           currentUser={currentUser}
@@ -163,15 +165,12 @@ const ActivityNav = () => {
     </Container>
   );
 };
-
-// styled-components
 const Div = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-/* ===== styled-components ===== */
 const Container = styled.div`
   min-height: 100dvh;
   width: 100vw;
@@ -186,18 +185,15 @@ const Container = styled.div`
 const Nav = styled.div`
   margin-top: 30px;
 `;
-
 const Name = styled.h2`
   margin-bottom: 10px;
   font-size: 25pt;
 `;
-
 const Btns = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
 `;
-
 const Btnb = styled.button`
   padding: 6px 12px;
   border-radius: 10px;
@@ -205,7 +201,6 @@ const Btnb = styled.button`
   opacity: 80%;
   cursor: pointer;
 `;
-
 const Message = styled.div`
   text-align: center;
   margin-top: 50px;
@@ -218,6 +213,7 @@ const Pagination = styled.div`
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  justify-content: center;
   gap: 8px;
   padding: 10px 16px;
   border-radius: 12px;
