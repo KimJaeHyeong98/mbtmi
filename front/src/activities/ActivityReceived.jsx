@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import profileimage from "../assets/img/kar.jpg";
 import axios from "axios";
 
 const ActivityReceived = ({
@@ -27,6 +26,7 @@ const ActivityReceived = ({
       console.error("하트 토글 실패:", err);
     }
   };
+
   return (
     <Container>
       <ProfileBlock>
@@ -42,8 +42,8 @@ const ActivityReceived = ({
         >
           <ProfileImage
             src={
-              profile.photo_url
-                ? `http://localhost:8080/uploads/${profile.photo_url}`
+              profile.photoUrl
+                ? `http://localhost:8080/uploads/${profile.photoUrl}`
                 : "/default-profile.png"
             }
             alt={`${profile.name} 프로필`}
@@ -59,6 +59,7 @@ const ActivityReceived = ({
   );
 };
 
+// styled-components
 const Container = styled.div`
   margin: 10px 0;
   min-width: 350px;
@@ -92,6 +93,7 @@ const Btn = styled.button`
   border-radius: 10px;
   font-size: 12px;
   opacity: 80%;
+  cursor: pointer;
 `;
 
 export default ActivityReceived;

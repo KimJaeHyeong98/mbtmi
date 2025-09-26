@@ -9,18 +9,54 @@ import PlusImg from "../assets/img/plus.png";
 
 const PostMain = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // ✅ 로그인된 사용자 정보
-  const currentUserId = user?.user_id; // ✅ 로그인한 사용자 id
+  const { user } = useAuth();
+  const currentUserId = user?.user_id;
   const [openProfile, setOpenProfile] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [profileUser, setProfileUser] = useState(null); // 선택된 프로필 유저 저장
+  const [profileUser, setProfileUser] = useState(null);
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
   const [openReportId, setOpenReportId] = useState(null);
   const [reportReason, setReportReason] = useState("");
   const [reportContent, setReportContent] = useState("");
 
-  // 신고 제출
+  // 🚨 서버에서 게시글 가져오기
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await axios.get("/posts/postsmain");
+        setPosts(res.data);
+      } catch (err) {
+        console.error("게시글 불러오기 실패:", err);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  // 🚨 좋아요 토글 (DB 반영)
+  const toggleLike = async (postId) => {
+    if (!user) return alert("로그인이 필요합니다!");
+
+    try {
+      const res = await axios.post(`${API_BASE}/posts/toggleLike`, null, {
+        params: { postId, userId: user.user_id },
+        withCredentials: true,
+      });
+
+      const { liked, likeCount } = res.data;
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.post_id === postId
+            ? { ...p, liked: liked, like_count: likeCount }
+            : p
+        )
+      );
+    } catch (err) {
+      console.error("좋아요 실패:", err);
+    }
+  };
+
+  // 🚨 신고 제출
   const handleReportSubmit = async (reportedUserId) => {
     if (!reportReason || !reportContent) {
       alert("신고 사유와 내용을 입력해주세요.");
@@ -36,7 +72,6 @@ const PostMain = () => {
       });
 
       alert("신고가 접수되었습니다.");
-      // 초기화
       setOpenReportId(null);
       setReportReason("");
       setReportContent("");
@@ -46,103 +81,41 @@ const PostMain = () => {
     }
   };
 
-  // 서버에서 게시글 가져오기
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await axios.get("/posts/postsmain");
-        console.log("서버 응답:", res.data);
-        setPosts(res.data);
-      } catch (err) {
-        console.error("게시글 불러오기 실패:", err);
-      }
-    };
-    fetchPosts();
-  }, []);
+  const toggleMenu = (id) => {
+    setOpenMenuId((prev) => (prev === id ? null : id));
+  };
 
-  // 좋아요 토글
-  const toggleLike = (id) => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.post_id === id
-          ? {
-              ...p,
-              liked: !p.liked,
-              like_count: p.liked ? p.like_count - 1 : p.like_count + 1,
-            }
-          : p
-      )
-    );
-    // 좋아요 토글 (DB 반영 + 화면 업데이트)
-    const toggleLike = async (postId) => {
-      if (!user) return alert("로그인이 필요합니다!");
+  const handleDelete = async (postId) => {
+    if (!window.confirm("정말로 삭제하시겠습니까?")) return;
 
-      try {
-        // 1️⃣ 서버 요청
-        const res = await axios.post(
-          `${API_BASE}/posts/toggleLike`,
-          null, // POST body는 없음
-          {
-            params: { postId, userId: user.user_id },
-            withCredentials: true,
-          }
-        );
+    try {
+      await axios.delete(`/posts/${postId}`);
+      setPosts((prev) => prev.filter((p) => p.post_id !== postId));
+    } catch (err) {
+      console.error("게시글 삭제 실패:", err);
+      alert("삭제에 실패했습니다.");
+    }
+  };
 
-        // 2️⃣ 응답 반영
-        const { liked, likeCount } = res.data;
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.post_id === postId
-              ? { ...p, liked: liked, like_count: likeCount }
-              : p
-          )
-        );
-      } catch (err) {
-        console.error("좋아요 실패:", err);
-      }
-    };
+  const handleEdit = async (postId, newText) => {
+    try {
+      const res = await axios.put(`/posts/${postId}`, { text: newText });
 
-    // "더보기" 메뉴 토글
-    const toggleMenu = (id) => {
-      setOpenMenuId((prev) => (prev === id ? null : id));
-    };
+      setPosts((prev) =>
+        prev.map((p) => (p.post_id === postId ? { ...p, text: newText } : p))
+      );
 
-    const handleDelete = async (postId) => {
-      if (!window.confirm("정말로 삭제하시겠습니까?")) return;
-
-      try {
-        await axios.delete(`/posts/${postId}`);
-        setPosts((prev) => prev.filter((p) => p.post_id !== postId));
-      } catch (err) {
-        console.error("게시글 삭제 실패:", err);
-        alert("삭제에 실패했습니다.");
-      }
-    };
-
-    const handleEdit = async (postId) => {
-      try {
-        const res = await axios.put(`/posts/${postId}`, {
-          text: newText, // 바꿀 내용
-          // 필요하다면 imageUrl 같은 다른 필드도 함께
-        });
-
-        // 백엔드가 성공적으로 응답하면 프론트 state도 업데이트
-        setPosts((prev) =>
-          prev.map((p) => (p.post_id === postId ? { ...p, text: newText } : p))
-        );
-
-        alert("게시글이 수정되었습니다!");
-      } catch (err) {
-        console.error("게시글 수정 실패:", err);
-        alert("수정에 실패했습니다.");
-      }
-    };
+      alert("게시글이 수정되었습니다!");
+    } catch (err) {
+      console.error("게시글 수정 실패:", err);
+      alert("수정에 실패했습니다.");
+    }
   };
 
   return (
     <Post>
       {posts.length === 0 ? (
-        <p>게시글이 아직 없습니다.</p>
+        <p>loading ...</p>
       ) : (
         posts.map((p) => (
           <PostCard key={p.post_id}>
@@ -157,12 +130,11 @@ const PostMain = () => {
                   }
                   alt="프로필"
                   onClick={() => {
-                    setProfileUser(p); // 클릭한 게시글 작성자의 데이터 저장
+                    setProfileUser(p);
                     setOpenProfile(true);
                   }}
                   style={{ cursor: "pointer" }}
                 />
-
                 <Meta>
                   <div className="name">
                     <strong>{p.name}</strong>{" "}
@@ -174,11 +146,11 @@ const PostMain = () => {
                 </Meta>
               </User>
               <MoreWrapper>
-                <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
-                {openMenuId === p.post_id && (
-                  <Menu>
-                    {p.user_id === currentUserId ? (
-                      <>
+                {p.user_id === currentUserId && (
+                  <>
+                    <More onClick={() => toggleMenu(p.post_id)}>⋯</More>
+                    {openMenuId === p.post_id && (
+                      <Menu>
                         <MenuItem
                           onClick={() => navigate(`/updatepost/${p.post_id}`)}
                         >
@@ -187,26 +159,20 @@ const PostMain = () => {
                         <MenuItem onClick={() => handleDelete(p.post_id)}>
                           글 삭제하기
                         </MenuItem>
-                      </>
-                    ) : (
-                      <>
-                        <MenuItem onClick={() => setOpenReportId(p.post_id)}>
-                          사용자 신고하기
-                        </MenuItem>
-                      </>
+                      </Menu>
                     )}
-                  </Menu>
+                  </>
                 )}
               </MoreWrapper>
             </Header>
 
             {/* 게시글 이미지 */}
-            {p.image_url ? (
+            {p.image_url && (
               <Photo
                 src={`http://localhost:8080/uploads/${p.image_url}`}
                 alt="게시글 이미지"
               />
-            ) : null}
+            )}
 
             {/* 게시글 텍스트 */}
             {p.text && <Caption>{p.text}</Caption>}
@@ -219,7 +185,7 @@ const PostMain = () => {
               <span>{p.like_count}</span>
             </Actions>
 
-            {/* ✅ 조건부 렌더링: 신고 입력창 */}
+            {/* 신고창 */}
             {openReportId === p.post_id && (
               <ReportBox>
                 <input
@@ -233,13 +199,6 @@ const PostMain = () => {
                   value={reportContent}
                   onChange={(e) => setReportContent(e.target.value)}
                 />
-
-                <textarea
-                  placeholder="신고 상세 내역"
-                  value={reportContent}
-                  onChange={(e) => setReportContent(e.target.value)}
-                />
-
                 <button onClick={() => handleReportSubmit(p.user_id)}>
                   신고 제출
                 </button>
@@ -251,11 +210,11 @@ const PostMain = () => {
           </PostCard>
         ))
       )}
-      {/* 모달 */}
+
       {openProfile && (
         <ProfileModal
           onClose={() => setOpenProfile(false)}
-          profileUser={profileUser} // 작성자 정보 전달
+          profileUser={profileUser}
         />
       )}
       <PostBtn onClick={() => navigate("/addpost")}>
@@ -266,7 +225,6 @@ const PostMain = () => {
 };
 
 /* ===== 스타일 ===== */
-
 const Post = styled.main`
   flex: 1;
   overflow-y: auto;
@@ -374,6 +332,7 @@ const MenuItem = styled.button`
   background: white;
   text-align: left;
   font-size: 15px;
+  color: black;
   cursor: pointer;
   &:hover {
     background: #f3f3f3;
@@ -420,7 +379,6 @@ const Divider = styled.hr`
   margin: 18px 0 6px;
 `;
 
-//아래는 조건부 랜더링 창 스타일드 컴포넌트
 const ReportBox = styled.div`
   display: flex;
   flex-direction: column;
