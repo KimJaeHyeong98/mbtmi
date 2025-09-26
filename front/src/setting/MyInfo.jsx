@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../main/AuthContext";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../globaltool/BottomNav.jsx";
+import defaultProfile from "../assets/img/mbtmi.jpg";
 
 const MyInfo = () => {
   const [name, setName] = useState("");

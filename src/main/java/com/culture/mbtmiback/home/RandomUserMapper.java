@@ -25,6 +25,7 @@ public interface RandomUserMapper {
                     FROM USERS
                     WHERE USER_ID != #{currentUserId}
                      AND USER_ID != 1
+                    AND PHOTO_URL IS NOT NULL   -- ✅ photo_url 조건 추가
                      AND (#{gender,jdbcType=VARCHAR} IS NULL OR NVL(GENDER, 'UNKNOWN') = #{gender,jdbcType=VARCHAR})
                      AND (#{location,jdbcType=VARCHAR} IS NULL OR LOCATION = #{location,jdbcType=VARCHAR})
                      AND (
