@@ -43,6 +43,7 @@ const ActivityNav = () => {
         const res = await axios.get(
           `/api/hearts/hearted/${currentUser.user_id}`
         );
+        console.log(res.data);
         setData(res.data);
       } catch (err) {
         console.error("보낸 하트 불러오기 실패:", err);
@@ -113,9 +114,11 @@ const ActivityNav = () => {
         currentData.map((profile, idx) => (
           <Activity
             key={startIndex + idx}
+            profile={profile} // 추가
             profileUser={profile}
+            currentUser={currentUser} // 이게 빠지면 undefined
             activity={`${profile.name}님께 하트를 보냈습니다.`}
-            btn="채팅 시작"
+            btn="하트 취소"
             profileImage={
               profile.photoUrl
                 ? `http://localhost:8080/uploads/${profile.photoUrl}`
@@ -124,6 +127,10 @@ const ActivityNav = () => {
             onClick={() => {
               setSelectedProfile(profile);
               setIsModalOpen(true);
+            }}
+            // 여기서 onDelete 전달
+            onDelete={(userId) => {
+              setData((prev) => prev.filter((item) => item.userId !== userId));
             }}
           />
         ))}
