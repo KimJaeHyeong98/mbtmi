@@ -12,10 +12,11 @@ const Activity = ({
   profileUser,
   profileImage,
 }) => {
+  console.log("currentUser:", currentUser);
   const delHeartHandler = async (e) => {
     e.stopPropagation();
     if (!currentUser || !currentUser.user_id) {
-      // console.error("currentUser가 없습니다.");
+      console.error("currentUser가 없습니다.");
       return;
     }
     try {
