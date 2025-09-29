@@ -62,10 +62,6 @@ const AccountMbti = () => {
                 ))}
             </Picker>
 
-            <Selected>
-                선택:{" "}
-                {activeIndex !== null ? mbtiTypes[activeIndex] : "선택 없음"}
-            </Selected>
             <NextButton onClick={handleDeMbti}>다음으로</NextButton>
         </Page>
     );

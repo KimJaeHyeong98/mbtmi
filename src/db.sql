@@ -230,6 +230,9 @@ WHERE HEART_ID = 1940;
 
 UPDATE USERS SET SELF_INTRO = '안녕하세요 채은성입니다' WHERE user_id = 147;
 UPDATE USERS SET NAME = '이서윤' WHERE user_id = 90;
+UPDATE USERS SET GENDER = 'M' WHERE user_id = 21;
+COMMIT;
+
 SELECT user_id,NAME, self_intro from USERS ORDER BY user_id;
 
 
