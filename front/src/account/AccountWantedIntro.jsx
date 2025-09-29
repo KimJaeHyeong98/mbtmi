@@ -126,7 +126,6 @@ const AccountwantedIntro = () => {
                 ))}
             </TagsWrapper>
 
-            <SelectedText>선택된 태그: {selectedTags.join(", ")}</SelectedText>
             <NextButton onClick={handleNext}>다음</NextButton>
         </Container>
     );

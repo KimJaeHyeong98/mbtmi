@@ -121,7 +121,6 @@ const AccountWantedHobby = () => {
                 </TagsWrapper>
             </Section>
 
-            <SelectedText>선택된 취미: {selectedTags.join(", ")}</SelectedText>
             <NextButton onClick={handleNext}>다음</NextButton>
         </Container>
     );

@@ -130,10 +130,6 @@ const AccountHobby = () => {
                 </TagsWrapper>
             </Section>
 
-            <SelectedText>
-                선택된 취미: {formData.hobby?.join(", ")}
-            </SelectedText>
-
             <NextButton onClick={handleNext}>다음</NextButton>
             {/* <NextButton
         disabled={selectedTags.length === 0}
