@@ -30,6 +30,11 @@ ALTER TABLE USERS ADD CONSTRAINT uq_users_email UNIQUE (email);
 
 select * from HOBBIES;
 
+select * from users;
+
+ALTER TABLE USERS
+    DROP COLUMN STATUS;
+
 
 SELECT * FROM users WHERE username='123' AND password='1234';
 
@@ -201,6 +206,15 @@ insert into chat_room values (chat_room_seq.nextval, 4, 1);
 insert into chat_room values (chat_room_seq.nextval, 2, 4);
 
 select * from chat_room where user1_id = 4 or user2_id = 4;
+
+select * from USERS order by  user_id;
+
+
+delete USERS where user_id = 293;
+
+select * from HEARTS where to_user = 293;
+
+delete from HEARTS where heart_id = 2118;
 
 SELECT
     cr.room_id,
