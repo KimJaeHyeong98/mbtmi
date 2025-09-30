@@ -4419,4 +4419,4 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
     position: relative; /* 🔥 하단 네비 절대위치 기준 */
     padding-top: 60px;
-`;he.defaults.baseURL="http://localhost:8080";he.defaults.withCredentials=!0;N5.createRoot(document.getElementById("root")).render(u.jsx(w.StrictMode,{children:u.jsx(P2,{children:u.jsx(OE,{children:u.jsx(Jy,{children:u.jsx(KA,{})})})})}));
+`;he.defaults.baseURL="http://localhost:8080";he.defaults.withCredentials=!0;N5.createRoot(document.getElementById("root")).render(u.jsx(w.StrictMode,{children:u.jsx(P2,{basename:"/mbtmi/",children:u.jsx(OE,{children:u.jsx(Jy,{children:u.jsx(KA,{})})})})}));
