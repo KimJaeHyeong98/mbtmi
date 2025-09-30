@@ -46,7 +46,7 @@ public interface RandomUserMapper {
                     )
                     ORDER BY DBMS_RANDOM.VALUE
                 )
-                WHERE ROWNUM <= 20
+                WHERE ROWNUM <= 10
             """)
     List<RandomUserModel> findRandomUserExcept(
             @Param("currentUserId") Long currentUserId,
@@ -62,10 +62,11 @@ public interface RandomUserMapper {
     List<TagModel> findTagsByUser(Long userId);
 
     @Select("""
-    SELECT uh.user_id, uh.hobby_id, h.hobby_name, uh.type
-    FROM USER_HOBBIES uh
-    JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
-    WHERE uh.user_id = #{userId} AND uh.type = 'SELF'
-""")
+                SELECT uh.user_id, uh.hobby_id, h.hobby_name, uh.type
+                FROM USER_HOBBIES uh
+                JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+                WHERE uh.user_id = #{userId} AND uh.type = 'SELF'
+            """)
     List<HobbyModel> findHobbiesByUser(Long userId);
+
 }

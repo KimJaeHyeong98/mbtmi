@@ -98,6 +98,184 @@ WHERE table_name = 'USERS';
 
 select * from users order by user_id;
 
+SELECT
+    u.user_id,
+    u.username,
+    -- 본인 태그
+    (SELECT LISTAGG(t.tag_name, ', ') WITHIN GROUP (ORDER BY t.tag_id)
+     FROM USER_TAGS ut
+              JOIN TAGS t ON ut.tag_id = t.tag_id
+     WHERE ut.user_id = u.user_id AND ut.type = 'SELF') AS self_tags,
+    -- 원하는 상대 태그
+    (SELECT LISTAGG(t.tag_name, ', ') WITHIN GROUP (ORDER BY t.tag_id)
+     FROM USER_TAGS ut
+              JOIN TAGS t ON ut.tag_id = t.tag_id
+     WHERE ut.user_id = u.user_id AND ut.type = 'DESIRED') AS desired_tags,
+    -- 본인 취미
+    (SELECT LISTAGG(h.hobby_name, ', ') WITHIN GROUP (ORDER BY h.hobby_id)
+     FROM USER_HOBBIES uh
+              JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+     WHERE uh.user_id = u.user_id AND uh.type = 'SELF') AS self_hobbies,
+    -- 원하는 상대 취미
+    (SELECT LISTAGG(h.hobby_name, ', ') WITHIN GROUP (ORDER BY h.hobby_id)
+     FROM USER_HOBBIES uh
+              JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+     WHERE uh.user_id = u.user_id AND uh.type = 'DESIRED') AS desired_hobbies
+FROM USERS u
+ORDER BY u.user_id;
+
+
+
+select * from HEARTS order by HEART_ID;
+
+
+
+-- 기존 USERS 기반 HEARTS 자동 생성 예시
+INSERT INTO HEARTS (heart_id, from_user, to_user, action_type, created_at)
+SELECT hearts_seq.NEXTVAL,  -- 시퀀스 사용 (또는 LEVEL + MAX(heart_id)로도 가능)
+       from_u.user_id,
+       to_u.user_id,
+       CASE WHEN MOD(LEVEL,5)=0 THEN 'X' ELSE 'HEART' END,
+       SYSDATE - DBMS_RANDOM.VALUE(0,30)
+FROM (SELECT user_id FROM USERS) from_u,
+     (SELECT user_id FROM USERS) to_u
+WHERE from_u.user_id != to_u.user_id  -- 자기 자신에게는 X
+  AND ROWNUM <= 2000;                  -- 총 2000건 생성
+
+
+-- HEARTS 랜덤 10,000건 생성 (Oracle)
+INSERT INTO HEARTS (heart_id, from_user, to_user, action_type, created_at)
+SELECT hearts_seq.NEXTVAL,   -- heart_id 시퀀스 사용
+       from_u.user_id,
+       to_u.user_id,
+       CASE WHEN MOD(ROWNUM,5)=0 THEN 'X' ELSE 'HEART' END,  -- 5분의 1은 X, 나머지 HEART
+       SYSDATE - DBMS_RANDOM.VALUE(0,30)  -- 최근 30일 랜덤 날짜
+FROM (SELECT user_id FROM USERS WHERE user_id BETWEEN 21 AND 147) from_u
+         CROSS JOIN (SELECT user_id FROM USERS WHERE user_id BETWEEN 21 AND 147) to_u
+WHERE from_u.user_id != to_u.user_id
+  AND ROWNUM <= 10000;  -- 총 10,000건 생성
+
+
+
+
+
+
+-- 중복 방지 랜덤 HEARTS 생성
+INSERT INTO HEARTS (heart_id, from_user, to_user, action_type, created_at)
+SELECT hearts_seq.NEXTVAL,
+       f.user_id,
+       t.user_id,
+       CASE WHEN MOD(ROWNUM,5)=0 THEN 'X' ELSE 'HEART' END,
+       SYSDATE - DBMS_RANDOM.VALUE(0,30)
+FROM (
+         SELECT user_id FROM USERS WHERE user_id BETWEEN 21 AND 147
+     ) f
+         JOIN (
+    SELECT user_id FROM USERS WHERE user_id BETWEEN 21 AND 147
+) t ON f.user_id != t.user_id
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM HEARTS h
+    WHERE h.from_user = f.user_id AND h.to_user = t.user_id
+)
+  AND ROWNUM <= 10000;
+
+
+INSERT INTO HEARTS (heart_id, from_user, to_user, action_type, created_at)
+SELECT hearts_seq.NEXTVAL,
+       f.user_id,
+       t.user_id,
+       CASE WHEN MOD(ROWNUM,5)=0 THEN 'X' ELSE 'HEART' END,
+       SYSDATE - DBMS_RANDOM.VALUE(0,30)
+FROM USERS f
+         CROSS JOIN USERS t
+WHERE f.user_id != t.user_id
+  AND NOT EXISTS (
+    SELECT 1
+    FROM HEARTS h
+    WHERE h.from_user = f.user_id
+      AND h.to_user = t.user_id
+)
+  AND ROWNUM <= 10000;
+
+
+
+
+
+INSERT INTO HEARTS (heart_id, from_user, to_user, action_type, created_at)
+SELECT hearts_seq.NEXTVAL, from_user, to_user,
+       CASE WHEN MOD(ROWNUM,5)=0 THEN 'X' ELSE 'HEART' END,
+       created_at
+FROM (
+         SELECT f.user_id AS from_user,
+                t.user_id AS to_user,
+                SYSDATE - DBMS_RANDOM.VALUE(0,30) AS created_at
+         FROM USERS f
+                  CROSS JOIN USERS t
+         WHERE f.user_id != t.user_id
+           AND NOT EXISTS (
+             SELECT 1
+             FROM HEARTS h
+             WHERE h.from_user = f.user_id
+               AND h.to_user = t.user_id
+         )
+     )
+WHERE ROWNUM <=  10;
+
+
+select * from HEARTS ;
+
+
+SELECT ut.user_id, ut.tag_id, t.tag_name, ut.type
+FROM USER_TAGS ut
+         JOIN TAGS t ON ut.tag_id = t.tag_id
+WHERE ut.user_id = 22 AND ut.type = 'DESIRED';
+
+select * from USER_TAGS;
+
+
+select * from TAGS;
+
+SELECT uh.user_id, uh.hobby_id, h.hobby_name, uh.type
+FROM USER_HOBBIES uh
+         JOIN HOBBIES h ON uh.hobby_id = h.hobby_id
+WHERE uh.user_id = 22 AND uh.type = 'SELF';
+
+delete from HEARTS where HEART_ID = 9;
+
+select * from USERS;
+
+select * from USER_HOBBIES;
+
+
+
+
+
+INSERT INTO HEARTS (heart_id, from_user, to_user, action_type, created_at)
+SELECT hearts_seq.NEXTVAL, from_user, to_user,
+       CASE WHEN MOD(ROWNUM,5)=0 THEN 'X' ELSE 'HEART' END,
+       created_at
+FROM (
+         SELECT f.user_id AS from_user,
+                t.user_id AS to_user,
+                SYSDATE - DBMS_RANDOM.VALUE(0,30) AS created_at
+         FROM USERS f
+                  CROSS JOIN USERS t
+         WHERE f.user_id != t.user_id
+           AND NOT EXISTS (
+             SELECT 1
+             FROM HEARTS h
+             WHERE h.from_user = f.user_id
+               AND h.to_user = t.user_id
+         )
+         ORDER BY DBMS_RANDOM.VALUE()
+     )
+WHERE ROWNUM <= 900;
+
+
+
+
+
 
 
 
@@ -116,6 +294,8 @@ VALUES (posts_seq.NEXTVAL, 117, '첫 글 테스트입니다!', 'abc123.jpg', 0);
 SELECT p.*, u.name, u.photo_url
 FROM posts p JOIN users u ON u.user_id = p.user_id
 ORDER BY p.created_at DESC;
+
+select * from USERS;
 
 --좋아요 테스트
 -- user_id=117이 방금 글(post_id=?에) 좋아요
@@ -144,6 +324,23 @@ select * from POST_LIKES;
 select Count(post_id) as count from post_likes where post_id = 3;
 
 select * from POSTS;
+
+
+select * from POSTS;
+
+select * from hearts ;
+delete from USER_TAGS where USER_ID =2;
+delete from USER_HOBBIES where  USER_ID= 2;
+delete from USERS where USER_ID = 2;
+
+
+
+delete from hearts where HEART_ID = 30;
+
+select * from USERS order by  USER_ID  ;
+
+SELECT name FROM USERS WHERE name LIKE '%오지영%' ORDER BY USER_ID;
+
 
 
 SELECT

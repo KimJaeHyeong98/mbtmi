@@ -28,8 +28,8 @@ public class RandomUserService {
         List<RandomUserModel> rows = randomUserMapper.findRandomUserExcept(currentUserId, gender, ageDown, ageUp, location);
 
         for (RandomUserModel row : rows) {
-            row.setTags(randomUserMapper.findTagsByUser(row.getUser_id()));
-            row.setHobbies(randomUserMapper.findHobbiesByUser(row.getUser_id()));
+            row.setTags(randomUserMapper.findTagsByUser(row.getUser_id())); // 나의 태그
+            row.setHobbies(randomUserMapper.findHobbiesByUser(row.getUser_id())); // 나의 취미
         }
         if (rows.isEmpty()) return List.of();
         System.out.println(rows);
