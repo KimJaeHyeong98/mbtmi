@@ -370,7 +370,7 @@ const StepWantedIntro = ({ onNext, onPrev, selectedTags, setSelectedTags }) => {
             <TagTitle>독특한 매력</TagTitle>
             <TagsWrapper>{renderTags(tagsUnique)}</TagsWrapper>
 
-            <SelectedText>선택된 태그: {selectedTags.join(", ")}</SelectedText>
+            
             <NextButton onClick={onNext}>다음</NextButton>
             <NextButton onClick={onPrev}>이전</NextButton>
         </Container>
@@ -485,9 +485,7 @@ const StepWantedHobby = ({
             <TagsWrapper>{renderTags(passiveHobbies)}</TagsWrapper>
 
             {/* ✅ 선택 목록은 보기 좋게 '#' 붙여서 표기 */}
-            <SelectedText>
-                선택된 취미: {selectedHobbies.map((h) => `#${h}`).join(", ")}
-            </SelectedText>
+       
 
             <NextButton onClick={onNext}>완료</NextButton>
             <NextButton onClick={onPrev}>이전</NextButton>
