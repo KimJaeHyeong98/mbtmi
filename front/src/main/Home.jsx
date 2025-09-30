@@ -27,28 +27,6 @@ const LogoImage = styled.img`
   align-items: center;
 `;
 
-const CardWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  overflow-x: hidden;
-  width: 100%;
-`;
-
-/* transient prop: $index */
-const CardSlide = styled.div`
-  display: flex;
-  transition: transform 0.3s ease;
-  ${(props) => `transform: translateX(${-props.$index * 100}%);`}
-`;
-
-const CardItem = styled.div`
-  width: 100%;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
 const Card = styled.div`
   width: 100%;
   max-width: 350px;
@@ -102,6 +80,7 @@ const TagList = styled.div`
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
+  margin: 5px;
 `;
 
 const Tag = styled.span`
@@ -126,13 +105,35 @@ const Btn = styled.span`
   cursor: pointer;
 `;
 
+const CardWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  width: 100%;
+`;
+
+/* transient prop: $index */
+const CardSlide = styled.div`
+  display: flex;
+  transition: transform 0.3s ease;
+  transform: translateX(${(props) => -props.$index * 100}%);
+`;
+
+const CardItem = styled.div`
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const SettingButton = styled.button`
   position: absolute;
   top: 10px;
   right: 10px;
   appearance: none;
   border: none;
-  background: #000000ff;
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
   font-size: 24px;
   padding: 7px 10px;
   border-radius: 16px;
@@ -146,7 +147,7 @@ const PhotoButton = styled.button`
   right: 330px;
   appearance: none;
   border: none;
-  background: #000000ff;
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
   font-size: 24px;
   padding: 7px 10px;
   border-radius: 16px;
@@ -189,18 +190,18 @@ const P = styled.div`
   margin: 8px;
 `;
 
-/* ===== Home Component (통합 버전) ===== */
+/* ===== Home Component ===== */
 const Home = ({ homeState, setHomeState }) => {
   const navigate = useNavigate();
-  const { user: currentUser, loggedIn, loading } = useAuth();
-
-  // 기본 상태 (homeState가 있으면 복원)
-  const [randomUsers, setRandomUsers] = useState(homeState?.randomUsers || []);
-  const [currentIndex, setCurrentIndex] = useState(
-    homeState?.currentIndex || 0
-  );
+  const { user: loggedIn, loading } = useAuth();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [randomUsers, setRandomUsers] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   const [filter, setFilter] = useState({
     gender: null,
     ageDown: null,
@@ -241,19 +242,17 @@ const Home = ({ homeState, setHomeState }) => {
     }
   };
 
-  // ---------------- loadRandomUsers ----------------
+  // 랜덤 유저 불러오기
   const loadRandomUsers = async (filters = {}) => {
     if (!currentUser) return;
     try {
-      setLoadingUsers(true);
       const res = await axios.get(`/api/users/random/${currentUser.user_id}`, {
         params: filters,
       });
+      console.log("📌 백엔드 응답 데이터:", res.data);
       const users = res.data;
-      if (!users || users.length === 0) {
+      if (users.length === 0) {
         setNoResult(true);
-        setRandomUsers([]);
-        setPredictScore(null);
       } else {
         setNoResult(false);
         setRandomUsers(users);
@@ -263,13 +262,10 @@ const Home = ({ homeState, setHomeState }) => {
       }
     } catch (err) {
       console.error("랜덤 유저 불러오기 실패:", err);
-    } finally {
-      setLoadingUsers(false);
     }
   };
 
   const fetchRandomUsers = async () => {
-    if (!currentUser) return;
     await loadRandomUsers(filter);
     await fetchMyActions();
   };
@@ -324,9 +320,8 @@ const Home = ({ homeState, setHomeState }) => {
     }
   };
 
-  // ---------------- 버튼 동작 ----------------
+  /* ===== 버튼 동작 (prev, next, heart, x) ===== */
   const handlePrev = () => {
-    if (!randomUsers || randomUsers.length === 0) return;
     const prevIndex =
       currentIndex - 1 < 0 ? randomUsers.length - 1 : currentIndex - 1;
     setCurrentIndex(prevIndex);
@@ -334,10 +329,8 @@ const Home = ({ homeState, setHomeState }) => {
   };
 
   const handleNext = async () => {
-    if (!randomUsers || randomUsers.length === 0) return;
     const nextIndex = currentIndex + 1;
     if (nextIndex >= randomUsers.length) {
-      // 더 불러오기
       await loadRandomUsers(filter);
       await fetchMyActions();
     } else {
@@ -346,98 +339,135 @@ const Home = ({ homeState, setHomeState }) => {
     }
   };
 
-  // ---------------- 하트 / 관심없음 ----------------
+  /* ===== 하트 및 관심없음. ===== */
   const handleHeart = async () => {
-    if (!randomUsers[currentIndex] || !currentUser) return;
+    if (isTransitioning || randomUsers.length === 0) return; // 잠금 확인
     const targetUserId = randomUsers[currentIndex].user_id;
+    setIsTransitioning(true);
     try {
       const res = await axios.post("/api/hearts/toggle", null, {
         params: { fromUser: currentUser.user_id, toUser: targetUserId },
       });
-      // 응답이 true면 하트 추가, false면 삭제 (기존 로직 가정)
-      if (res.data) {
-        setHeartedUsers((prev) => {
-          const updated = new Set(prev);
+
+      setHeartedUsers((prev) => {
+        const updated = new Set(prev);
+        if (updated.has(targetUserId)) {
+          // 이미 ❤️면 제거
+          updated.delete(targetUserId);
+        } else {
+          // 없으면 추가
           updated.add(targetUserId);
-          return updated;
-        });
-        setNoHeartedUsers((prev) => {
-          const updated = new Set(prev);
-          updated.delete(targetUserId);
-          return updated;
-        });
-      } else {
-        setHeartedUsers((prev) => {
-          const updated = new Set(prev);
-          updated.delete(targetUserId);
-          return updated;
-        });
-      }
+        }
+        return updated;
+      });
+
+      // 🚫 상태에서 제거
+      setNoHeartedUsers((prev) => {
+        const updated = new Set(prev);
+        updated.delete(targetUserId);
+        return updated;
+      });
+
+      // 2초 후 카드 이동 + 버튼 잠금 해제
+      setTimeout(() => {
+        setCurrentIndex((prevIndex) =>
+          prevIndex + 1 >= randomUsers.length ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false); // 잠금 해제
+      }, 2000);
     } catch (err) {
       console.error("하트 요청 실패:", err);
+      setIsTransitioning(false); // 실패 시에도 잠금 해제
     }
   };
 
   const handleNotinterested = async () => {
-    if (!randomUsers[currentIndex] || !currentUser) return;
+    if (isTransitioning || randomUsers.length === 0) return; // 잠금 확인
     const targetUserId = randomUsers[currentIndex].user_id;
+    setIsTransitioning(true);
     try {
       const res = await axios.post("/api/hearts/toggleX", null, {
         params: { fromUser: currentUser.user_id, toUser: targetUserId },
       });
-      if (res.data) {
-        setNoHeartedUsers((prev) => {
-          const updated = new Set(prev);
+
+      setNoHeartedUsers((prev) => {
+        const updated = new Set(prev);
+        if (updated.has(targetUserId)) {
+          // 이미 🚫면 제거
+          updated.delete(targetUserId);
+        } else {
+          // 없으면 추가
           updated.add(targetUserId);
-          return updated;
-        });
-        setHeartedUsers((prev) => {
-          const updated = new Set(prev);
-          updated.delete(targetUserId);
-          return updated;
-        });
-      } else {
-        setNoHeartedUsers((prev) => {
-          const updated = new Set(prev);
-          updated.delete(targetUserId);
-          return updated;
-        });
-      }
+        }
+        return updated;
+      });
+
+      // ❤️ 상태에서 제거
+      setHeartedUsers((prev) => {
+        const updated = new Set(prev);
+        updated.delete(targetUserId);
+        return updated;
+      });
+      // 2초 후 카드 이동 + 버튼 잠금 해제
+      setTimeout(() => {
+        setCurrentIndex((prevIndex) =>
+          prevIndex + 1 >= randomUsers.length ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false); // 잠금 해제
+      }, 2000);
     } catch (err) {
       console.error("관심없음 요청 실패:", err);
+      setIsTransitioning(false); // 실패 시에도 잠금 해제
     }
   };
-
-  // ---------------- 초기 마운트 및 상태 복원 ----------------
+  // ================= 초기 마운트 및 상태 복원 =================
   useEffect(() => {
-    if (!initialized && currentUser) {
-      if (homeState) {
-        setRandomUsers(homeState.randomUsers || []);
-        setHeartedUsers(
-          homeState.heartedUsers instanceof Set
-            ? homeState.heartedUsers
-            : new Set(homeState.heartedUsers || [])
-        );
-        setNoHeartedUsers(
-          homeState.noHeartedUsers instanceof Set
-            ? homeState.noHeartedUsers
-            : new Set(homeState.noHeartedUsers || [])
-        );
-        setCurrentIndex(homeState.currentIndex || 0);
-        setLoadingUsers(false);
-        // 예측값 재요청 (현재 인덱스)
-        if ((homeState.randomUsers || []).length > 0) {
-          fetchPredictScore(
-            (homeState.randomUsers || [])[homeState.currentIndex || 0]
-          );
-        }
-      } else {
-        fetchRandomUsers();
-      }
-      setInitialized(true);
-    }
-  }, [currentUser, homeState, initialized]);
+    const initializeHome = async () => {
+      try {
+        // 1️⃣ 현재 로그인된 유저 가져오기
+        const res = await axios.get("/api/check-session");
+        if (!res.data.loggedIn) return;
 
+        const user = res.data.user;
+        setCurrentUser(user);
+
+        // 2️⃣ homeState가 있으면 상태 복원
+        if (homeState) {
+          setRandomUsers(homeState.randomUsers || []);
+          setHeartedUsers(
+            homeState.heartedUsers instanceof Set
+              ? homeState.heartedUsers
+              : new Set(homeState.heartedUsers || [])
+          );
+          setNoHeartedUsers(
+            homeState.noHeartedUsers instanceof Set
+              ? homeState.noHeartedUsers
+              : new Set(homeState.noHeartedUsers || [])
+          );
+          setCurrentIndex(homeState.currentIndex || 0);
+          setLoadingUsers(false);
+
+          // 3️⃣ 현재 인덱스 유저에 대한 AutoML 예측
+          if ((homeState.randomUsers || []).length > 0) {
+            await fetchPredictScore(
+              homeState.randomUsers[homeState.currentIndex || 0]
+            );
+          }
+        } else {
+          // 4️⃣ homeState 없으면 랜덤 유저 로딩 + 내 액션 불러오기
+          await fetchRandomUsers();
+        }
+
+        setInitialized(true);
+      } catch (err) {
+        console.error("Home 초기화 실패:", err);
+      }
+    };
+
+    if (!initialized) {
+      initializeHome();
+    }
+  }, [initialized, homeState]);
   // 상태를 부모로 저장 (있을 때만)
   useEffect(() => {
     if (typeof setHomeState === "function") {
@@ -460,8 +490,11 @@ const Home = ({ homeState, setHomeState }) => {
     ) {
       fetchPredictScore(randomUsers[currentIndex]);
     }
-    
   }, [currentIndex]);
+
+  useEffect(() => {
+    if (currentUser) fetchRandomUsers();
+  }, [currentUser]);
 
   if (loading) return <p>로딩중...</p>;
   if (!loggedIn) return <p>로그인 해주세요</p>;
@@ -474,107 +507,86 @@ const Home = ({ homeState, setHomeState }) => {
         style={{ userSelect: "none", WebkitUserDrag: "none" }}
       />
       <CardWrapper>
-        {loadingUsers ? (
+        {randomUsers.length === 0 ? (
           <p style={{ color: "white", fontSize: "20px" }}>LOADING...</p>
         ) : noResult ? (
           <NothingResultHome onOpenModal={() => setIsModalOpen(true)} />
         ) : (
           <CardSlide $index={currentIndex}>
-            {randomUsers.map((user) => {
-              const profileSrc = user.photo_url
-                ? user.photo_url.startsWith("http")
-                  ? user.photo_url
-                  : `http://localhost:8080/uploads/${user.photo_url}`
-                : logoimage;
-
-              return (
-                <CardItem key={user.user_id}>
-                  <Card>
-                    <ModalWrapper>
-                      <PhotoButton onClick={() => setIsPhotoModalOpen(true)}>
-                        🖼️
-                      </PhotoButton>
-                      <SettingButton onClick={() => setIsModalOpen(true)}>
-                        ☰
-                      </SettingButton>
-                    </ModalWrapper>
-
-                    <div>
-                      <Name>{user.name}</Name>
-                      <P>MBTI: {user.mbti}</P>
-                      <P>{user.self_intro}</P>
-                    </div>
-
-                    <TagList>
-                      {user.tags &&
-                        user.tags
-                          .filter((tag) => tag.type === "SELF")
-                          .map((tag) => (
-                            <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
-                          ))}
-                    </TagList>
-
-                    <TagList>
-                      {user.hobbies &&
-                        user.hobbies
-                          .filter((hobby) => hobby.type === "SELF")
-                          .map((hobby) => (
-                            <Tag key={hobby.hobby_id}>#{hobby.hobby_name}</Tag>
-                          ))}
-                    </TagList>
-
-                    <hr />
-
-                    <div>{user.name}이 원하는 상대방</div>
-                    <TagList>
-                      {user.desiredTags?.map((tag) => (
-                        <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
-                      ))}
-                    </TagList>
-                    <TagList>
-                      {user.desiredHobbies?.map((hobby) => (
+            {randomUsers.map((user) => (
+              <CardItem key={user.user_id}>
+                <Card>
+                  <ModalWrapper>
+                    <PhotoButton onClick={() => setIsPhotoModalOpen(true)}>
+                      🖼️
+                    </PhotoButton>
+                    <SettingButton onClick={() => setIsModalOpen(true)}>
+                      ☰
+                    </SettingButton>
+                  </ModalWrapper>
+                  <div>
+                    <Name>{user.name}</Name>
+                    <P>MBTI: {user.mbti}</P>
+                    <P>{user.self_intro}</P>
+                  </div>
+                  <TagList>
+                    {user.tags &&
+                      user.tags
+                        .filter((tag) => tag.type === "SELF")
+                        .map((tag) => (
+                          <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
+                        ))}
+                  </TagList>
+                  <TagList>
+                    {user.hobbies
+                      ?.filter((hobby) => hobby.type === "SELF")
+                      .map((hobby) => (
                         <Tag key={hobby.hobby_id}>#{hobby.hobby_name}</Tag>
                       ))}
-                    </TagList>
+                  </TagList>
+                  <hr />
+                  <div>{user.name}이 원하는 상대방</div>
+                  <TagList>
+                    {user.desiredTags?.map((tag) => (
+                      <Tag key={tag.tag_id}>#{tag.tag_name}</Tag>
+                    ))}
+                  </TagList>
+                  <TagList>
+                    {user.desiredHobbies?.map((hobby) => (
+                      <Tag key={hobby.hobby_id}>#{hobby.hobby_name}</Tag>
+                    ))}
+                  </TagList>
+                  <p>MBTI: {user.desired_mbti}</p>
+                  <Btns>
+                    <Btn onClick={handlePrev}>⬅️</Btn>
 
-                    <p>MBTI: {user.desired_mbti}</p>
+                    <Btn onClick={handleHeart}>
+                      {heartedUsers.has(user.user_id) ? "❤️" : "🤍"}
+                    </Btn>
+                    <Btn onClick={handleNotinterested}>
+                      {noHeartedUsers.has(user.user_id) ? "🚫" : "❌"}
+                    </Btn>
 
-                    <Btns>
-                      <Btn onClick={handlePrev}>⬅️</Btn>
-                      <Btn
-                        onClick={() => {
-                          handleHeart();
-                          setTimeout(handleNext, 1500);
-                        }}
-                      >
-                        {heartedUsers.has(user.user_id) ? "❤️" : "🤍"}
-                      </Btn>
-                      <Btn
-                        onClick={() => {
-                          handleNotinterested();
-                          setTimeout(handleNext, 1500);
-                        }}
-                      >
-                        {noHeartedUsers.has(user.user_id) ? "🚫" : "❌"}
-                      </Btn>
-                      <Btn onClick={handleNext}>➡️</Btn>
-                    </Btns>
+                    <Btn onClick={handleNext}>➡️</Btn>
+                  </Btns>
+                  {automlError && (
+                    <GuideText style={{ color: "red" }}>
+                      AutoML 에러: {automlError}
+                    </GuideText>
+                  )}
 
-                    {automlError && (
-                      <GuideText style={{ color: "red" }}>
-                        AutoML 에러: {automlError}
-                      </GuideText>
-                    )}
-
-                    {predictScore !== null && (
-                      <GuideText>
-                        이 유저와의 매칭 확률: {Math.round(predictScore * 100)}%
-                      </GuideText>
-                    )}
-                  </Card>
-                </CardItem>
-              );
-            })}
+                  {predictScore !== null && (
+                    <GuideText>
+                      이 유저와의 매칭 확률: {Math.round(predictScore * 100)}%
+                    </GuideText>
+                  )}
+                  {/* <GuideText>
+                    🤍 = 하트하기 / ❤️ = 이미 하트함 <br />❌ = 관심없음 / 🚫 =
+                    이미 관심없음
+                  </GuideText> */}
+                </Card>
+              </CardItem>
+            ))}
           </CardSlide>
         )}
       </CardWrapper>
