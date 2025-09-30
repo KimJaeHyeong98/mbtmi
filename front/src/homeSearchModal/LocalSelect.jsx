@@ -82,7 +82,7 @@ const StyledSelect = styled.select`
   background-color: ${(props) => (props.value ? "#4a90e2" : "#fff")};
   color: ${(props) => (props.value ? "#fff" : "#333")};
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   flex: 1;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s,
     box-shadow 0.2s;

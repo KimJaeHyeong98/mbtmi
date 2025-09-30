@@ -73,8 +73,6 @@ const AccountWantedHobby = () => {
         }
     };
 
-    console.log(formData);
-
     const handleNext = () => {
         const currentDe_Hobbies = selectedTags.length || [];
         if (currentDe_Hobbies.length === 0) {
@@ -123,7 +121,6 @@ const AccountWantedHobby = () => {
                 </TagsWrapper>
             </Section>
 
-            <SelectedText>선택된 취미: {selectedTags.join(", ")}</SelectedText>
             <NextButton onClick={handleNext}>다음</NextButton>
         </Container>
     );

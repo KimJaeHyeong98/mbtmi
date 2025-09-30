@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSignup } from "../SignupProvider"; // ✅ Context 불러오기
+import MBTIOCR from "./AccountgoToMbti";
 
 const AccountSelMbti = () => {
     const navigate = useNavigate();
@@ -30,6 +31,16 @@ const AccountSelMbti = () => {
 
     const goToMbti = () => {
         window.open("https://www.16personalities.com/ko", "_blank");
+    };
+
+    const handleMbtiFromOCR = (mbtiString) => {
+        if (!mbtiString || mbtiString.length !== 4) return;
+
+        const [EI, SN, TF, JP] = mbtiString.toUpperCase().split("");
+        setFormData((prev) => ({
+            ...prev,
+            mbti: { EI, SN, TF, JP },
+        }));
     };
 
     // ✅ MBTI 4자리 모두 선택했는지 체크
@@ -134,6 +145,10 @@ const AccountSelMbti = () => {
                     실제 MBTI 검사
                 </CheckMbtiButton>
             </LineText>
+            <LineText></LineText>
+            <UploadWrapper>
+                <MBTIOCR setMbti={handleMbtiFromOCR} />
+            </UploadWrapper>
         </Container>
     );
 };
@@ -257,6 +272,38 @@ const Container = styled.div`
     justify-content: flex-start;
     font-size: 10pt;
     padding-top: 20px;
+`;
+
+const UploadWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+`;
+
+const UploadLabel = styled.label`
+    width: 220px;
+    height: 220px;
+    border: 2px dashed #aaa;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    font-weight: bold;
+    color: #555;
+    transition: all 0.3s ease;
+
+    input {
+        display: none;
+    }
+
+    &:hover {
+        border-color: #888;
+        background-color: #f0f0f0;
+    }
 `;
 
 export default AccountSelMbti;

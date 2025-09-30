@@ -24,7 +24,9 @@ const Myprofile = () => {
         name: user.name || "",
         location: user.location || "",
         self_intro: user.self_intro || "",
-        preview: user.profileUrl || null, // DB에 저장된 이미지 경로가 있다면 사용
+        preview: user.photo_url
+          ? `http://localhost:8080/uploads/${user.photo_url}`
+          : defaultProfile, // 기본 이미지
       }));
     }
   }, [user]);
@@ -52,8 +54,6 @@ const Myprofile = () => {
       profileFile: form.profileFile,
     };
 
-    console.log("전송 payload:", payload); // 🔹 콘솔로 확인
-
     const success = await updateMyInfo(payload);
     if (success) {
       alert("프로필이 업데이트되었습니다!");
@@ -69,10 +69,11 @@ const Myprofile = () => {
         <ProfileSection>
           {/* 프로필 이미지 & 업로드 */}
           <ProfileImage
-            src={form.preview || "/default_profile.png"} // 기본 이미지
+            src={form.preview}
             alt="프로필 이미지"
             draggable="false"
           />
+
           <FileInputLabel>
             이미지 변경
             <input type="file" accept="image/*" onChange={handleFileChange} />

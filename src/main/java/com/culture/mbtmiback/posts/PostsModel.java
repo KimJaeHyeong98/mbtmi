@@ -1,5 +1,6 @@
 package com.culture.mbtmiback.posts;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,7 +15,12 @@ public class PostsModel {
     private String name;    // 사용자 이름
     private String mbti;    // 사용자 MBTI
     private int like_count; // 좋아요 수
+    private String location;
+    private String photo_url;
+    private boolean liked;
 
+    @JsonFormat(pattern = "yyyy", timezone = "Asia/Seoul")
+    private Date birth_date;
     // + User 정보도 함께 보여주고 싶으면 (JOIN 결과 담기용)
 
 }

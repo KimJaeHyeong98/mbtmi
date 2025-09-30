@@ -1,34 +1,69 @@
 import styled from "styled-components";
 import profileimage from "../assets/img/kar.jpg";
+import axios from "axios";
 
-const Activity = ({ name, activity, btn, profileImage, onClick }) => {
-  // const profile = {
-  //   name: "유지민",
-  //   activity: "유지민님께 하트를 보냈습니다.",
-  //   btn: "하트 보내기",
-  // };
-
+const Activity = ({
+  currentUser,
+  activity,
+  btn,
+  profile,
+  onClick,
+  onDelete,
+  profileUser,
+  profileImage,
+}) => {
+  console.log("currentUser:", currentUser);
+  const delHeartHandler = async (e) => {
+    e.stopPropagation();
+    if (!currentUser || !currentUser.user_id) {
+      console.error("currentUser가 없습니다.");
+      return;
+    }
+    try {
+      const res = await axios.post("/api/hearts/toggle", null, {
+        params: {
+          fromUser: currentUser.user_id,
+          toUser: profile.userId,
+        },
+      });
+      // console.log("하트 토글 결과(성공):", res.data);
+      if (onDelete) onDelete(profile.userId);
+    } catch (err) {
+      // console.error("하트 토글 실패:", err);
+    }
+  };
   return (
     <Container onClick={onClick}>
       <ProfileBlock>
         {/* 프로필 이미지 */}
         <ProfileImage
-          src={profileImage} // ✅ props로 받은 이미지
-          alt={`${name} 프로필`}
-          style={{ userSelect: "none", WebkitUserDrag: "none" }}
+          src={profileImage ?? logoimage} // profileImage가 있으면 그대로, 없으면 기본 이미지
+          alt={`${profileUser?.name} 프로필`}
+          draggable={false}
         />
         {/* 활동 텍스트 */}
         <Give>{activity}</Give>
         {/* 버튼 */}
-        {/* <Btn>{btn}</Btn> */}
+        <Btn onClick={delHeartHandler}>{btn}</Btn>
         {/* 내가 보낸 페이지에는 없어도 괜찮음 */}
       </ProfileBlock>
     </Container>
   );
 };
 
+export default Activity;
+
+const Btn = styled.button`
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #252424ff;
+  color: white;
+  cursor: pointer;
+`;
+/* ===== styled ===== */
 const Container = styled.div`
-  margin: 10px 0;
+  margin: 15px 0;
   min-width: 350px;
   display: flex;
   flex-direction: column;
@@ -39,12 +74,13 @@ const ProfileBlock = styled.div`
   display: flex;
   width: 350px;
   align-items: center;
-  gap: 10px; /* 이미지-텍스트-버튼 간 간격 */
+  gap: 10px;
 `;
 
 const Give = styled.h2`
   margin-left: 10px;
   font-size: 10pt;
+  min-width: 190px;
 `;
 
 const ProfileImage = styled.img`
@@ -53,13 +89,3 @@ const ProfileImage = styled.img`
   border-radius: 100%;
   object-fit: cover;
 `;
-
-const Btn = styled.button`
-  margin-left: 10px;
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 10px;
-  opacity: 80%;
-`;
-
-export default Activity;

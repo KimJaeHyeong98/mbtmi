@@ -71,8 +71,6 @@ const AccountwantedIntro = () => {
         }
     };
 
-    console.log(formData.de_introTags);
-
     const handleNext = () => {
         if (selectedTags.length === 0) {
             alert("하나 이상의 태그를 선택하셔야 합니다.");
@@ -128,7 +126,6 @@ const AccountwantedIntro = () => {
                 ))}
             </TagsWrapper>
 
-            <SelectedText>선택된 태그: {selectedTags.join(", ")}</SelectedText>
             <NextButton onClick={handleNext}>다음</NextButton>
         </Container>
     );

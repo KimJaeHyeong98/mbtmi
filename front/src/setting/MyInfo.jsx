@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../main/AuthContext";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../globaltool/BottomNav.jsx";
+import defaultProfile from "../assets/img/mbtmi.jpg";
 
 const MyInfo = () => {
   const [name, setName] = useState("");
@@ -82,7 +83,15 @@ const MyInfo = () => {
 
         <BottomActions>
           <DangerButton onClick={handleLogout}>{btn.logout}</DangerButton>
-          <DangerButton onClick={handleDelAccount}>{btn.bye}</DangerButton>
+          {user?.user_id === 1 ? (
+            // 관리자 전용 버튼
+            <DangerButton onClick={() => navigate("/report")}>
+              신고 유저 조회
+            </DangerButton>
+          ) : (
+            // 일반 유저 전용 버튼
+            <DangerButton onClick={handleDelAccount}>{btn.bye}</DangerButton>
+          )}
         </BottomActions>
       </Card>
       <BottomNav />
@@ -103,10 +112,9 @@ const Container = styled.div`
 `;
 
 const Card = styled.div`
-  
   width: 100%;
   max-width: 300px;
-  padding: 24px;
+  padding: 30px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
@@ -124,6 +132,7 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 60px;
 `;
 
 //

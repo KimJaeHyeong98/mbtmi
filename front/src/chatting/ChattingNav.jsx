@@ -1,17 +1,30 @@
 import styled from "styled-components";
 import profileImg from "../assets/img/kar.jpg";
-import {useNavigate} from "react-router-dom"; // 상대 프로필 이미지
+import { useLocation, useNavigate } from "react-router-dom"; // 상대 프로필 이미지
 
 const ChattingNav = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const room = state?.room;
+
+  // room이 없으면 기본 값 사용
+  const opponentName = room?.opponent_name || "이름 없음";
+  const opponentPic = room?.opponent_pic
+    ? `http://localhost:8080/uploads/${room.opponent_pic}` // 백엔드 서버 URL 기준
+    : profileImg; // 기본 이미지
+
   return (
     <HeaderContainer>
       <LeftSection>
         <BackButton onClick={() => navigate(-1)}>{"<"}</BackButton>
-        <Profile src={profileImg} alt="프로필" />
+        {/* <Profile src={profileImg} alt="프로필" /> */}
+
+        <Profile src={opponentPic} alt="프로필" />
         <NameSection>
-          <Name>유지민</Name>
-          <Status>최근 활동: 11분 전</Status>
+          {/* <Name>유지aa민</Name> */}
+          <Name>{opponentName}</Name>
+          {/* <Status>최근 활동: 11분 전</Status> */}
+          {/* 잠시보류 */}
         </NameSection>
       </LeftSection>
       <RightSection>
@@ -25,14 +38,14 @@ const ChattingNav = () => {
 /* ===== styled components ===== */
 
 const HeaderContainer = styled.div`
-    width: 100%;
-    height: 60px;
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 `;
 
 const LeftSection = styled.div`

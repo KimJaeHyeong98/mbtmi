@@ -5,7 +5,7 @@ const TopNav = () => {
   return (
     <TopBar>
       <TopBow>
-        <Button>오늘의 글</Button>
+        <Button>TMI</Button>
       </TopBow>
       <hr />
     </TopBar>
@@ -31,7 +31,7 @@ const TopBow = styled.div`
 const Button = styled.button`
   padding: 0;
   background: none;
-  color: black;
+  color: #363535;
   font-size: 25px;
   font-weight: bold;
 `;

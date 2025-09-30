@@ -10,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,9 +26,16 @@ public class PostsC {
     @Autowired
     private PostsService postsService;
 
-    @GetMapping ("/postsmain")
-    public List<PostsModel> getAllPosts() {
-        return postsService.getAllPosts();
+    @GetMapping("/postsmain")
+    public ResponseEntity<List<PostsModel>> getAllPosts(HttpSession session) {
+        // 1. 세션에서 로그인된 사용자 ID를 가져옵니다.
+        AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+        // 로그인이 안 되어 있다면 -1 (또는 0)과 같은 임시 ID를 사용하거나 비로그인 처리를 합니다.
+        Long currentUserId = (sessionUser != null) ? sessionUser.getUser_id() : null;
+
+        // 2. Service에 게시글 목록과 사용자 ID를 전달합니다.
+        List<PostsModel> posts = postsService.getAllPosts(currentUserId);
+        return ResponseEntity.ok(posts);
     }
 
 
@@ -70,4 +80,90 @@ public class PostsC {
         }
 
     }
+
+    // 게시글 삭제 API
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId) {
+        int result = postsService.deletePost(postId);
+        if (result > 0) {
+            return ResponseEntity.ok("게시글이 삭제되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("해당 ID의 게시글을 찾을 수 없습니다.");
+        }
+    }
+
+    // 좋아요 토글
+    @PostMapping("/toggleLike")
+    public ResponseEntity<Map<String, Object>> toggleLike(
+            @RequestParam Long postId,
+            @RequestParam Long userId
+    ) {
+        System.out.println("toggleLike 호출 - postId: " + postId + ", userId: " + userId);
+        try {
+            boolean liked = postsService.toggleLike(postId, userId);
+            int likeCount = postsService.getLikeCount(postId);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("liked", liked);
+            result.put("likeCount", likeCount);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace(); // 어떤 예외가 나는지 콘솔 확인
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+
+    // 게시글 수정 API
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updatePost(
+            @PathVariable Long postId,
+            @RequestPart("text") String text,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpSession session
+    ) {
+        try {
+            AccountModel sessionUser = (AccountModel) session.getAttribute("user");
+            if (sessionUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+            }
+
+            String fileName = null;
+            if (file != null && !file.isEmpty()) {
+                fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
+                Files.createDirectories(uploadDir);
+                Path savePath = uploadDir.resolve(fileName);
+                file.transferTo(savePath.toFile());
+                System.out.println("수정된 파일 저장 완료: " + savePath.toAbsolutePath());
+            }
+
+            int result = postsService.updatePost(postId, sessionUser.getUser_id(), text, fileName);
+
+            if (result > 0) {
+                return ResponseEntity.ok("게시글 수정 완료");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없음");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("서버 에러: " + e.getMessage());
+        }
+    }
+
+    // 게시글 단일 조회
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostsModel> getPostById(@PathVariable Long postId) {
+        PostsModel post = postsService.getPostById(postId);
+        if (post != null) {
+            return ResponseEntity.ok(post);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
 }

@@ -7,4 +7,8 @@ public class HobbyModel {
     private Long hobby_id;
     private String hobby_name;
     private String type;
+
+
+
 }
+

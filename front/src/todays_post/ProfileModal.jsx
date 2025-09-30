@@ -1,4 +1,3 @@
-// src/components/PreCardModal.jsx
 import { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
@@ -30,27 +29,38 @@ const ProfileModal = ({ onClose, profileUser }) => {
     };
   }, [onClose]);
 
+  // 모달 열릴 때 이미 하트한 유저 정보 불러오기
+  useEffect(() => {
+    const fetchHeartedUsers = async () => {
+      if (!currentUser) return;
+      try {
+        const res = await axios.get(`/api/hearts/my/${currentUser.user_id}`);
+        // 서버에서 내 하트 리스트 받아와서 Set으로 변환
+        setHeartedUsers(new Set(res.data));
+      } catch (err) {
+        console.error("내 하트 정보 불러오기 실패:", err);
+      }
+    };
+    fetchHeartedUsers();
+  }, [currentUser]);
+
+  // 하트 토글
   const handleHeart = async () => {
-    const targetUserId = profileUser?.user_id; // 지금 보고 있는 프로필 유저 id
-    if (!targetUserId || !currentUser) {
-      alert("유저 정보가 없습니다.");
-      return;
-    }
+    if (!currentUser || !profileUser) return;
 
     try {
-      const res = await axios.post("/api/hearts", {
-        fromUser: currentUser.user_id, // 로그인한 유저
-        toUser: targetUserId, // 하트 대상 유저
-      });
+      const res = await axios.post(
+        `/api/hearts/toggle?fromUser=${currentUser.user_id}&toUser=${profileUser.user_id}`
+      );
 
-      if (res.data.success) {
-        // 성공 → 하트 추가
-        setHeartedUsers((prev) => new Set(prev).add(targetUserId));
+      if (res.data) {
+        // 서버에서 true 반환 → 하트 등록
+        setHeartedUsers((prev) => new Set([...prev, profileUser.user_id]));
       } else {
-        // 실패 → 하트 취소
+        // false → 하트 취소
         setHeartedUsers((prev) => {
-          const updated = new Set(prev);
-          updated.delete(targetUserId);
+          const updated = new Set([...prev]);
+          updated.delete(profileUser.user_id);
           return updated;
         });
       }
@@ -59,37 +69,44 @@ const ProfileModal = ({ onClose, profileUser }) => {
     }
   };
 
+  if (!profileUser) return null;
+
   return ReactDOM.createPortal(
     <Overlay onClick={onClose}>
       <Dialog onClick={(e) => e.stopPropagation()}>
-        <CloseBtn onClick={onClose} aria-label="close">
-          ×
-        </CloseBtn>
+        <CloseBtn onClick={onClose}>×</CloseBtn>
 
+        {/* 프로필 이미지 */}
         <ProfileImage
-          src={formData.profile?.preview || logoimage}
+          src={
+            profileUser.photo_url
+              ? `http://localhost:8080/uploads/${profileUser.photo_url}`
+              : logoimage
+          }
           alt="profile"
         />
+
+        {/* 이름 / MBTI */}
         <Name>
-          {/* {p.name}({formData.age}) / {mbti} */}
+          {profileUser.name} ({profileUser.birth_date ?? "??"}) /{" "}
+          {profileUser.mbti ?? "??"}
         </Name>
-        <Region>{formData.location}</Region>
+        <Region>{profileUser.location ?? "지역 정보 없음"}</Region>
 
-        <PreZone>
-          상태메시지{" "}
-          {(formData.hobby ?? []).map((h, i) => (
-            <Tag key={`h-${i}`}>{h}</Tag>
-          ))}
-        </PreZone>
-
+        {/* 하트 버튼 */}
         <Buttons>
-          {/* 하트 */}
-          <Btn
-            $active={heartedUsers.has(profileUser?.user_id)}
-            onClick={handleHeart}
-          >
-            {heartedUsers.has(profileUser?.user_id) ? "❤️" : "🤍"}
-          </Btn>
+          {currentUser?.user_id !== profileUser.user_id && (
+            <Btn
+              $active={heartedUsers.has(profileUser.user_id)}
+              onClick={handleHeart}
+            >
+              {heartedUsers.has(profileUser.user_id) ? "❤️" : "🤍"}
+            </Btn>
+          )}
+
+          {currentUser?.user_id === profileUser.user_id && (
+            <p style={{ margin: 0, color: "#999" }}>나의 프로필</p>
+          )}
         </Buttons>
       </Dialog>
     </Overlay>,
@@ -142,6 +159,7 @@ const CloseBtn = styled.button`
 const ProfileImage = styled.img`
   width: 85%;
   border-radius: 20px;
+  height: 280px;
   object-fit: cover;
 `;
 

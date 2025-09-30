@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
     const checkSession = async () => {
         try {
             const res = await axios.get("/api/check-session"); // 상대 경로 사용
-            console.log("checkSession response:", res.data);
             if (res.data?.loggedIn) {
                 setLoggedIn(true);
                 setUser(res.data.user);
@@ -85,8 +84,6 @@ export const AuthProvider = ({ children }) => {
                 },
                 { withCredentials: true }
             );
-            console.log("전송성공", formData);
-            console.log("Signup response:", res.data);
             if (res.data.success) {
                 setUser(res.data.user); // 전역 상태 갱신
                 return { success: true, userId: res.data.userId };
@@ -105,7 +102,6 @@ export const AuthProvider = ({ children }) => {
                 { username: id, password },
                 { withCredentials: true }
             );
-            console.log("login response:", res);
             if (res.data) {
                 setLoggedIn(true);
                 setUser(res.data);
@@ -175,11 +171,6 @@ export const AuthProvider = ({ children }) => {
             // 파일이 있다면 FormData에 추가
             if (payload.profileFile) {
                 formData.append("profileFile", payload.profileFile);
-            }
-
-            // ✅ 콘솔로 FormData 값 확인
-            for (let pair of formData.entries()) {
-                console.log(pair[0], pair[1]);
             }
 
             // 실제 API 호출

@@ -13,9 +13,15 @@ public class HeartsCheckService {
         this.heartsCheckMapper = heartsCheckMapper;
     }
 
-    //하트가 있는지?
+    //하트가 있는지? // 잘못만듬. 후에 삭제예정
     public boolean hasHearts(int fromUser, int toUser) {
         return heartsCheckMapper.findByUsers(fromUser, toUser);
+    }
+    // ✅ 상호 하트 여부 확인 (추가) (신설)
+    public boolean isMutualHearts(int fromUser, int toUser) {
+        boolean u1toU2 = hasHearts(fromUser, toUser);
+        boolean u2toU1 = hasHearts(toUser, fromUser);
+        return u1toU2 && u2toU1;
     }
 
     //내가 하트한 유저 목록 가져오기
@@ -45,16 +51,23 @@ public class HeartsCheckService {
 
     // X 토글
     public boolean checkHeartsX(int fromUser, int toUser) {
-        // HEART가 이미 있으면 먼저 삭제
-        if (heartsCheckMapper.findByUsersHeart(fromUser, toUser)) {
+        boolean haveHeart = heartsCheckMapper.findByUsersHeart(fromUser, toUser);
+        if (haveHeart) {
+            // 이미 있으면 삭제 → 하트 해제
             heartsCheckMapper.deleteHeart(fromUser, toUser);
-        }
-        boolean haveX = heartsCheckMapper.findByUsersX(fromUser, toUser);
-        if (haveX) {
-            heartsCheckMapper.deleteHeartX(fromUser, toUser);
             return false;
         } else {
-            heartsCheckMapper.insertHeartX(fromUser, toUser);
+            // 없으면 하트 추가
+            heartsCheckMapper.insertHeart(fromUser, toUser);
+
+            // ✅ 상대방도 나를 하트했는지 확인 (쌍방체크)
+            boolean mutual = heartsCheckMapper.findByUsersHeart(toUser, fromUser);
+
+            if (mutual) {
+                // TODO: 채팅방 생성 로직 추가 (ChatRoomMapper 등 활용)
+                System.out.println("💬 쌍방 하트 → 채팅방 생성 필요!");
+            }
+
             return true;
         }
     }
