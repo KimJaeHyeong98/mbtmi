@@ -28,6 +28,7 @@ ALTER TABLE USERS MODIFY email VARCHAR2(50) NOT NULL;
 ALTER TABLE USERS ADD CONSTRAINT uq_users_email UNIQUE (email);
 
 
+select * from HOBBIES;
 
 
 SELECT * FROM users WHERE username='123' AND password='1234';

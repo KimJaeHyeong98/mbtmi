@@ -126,7 +126,7 @@ const MyIntro = () => {
             <TagTitle>---------- 독특한 매력 ----------</TagTitle>
             <TagsWrapper>{renderTags(tags2)}</TagsWrapper>
 
-            <SelectedText>선택된 태그: {selectedTags.join(", ")}</SelectedText>
+            
 
             <NextButton
                 disabled={selectedTags.length === 0}

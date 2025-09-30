@@ -133,9 +133,7 @@ const Myhobby = () => {
                 <TagsWrapper>{renderTags(passiveHobbies)}</TagsWrapper>
             </Section>
 
-            <SelectedText>
-                선택된 취미: {formData.hobby?.join(", ")}
-            </SelectedText>
+            
 
             <NextButton
                 disabled={(formData.hobby?.length ?? 0) === 0}
