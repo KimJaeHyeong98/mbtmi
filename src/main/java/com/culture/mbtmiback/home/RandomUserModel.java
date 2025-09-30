@@ -24,4 +24,5 @@ public class RandomUserModel {
     private List<TagModel> tags;
     private List<HobbyModel> desiredHobbies;
     private List<TagModel> desiredTags;
+
 }

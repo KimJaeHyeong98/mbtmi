@@ -1,10 +1,10 @@
+// Home.jsx
 import styled from "styled-components";
 import logoimage from "../assets/img/mbtmi.jpg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-import ChattingRoomNav from "../chatting/ChattingRoomNav.jsx";
 import BottomNav from "../globaltool/BottomNav.jsx";
 import HomeModal from "../homeSearchModal/HomeModal";
 import NothingResultHome from "./NothingResultHome";
@@ -112,6 +112,7 @@ const CardWrapper = styled.div`
   width: 100%;
 `;
 
+/* transient prop: $index */
 const CardSlide = styled.div`
   display: flex;
   transition: transform 0.3s ease;
@@ -190,7 +191,7 @@ const P = styled.div`
 `;
 
 /* ===== Home Component ===== */
-const Home = () => {
+const Home = ({ homeState, setHomeState }) => {
   const navigate = useNavigate();
   const { user: loggedIn, loading } = useAuth();
   const [currentUser, setCurrentUser] = useState(null);
@@ -207,11 +208,28 @@ const Home = () => {
     ageUp: null,
     location: null,
   });
-
   const [noResult, setNoResult] = useState(false);
-  const [heartedUsers, setHeartedUsers] = useState(new Set());
-  const [noHeartedUsers, setNoHeartedUsers] = useState(new Set());
 
+  const initialHearted =
+    homeState?.heartedUsers instanceof Set
+      ? homeState.heartedUsers
+      : new Set(homeState?.heartedUsers || []);
+  const initialNoHearted =
+    homeState?.noHeartedUsers instanceof Set
+      ? homeState.noHeartedUsers
+      : new Set(homeState?.noHeartedUsers || []);
+
+  const [heartedUsers, setHeartedUsers] = useState(initialHearted);
+  const [noHeartedUsers, setNoHeartedUsers] = useState(initialNoHearted);
+
+  const [initialized, setInitialized] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
+  // AutoML 상태
+  const [predictScore, setPredictScore] = useState(null);
+  const [automlError, setAutomlError] = useState(null);
+
+  // ---------------- fetchMyActions ----------------
   const fetchMyActions = async () => {
     if (!currentUser) return;
     try {
@@ -239,9 +257,11 @@ const Home = () => {
         setNoResult(false);
         setRandomUsers(users);
         setCurrentIndex(0);
+        // 첫 유저에 대해 예측 수행
+        await fetchPredictScore(users[0]);
       }
     } catch (err) {
-      console.error(err);
+      console.error("랜덤 유저 불러오기 실패:", err);
     }
   };
 
@@ -249,11 +269,63 @@ const Home = () => {
     await loadRandomUsers(filter);
     await fetchMyActions();
   };
+
+  // ---------------- AutoML 예측 ----------------
+  const fetchPredictScore = async (targetUser) => {
+    if (!currentUser || !targetUser) return;
+
+    try {
+      const AGE_DIFF = Math.abs(
+        new Date(currentUser.birth_date).getFullYear() -
+          new Date(targetUser.birth_date).getFullYear()
+      );
+
+      const TAG_OVERLAP =
+        targetUser.tags?.filter((t) => t.type === "SELF").length || 0;
+      const HOBBY_OVERLAP =
+        targetUser.hobbies?.filter((h) => h.type === "SELF").length || 0;
+
+      const data = {
+        FROM_USER: String(currentUser.user_id),
+        TO_USER: String(targetUser.user_id),
+        FROM_MBTI: String(currentUser.mbti),
+        TO_MBTI: String(targetUser.mbti),
+        AGE_DIFF: String(AGE_DIFF),
+        TAG_OVERLAP: String(TAG_OVERLAP),
+        HOBBY_OVERLAP: String(HOBBY_OVERLAP),
+      };
+
+      // console.log("AutoML 요청 데이터:", data);
+
+      const res = await axios.post("http://localhost:5000/predict", data, {
+        withCredentials: true,
+      });
+
+      if (res.data.prediction) {
+        const matchScoreObj = res.data.prediction.find((p) => p.label === "1");
+        const score = matchScoreObj ? matchScoreObj.score : 0;
+        setPredictScore(score);
+        setAutomlError(null);
+      } else if (res.data.error) {
+        setPredictScore(null);
+        setAutomlError(res.data.error);
+      } else {
+        setPredictScore(null);
+        setAutomlError("Unknown prediction error");
+      }
+    } catch (err) {
+      setPredictScore(null);
+      setAutomlError(err.message || "AutoML 요청 실패");
+      console.error("AutoML 요청 에러:", err);
+    }
+  };
+
   /* ===== 버튼 동작 (prev, next, heart, x) ===== */
   const handlePrev = () => {
     const prevIndex =
       currentIndex - 1 < 0 ? randomUsers.length - 1 : currentIndex - 1;
     setCurrentIndex(prevIndex);
+    fetchPredictScore(randomUsers[prevIndex]);
   };
 
   const handleNext = async () => {
@@ -263,6 +335,7 @@ const Home = () => {
       await fetchMyActions();
     } else {
       setCurrentIndex(nextIndex);
+      fetchPredictScore(randomUsers[nextIndex]);
     }
   };
 
@@ -347,20 +420,77 @@ const Home = () => {
       setIsTransitioning(false); // 실패 시에도 잠금 해제
     }
   };
-  // ================= 초기 마운트 =================
+  // ================= 초기 마운트 및 상태 복원 =================
   useEffect(() => {
-    const fetchCurrentUser = async () => {
+    const initializeHome = async () => {
       try {
+        // 1️⃣ 현재 로그인된 유저 가져오기
         const res = await axios.get("/api/check-session");
-        if (res.data.loggedIn) {
-          setCurrentUser(res.data.user);
+        if (!res.data.loggedIn) return;
+
+        const user = res.data.user;
+        setCurrentUser(user);
+
+        // 2️⃣ homeState가 있으면 상태 복원
+        if (homeState) {
+          setRandomUsers(homeState.randomUsers || []);
+          setHeartedUsers(
+            homeState.heartedUsers instanceof Set
+              ? homeState.heartedUsers
+              : new Set(homeState.heartedUsers || [])
+          );
+          setNoHeartedUsers(
+            homeState.noHeartedUsers instanceof Set
+              ? homeState.noHeartedUsers
+              : new Set(homeState.noHeartedUsers || [])
+          );
+          setCurrentIndex(homeState.currentIndex || 0);
+          setLoadingUsers(false);
+
+          // 3️⃣ 현재 인덱스 유저에 대한 AutoML 예측
+          if ((homeState.randomUsers || []).length > 0) {
+            await fetchPredictScore(
+              homeState.randomUsers[homeState.currentIndex || 0]
+            );
+          }
+        } else {
+          // 4️⃣ homeState 없으면 랜덤 유저 로딩 + 내 액션 불러오기
+          await fetchRandomUsers();
         }
+
+        setInitialized(true);
       } catch (err) {
-        console.error("세션 체크 실패:", err);
+        console.error("Home 초기화 실패:", err);
       }
     };
-    fetchCurrentUser();
-  }, []);
+
+    if (!initialized) {
+      initializeHome();
+    }
+  }, [initialized, homeState]);
+  // 상태를 부모로 저장 (있을 때만)
+  useEffect(() => {
+    if (typeof setHomeState === "function") {
+      setHomeState({
+        randomUsers,
+        heartedUsers,
+        noHeartedUsers,
+        currentIndex,
+      });
+    }
+  }, [randomUsers, heartedUsers, noHeartedUsers, currentIndex, setHomeState]);
+
+  // currentIndex 변경 시 예측 재요청(안정성용)
+  useEffect(() => {
+    if (
+      randomUsers &&
+      randomUsers.length > 0 &&
+      currentIndex >= 0 &&
+      currentIndex < randomUsers.length
+    ) {
+      fetchPredictScore(randomUsers[currentIndex]);
+    }
+  }, [currentIndex]);
 
   useEffect(() => {
     if (currentUser) fetchRandomUsers();
@@ -439,6 +569,17 @@ const Home = () => {
 
                     <Btn onClick={handleNext}>➡️</Btn>
                   </Btns>
+                  {automlError && (
+                    <GuideText style={{ color: "red" }}>
+                      AutoML 에러: {automlError}
+                    </GuideText>
+                  )}
+
+                  {predictScore !== null && (
+                    <GuideText>
+                      이 유저와의 매칭 확률: {Math.round(predictScore * 100)}%
+                    </GuideText>
+                  )}
                   {/* <GuideText>
                     🤍 = 하트하기 / ❤️ = 이미 하트함 <br />❌ = 관심없음 / 🚫 =
                     이미 관심없음
@@ -458,6 +599,7 @@ const Home = () => {
         onSelectFilter={(filters) => {
           setFilter(filters);
           loadRandomUsers(filters);
+          fetchMyActions();
         }}
       />
 
@@ -468,7 +610,9 @@ const Home = () => {
               <ProfileImage
                 src={
                   randomUsers[currentIndex]?.photo_url
-                    ? `http://localhost:8080/uploads/${randomUsers[currentIndex].photo_url}`
+                    ? randomUsers[currentIndex].photo_url.startsWith("http")
+                      ? randomUsers[currentIndex].photo_url
+                      : `http://localhost:8080/uploads/${randomUsers[currentIndex].photo_url}`
                     : logoimage
                 }
                 alt={`${randomUsers[currentIndex]?.name} 프로필`}
