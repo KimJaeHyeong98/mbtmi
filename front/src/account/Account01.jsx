@@ -32,7 +32,7 @@ const Account01 = () => {
       <MainContent $visible={!showClouds}>
         <Logo src={mainLogo} alt="Main Logo" />
         <Mbtmi src={mbtmi} alt="MBTI Logo" />
-        <ButtonLogin onClick={() => navigate("/login")}>로그인</ButtonLogin>
+        <ButtonLogin onClick={() => navigate("/login")}>로그인1122</ButtonLogin>
         <ButtonAccount onClick={() => navigate("/info")}>
           회원가입
         </ButtonAccount>

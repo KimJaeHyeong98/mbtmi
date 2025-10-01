@@ -12,7 +12,7 @@ axios.defaults.withCredentials = true;
 // console.log(clientId);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/mbtmi/">
       <AuthProvider>
         <SignupProvider>
           <AccountMain />
