@@ -25,6 +25,8 @@ const ActivityModal = ({
         roomId: res.data,
         user1_id: currentUser.user_id,
         user2_id: targetUser.userId,
+        opponent_name: targetUser.name, // 추가
+        opponent_pic: targetUser.profileImage, // 추가
       };
       navigate(`/chat/${room.roomId}`, { state: { room } });
     } catch (err) {

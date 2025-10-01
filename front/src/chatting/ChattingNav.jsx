@@ -28,8 +28,8 @@ const ChattingNav = () => {
         </NameSection>
       </LeftSection>
       <RightSection>
-        <IconButton>♡</IconButton>
-        <IconButton>📞</IconButton>
+        {/* <IconButton>♡</IconButton>
+        <IconButton>📞</IconButton> */}
       </RightSection>
     </HeaderContainer>
   );
