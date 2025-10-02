@@ -62,6 +62,20 @@ dist-ssr
 *.sln
 *.sw?
 
+
+service-account-key.json
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+venv/
+.venv/
+automl_venv/
+
+
+
 # 개인 설정 파일 (비밀번호 등)
 src/main/resources/application.properties
 
